@@ -1,0 +1,8 @@
+# python bytecode cache files
+**/*.pyc
+
+# pycharm files
+.idea/
+
+# SDK download warning file
+.sdkwarning
