@@ -35,6 +35,17 @@ UnitInfo = collections.namedtuple('UnitInfo', ['driver', 'variant', 'serial'])
 PICO_OK = 0
 
 
+def requires_device(error_message):
+    def check_device_decorator(method):
+        def check_device_impl(self, device, *args, **kwargs):
+            if not isinstance(device, Device) or device.driver != self:
+                raise TypeError(error_message)
+            return method(self, device, *args, **kwargs)
+        return check_device_impl
+    return check_device_decorator
+
+
+
 class Library(object):
     def load(self):
         result = None
@@ -99,22 +110,29 @@ class Library(object):
         Note: Either use this object in a context manager, or manually call .close() on it when you are finished."""
         return Device(self, self._python_open_unit(serial=serial))
 
+    @requires_device("close_unit requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def close_unit(self, device):
-        if not isinstance(device, Device) or device.driver != self:
-            raise CannotCloseUnitError("you have passed the device to the wrong driver for teardown.")
-
         self._python_close_unit(device.handle)
 
+    @requires_device("get_unit_info requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def get_unit_info(self, device):
+        return self._python_get_unit_info_wrapper(device.handle)
+
     def _python_open_unit(self, serial=None):
+        print("_python_open_unit (driver=%s)" % self.name)
         handle = -1
         if serial is None:
+            print("serial not provided")
             if len(self._open_unit.argtypes) > 1:
+                print("using no-args return value handle function.")
                 chandle = c_int16()
                 self._open_unit(ctypes.byref(chandle), None)
                 handle = chandle.value
             else:
+                print("using no-args return value handle function.")
                 handle = self._open_unit()
         else:
+            print("searching for serial %s" % serial)
             if len(self._open_unit.argtypes) > 1:
                 chandle = c_int16()
                 cserial = create_string_buffer(serial)
@@ -135,6 +153,8 @@ class Library(object):
 
                 for temp_handle in open_handles:
                     self._python_close_unit(temp_handle)
+
+        print("handle found: %s" % handle)
 
         if handle < 1:
             raise DeviceNotFoundError(("Driver %s could find no device" % self.name) + "s" if serial is None else

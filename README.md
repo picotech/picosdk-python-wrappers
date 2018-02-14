@@ -1,3 +1,10 @@
+
+## Testing this code
+
+Check which device driver your device uses, and check the constants at the top of the test files to enable the relevant drivers for connected-device tests. (most tests use this).
+
+run `nosetests` in the root of the repo.
+
 ## Python interface
 
 The library class's public methods (ones not starting with an underscore) form a sanitised Python interface to the
