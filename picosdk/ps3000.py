@@ -9,6 +9,7 @@ for PicoScope 3000 Series oscilloscopes using the ps3000 driver API functions.
 from ctypes import *
 from picosdk.library import Library
 
+
 class ps3000lib(Library):
     def __init__(self):
         super(ps3000lib, self).__init__("ps3000")
@@ -98,8 +99,8 @@ doc = """ int16_t ps3000_set_trigger
         int16_t  delay,
         int16_t  auto_trigger_ms
     ); """
-ps3000.make_symbol("_set_trigger", "ps3000_set_trigger", c_int16, [c_int16, c_int16, c_int16, c_int16, c_int16, c_int16],
-                   doc)
+ps3000.make_symbol("_set_trigger", "ps3000_set_trigger", c_int16,
+                   [c_int16, c_int16, c_int16, c_int16, c_int16, c_int16], doc)
 
 doc = """ int16_t ps3000_set_trigger2
     (
@@ -110,8 +111,8 @@ doc = """ int16_t ps3000_set_trigger2
         float    delay,
         int16_t  auto_trigger_ms
     ); """
-ps3000.make_symbol("_set_trigger2", "ps3000_set_trigger2", c_int16, [c_int16, c_int16, c_int16, c_int16, c_float, c_int16],
-                   doc)
+ps3000.make_symbol("_set_trigger2", "ps3000_set_trigger2", c_int16,
+                   [c_int16, c_int16, c_int16, c_int16, c_float, c_int16], doc)
 
 doc = """ int16_t ps3000_run_block
     (
@@ -275,8 +276,8 @@ doc = """ int16_t ps3000_save_streaming_data
         int16_t              *dataBuffers,
         int16_t               dataBufferSize
     ); """
-ps3000.make_symbol("_save_streaming_data", "ps3000_save_streaming_data", c_int16, [c_int16, c_void_p, c_void_p, c_int16],
-                   doc)
+ps3000.make_symbol("_save_streaming_data", "ps3000_save_streaming_data", c_int16,
+                   [c_int16, c_void_p, c_void_p, c_int16], doc)
 
 doc = """ int16_t ps3000SetAdvTriggerChannelProperties
     (

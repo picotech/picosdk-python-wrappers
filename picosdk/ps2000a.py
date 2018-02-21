@@ -9,6 +9,7 @@ file for PicoScope 2000 Series oscilloscopes using the ps2000a driver API functi
 from ctypes import *
 from picosdk.library import Library
 
+
 class ps2000alib(Library):
     def __init__(self):
         super(ps2000alib, self).__init__("ps2000a")
@@ -79,8 +80,8 @@ doc = """ PICO_STATUS ps2000aSetChannel
         PS2000A_RANGE    range,
         float            analogOffset
     ); """
-ps2000a.make_symbol("_SetChannel", "ps2000aSetChannel", c_uint32, [c_int16, c_int32, c_int16, c_int32, c_int32, c_float],
-                    doc)
+ps2000a.make_symbol("_SetChannel", "ps2000aSetChannel", c_uint32,
+                    [c_int16, c_int32, c_int16, c_int32, c_int32, c_float], doc)
 
 doc = """ PICO_STATUS ps2000aSetDigitalPort
     (

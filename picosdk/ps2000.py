@@ -76,8 +76,8 @@ doc = """ int16_t ps2000_set_trigger
         int16_t  delay,
         int16_t  auto_trigger_ms
     ); """
-ps2000.make_symbol("_set_trigger", "ps2000_set_trigger", c_int16, [c_int16, c_int16, c_int16, c_int16, c_int16, c_int16],
-                   doc)
+ps2000.make_symbol("_set_trigger", "ps2000_set_trigger", c_int16,
+                   [c_int16, c_int16, c_int16, c_int16, c_int16, c_int16], doc)
 
 doc = """ int16_t ps2000_set_trigger2
     (
@@ -88,8 +88,8 @@ doc = """ int16_t ps2000_set_trigger2
         float    delay,
         int16_t  auto_trigger_ms
     ); """
-ps2000.make_symbol("_set_trigger2", "ps2000_set_trigger2", c_int16, [c_int16, c_int16, c_int16, c_int16, c_float, c_int16],
-                   doc)
+ps2000.make_symbol("_set_trigger2", "ps2000_set_trigger2", c_int16,
+                   [c_int16, c_int16, c_int16, c_int16, c_float, c_int16], doc)
 
 doc = """ int16_t ps2000_run_block
     (

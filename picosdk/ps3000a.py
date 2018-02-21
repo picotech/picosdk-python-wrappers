@@ -81,8 +81,8 @@ doc = """ PICO_STATUS ps3000aSetChannel
         PS3000a_RANGE    range,
         float            analogOffset
     ); """
-ps3000a.make_symbol("_SetChannel", "ps3000aSetChannel", c_uint32, [c_int16, c_int32, c_int16, c_int32, c_int32, c_float],
-                    doc)
+ps3000a.make_symbol("_SetChannel", "ps3000aSetChannel", c_uint32,
+                    [c_int16, c_int32, c_int16, c_int32, c_int32, c_float], doc)
 
 doc = """ PICO_STATUS ps3000aSetDigitalPort
     (
