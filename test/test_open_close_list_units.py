@@ -15,6 +15,8 @@ drivers_to_load = [
     'ps2000a',
     'ps3000',
     'ps3000a',
+    'ps4000',
+    'ps4000a',
 ]
 
 modules = {}
@@ -29,6 +31,8 @@ drivers_with_device_connected = [
     # 'ps2000a',
     # 'ps3000',
     # 'ps3000a',
+    # 'ps4000',
+    # 'ps4000a',
 ]
 
 class error_failure(Exception):
