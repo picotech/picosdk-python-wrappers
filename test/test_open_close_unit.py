@@ -2,73 +2,16 @@
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
-Unit tests for the wrapper functions for opening, listing/enumerating and closing devices.
+Unit tests for the wrapper functions for opening and closing devices.
 """
 
 from __future__ import print_function
-import importlib
-import unittest
+
+from test.test_helpers import DriverTest, drivers_to_load, drivers_with_device_connected
 from picosdk.library import DeviceNotFoundError
 
-drivers_to_load = [
-    'ps2000',
-    'ps2000a',
-    'ps3000',
-    'ps3000a',
-    'ps4000',
-    'ps4000a',
-]
 
-modules = {}
-
-for d in drivers_to_load:
-    modules[d] = importlib.import_module("picosdk.%s" % d)
-
-# PLEASE MODIFY this list before running, to indicate which drivers should
-# expect to find a device.
-drivers_with_device_connected = [
-    # 'ps2000',
-    # 'ps2000a',
-    # 'ps3000',
-    # 'ps3000a',
-    # 'ps4000',
-    # 'ps4000a',
-]
-
-class error_failure(Exception):
-    pass
-
-class error(Exception):
-    pass
-
-class OpenCloseTest(unittest.TestCase):
-
-    def _find_driver(self, name):
-        # e.g. ps2000.ps2000
-        module = modules[name]
-        return getattr(module, name)
-
-    def run_snippet_and_count_problems(self, drivers_to_use, fn):
-        errors = []
-        failures = []
-        for d in drivers_to_use:
-            driver = self._find_driver(d)
-            try:
-                result = fn(driver)
-                if result is not None:
-                    failures.append((d, result))
-            except Exception as e:
-                errors.append((d, e))
-        # format the errors and failure messages for printing:
-        errors = ", ".join(["%s (%s)" % e for e in errors])
-        failures = ", ".join(["%s (%s)" % f for f in failures])
-        if failures and errors:
-            raise error_failure("drivers error'd: %s\nand drivers failed: %s" % (errors, failures))
-        elif errors:
-            raise error("drivers error'd: %s" % errors)
-        else:
-            self.assertEqual(len(failures), 0, "Drivers failed: %s" % failures)
-
+class OpenCloseTest(DriverTest):
     def test_open_unit_failure(self):
         """test_open_unit_failure
         note: test assumes that at maximum one device is attached for each driver."""
@@ -90,7 +33,7 @@ class OpenCloseTest(unittest.TestCase):
 
     def test_open_unit_success(self):
         """test_open_unit_success
-        note: test assumes you have set drivers_with_device_connected above"""
+        note: test assumes you have set test_helpers.drivers_with_device_connected"""
         if not drivers_with_device_connected:
             return
         drivers_to_use = drivers_with_device_connected[:]
@@ -115,7 +58,7 @@ class OpenCloseTest(unittest.TestCase):
 
     def test_close_unit_success(self):
         """test_close_unit_success
-        note: test assumes you have set drivers_with_device_connected above"""
+        note: test assumes you have set test_helpers.drivers_with_device_connected"""
         if not drivers_with_device_connected:
             return
         drivers_to_use = drivers_with_device_connected
