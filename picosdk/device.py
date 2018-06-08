@@ -12,7 +12,7 @@ class ClosedDeviceError(Exception):
     pass
 
 
-def requires_open(error_message):
+def requires_open(error_message="This operation requires a device to be connected."):
     def check_open_decorator(method):
         def check_open_impl(self, *args, **kwargs):
             if not self.is_open:
@@ -29,14 +29,14 @@ class Device(object):
         self.handle = handle
         self.is_open = handle > 0
 
-    @requires_open
+    @requires_open("The device either did not initialise correctly or has already been closed.")
     def close(self):
         self.driver.close_unit(self)
         self.handle = None
         self.is_open = False
 
     @property
-    @requires_open
+    @requires_open()
     def info(self):
         return self.driver.get_unit_info(self)
 
