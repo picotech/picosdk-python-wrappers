@@ -11,7 +11,7 @@ from __future__ import print_function
 
 import sys
 import ctypes
-from ctypes import c_int16, c_uint32, create_string_buffer
+from ctypes import c_int16, c_int32, c_uint32, create_string_buffer
 from ctypes.util import find_library
 import collections
 
@@ -109,11 +109,14 @@ class Library(object):
 
         return device_infos
 
-    def open_unit(self, serial=None):
-        """If no serial is provided, this function opens the first device discovered.
+    def open_unit(self, serial=None, resolution=None):
+        """optional arguments:
+        serial: If no serial number is provided, this function opens the first device discovered.
+        resolution: for some devices, you may specify a resolution as you open the device. You should retrieve this
+            numeric constant from the relevant driver module.
         returns: a Device instance, which has functions on it for collecting data and using the waveform generator (if present).
         Note: Either use this object in a context manager, or manually call .close() on it when you are finished."""
-        return Device(self, self._python_open_unit(serial=serial))
+        return Device(self, self._python_open_unit(serial=serial, resolution=resolution))
 
     @requires_device("close_unit requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def close_unit(self, device):
@@ -123,20 +126,38 @@ class Library(object):
     def get_unit_info(self, device):
         return self._python_get_unit_info_wrapper(device.handle)
 
-    def _python_open_unit(self, serial=None):
+    def _python_open_unit(self, serial=None, resolution=None):
         handle = -1
+        status = None
         if serial is None:
-            if len(self._open_unit.argtypes) > 1:
+            if len(self._open_unit.argtypes) == 3:
+                if resolution is None:
+                    resolution = self.DEFAULT_RESOLUTION
                 chandle = c_int16()
-                self._open_unit(ctypes.byref(chandle), None)
+                cresolution = c_int32()
+                cresolution.value = resolution
+                status = self._open_unit(ctypes.byref(chandle), None, cresolution)
+                handle = chandle.value
+            elif len(self._open_unit.argtypes) == 2:
+                chandle = c_int16()
+                status = self._open_unit(ctypes.byref(chandle), None)
                 handle = chandle.value
             else:
                 handle = self._open_unit()
         else:
-            if len(self._open_unit.argtypes) > 1:
+            if len(self._open_unit.argtypes) == 3:
+                if resolution is None:
+                    resolution = self.DEFAULT_RESOLUTION
+                chandle = c_int16()
+                cresolution = c_int32()
+                cresolution.value = resolution
+                cserial = create_string_buffer(serial)
+                status = self._open_unit(ctypes.byref(chandle), cserial, cresolution)
+                handle = chandle.value
+            elif len(self._open_unit.argtypes) == 2:
                 chandle = c_int16()
                 cserial = create_string_buffer(serial)
-                self._open_unit(ctypes.byref(chandle), cserial)
+                status = self._open_unit(ctypes.byref(chandle), cserial)
                 handle = chandle.value
             else:
                 open_handles = []
@@ -154,17 +175,27 @@ class Library(object):
                     self._python_close_unit(temp_handle)
 
         if handle < 1:
-            raise DeviceNotFoundError(("Driver %s could find no device" % self.name) + "s" if serial is None else
-                                                                                      (" matching %s" % serial))
+            message = ("Driver %s could find no device" % self.name) + ("s" if serial is None else
+                                                                        (" matching %s" % serial))
+            if status is not None:
+                message += " (%s)" % constants.pico_tag(status)
+            raise DeviceNotFoundError(message)
 
         return handle
 
     def _python_close_unit(self, handle):
         return self._close_unit(c_int16(handle))
 
+    @staticmethod
+    def _create_empty_string_buffer():
+        try:
+            return create_string_buffer("\0", 255)
+        except TypeError:
+            return create_string_buffer("\0".encode('utf8'), 255)
+
     def _python_get_unit_info(self, handle, info_type):
         STRING_SIZE = 255
-        info = create_string_buffer("\0", STRING_SIZE)
+        info = self._create_empty_string_buffer()
         if len(self._get_unit_info.argtypes) == 4:
             info_len = self._get_unit_info(c_int16(handle), info, c_int16(STRING_SIZE), c_int16(info_type))
             if info_len > 0:

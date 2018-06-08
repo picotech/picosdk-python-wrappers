@@ -15,6 +15,7 @@ drivers_to_load = [
     'ps3000a',
     'ps4000',
     'ps4000a',
+    'ps5000a',
 ]
 
 modules = {}
@@ -31,6 +32,7 @@ drivers_with_device_connected = [
     # 'ps3000a',
     # 'ps4000',
     # 'ps4000a',
+    # 'ps5000a',
 ]
 
 
@@ -61,7 +63,7 @@ class DriverTest(_unittest.TestCase):
             except Exception as e:
                 errors.append((d, e))
         # format the errors and failure messages for printing:
-        errors = ", ".join(["%s (%s)" % e for e in errors])
+        errors = ", ".join(["%s (%r)" % e for e in errors])
         failures = ", ".join(["%s (%s)" % f for f in failures])
         if failures and errors:
             raise error_failure("drivers error'd: %s\nand drivers failed: %s" % (errors, failures))

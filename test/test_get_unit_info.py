@@ -11,6 +11,12 @@ from test.test_helpers import DriverTest, drivers_with_device_connected
 from picosdk.library import DeviceNotFoundError, UnitInfo
 
 
+try:
+    STRING_TYPES = (str, unicode)
+except:
+    STRING_TYPES = (bytes, str)
+
+
 class GetInfoTest(DriverTest):
     def test_get_info_success(self):
         """test_get_info_success
@@ -31,7 +37,7 @@ class GetInfoTest(DriverTest):
 
             self.assertIsInstance(info, UnitInfo)
             self.assertEqual(info.driver, driver)
-            self.assertIsInstance(info.variant, (str, unicode))
-            self.assertIsInstance(info.serial, (str, unicode))
+            self.assertIsInstance(info.variant, STRING_TYPES)
+            self.assertIsInstance(info.serial, STRING_TYPES)
 
         self.run_snippet_and_count_problems(drivers_to_use, test)

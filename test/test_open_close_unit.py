@@ -38,21 +38,17 @@ class OpenCloseTest(DriverTest):
             return
         drivers_to_use = drivers_with_device_connected[:]
         def test(driver):
-            print("in test function")
             threw = False
             devices = []
             try:
                 devices.append(driver.open_unit())
             except DeviceNotFoundError:
-                print("caught DeviceNotFoundError")
                 threw = True
             finally:
-                print("closing devices")
                 for device in devices:
                     print("closing device %s" % device.handle)
                     device.close()
             if threw:
-                print("returning error.")
                 return "no device found."
         self.run_snippet_and_count_problems(drivers_to_use, test)
 

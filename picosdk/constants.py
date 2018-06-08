@@ -30,6 +30,11 @@ def pico_num(tag):
         raise UnknownConstantError("%s is not a known PICO_STATUS macro." % tag)
 
 
+def make_enum(members):
+    """All C enums with no specific values follow the pattern 0, 1, 2... in the order they are in source."""
+    return {member: i for i, member in enumerate(members)}
+
+
 PICO_STATUS = {
     "PICO_OK": 0x00000000,
     "PICO_MAX_UNITS_OPENED": 0x00000001,
