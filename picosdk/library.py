@@ -16,10 +16,12 @@ from ctypes.util import find_library
 import collections
 
 from picosdk.device import Device
+import picosdk.constants as constants
 
 
 class DeviceNotFoundError(Exception):
     pass
+
 
 class CannotCloseUnitError(Exception):
     pass
@@ -61,6 +63,9 @@ class Library(object):
     def __init__(self, name):
         self.name = name
         self._clib = self.load()
+        self.PICO_INFO = constants.PICO_INFO
+        self.PICO_STATUS = constants.PICO_STATUS
+        self.PICO_STATUS_LOOKUP = constants.PICO_STATUS_LOOKUP
 
     def __str__(self):
         return "picosdk %s library" % self.name
@@ -119,32 +124,26 @@ class Library(object):
         return self._python_get_unit_info_wrapper(device.handle)
 
     def _python_open_unit(self, serial=None):
-        print("_python_open_unit (driver=%s)" % self.name)
         handle = -1
         if serial is None:
-            print("serial not provided")
             if len(self._open_unit.argtypes) > 1:
-                print("using no-args return value handle function.")
                 chandle = c_int16()
                 self._open_unit(ctypes.byref(chandle), None)
                 handle = chandle.value
             else:
-                print("using no-args return value handle function.")
                 handle = self._open_unit()
         else:
-            print("searching for serial %s" % serial)
             if len(self._open_unit.argtypes) > 1:
                 chandle = c_int16()
                 cserial = create_string_buffer(serial)
                 self._open_unit(ctypes.byref(chandle), cserial)
                 handle = chandle.value
             else:
-                SERIAL_NUMBER = 4
                 open_handles = []
                 temp_handle = self._open_unit()
 
                 while temp_handle > 0:
-                    this_serial = self._python_get_unit_info(temp_handle, SERIAL_NUMBER)
+                    this_serial = self._python_get_unit_info(temp_handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
                     if this_serial == serial:
                         handle = temp_handle
                         break
@@ -153,8 +152,6 @@ class Library(object):
 
                 for temp_handle in open_handles:
                     self._python_close_unit(temp_handle)
-
-        print("handle found: %s" % handle)
 
         if handle < 1:
             raise DeviceNotFoundError(("Driver %s could find no device" % self.name) + "s" if serial is None else
@@ -185,13 +182,10 @@ class Library(object):
         return ""
 
     def _python_get_unit_info_wrapper(self, handle):
-        MODEL_VARIANT = 3
-        SERIAL_NUMBER = 4
-
         return UnitInfo(
             driver= self,
-            variant= self._python_get_unit_info(handle, MODEL_VARIANT),
-            serial= self._python_get_unit_info(handle, SERIAL_NUMBER)
+            variant= self._python_get_unit_info(handle, self.PICO_INFO["PICO_VARIANT_INFO"]),
+            serial= self._python_get_unit_info(handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
         )
 
 
