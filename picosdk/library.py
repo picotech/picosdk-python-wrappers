@@ -19,6 +19,14 @@ from picosdk.device import Device
 import picosdk.constants as constants
 
 
+class CannotFindPicoSDKError(Exception):
+    pass
+
+
+class CannotOpenPicoSDKError(Exception):
+    pass
+
+
 class DeviceNotFoundError(Exception):
     pass
 
@@ -51,13 +59,19 @@ def requires_device(error_message):
 class Library(object):
     def load(self):
         result = None
+        library_path = find_library(self.name)
+
+        if library_path is None:
+            env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
+            raise CannotFindPicoSDKError("PicoSDK (%s) not found, check %s" % (self.name, env_var_name))
+        
         try:
             if sys.platform == 'win32':
-                result = ctypes.WinDLL(find_library(self.name))
+                result = ctypes.WinDLL(library_path)
             else:
-                result = ctypes.cdll.LoadLibrary(find_library(self.name))
-        except OSError:
-            print(self.name, "import(%d): Library not found" % sys.exc_info()[-1].tb_lineno)
+                result = ctypes.cdll.LoadLibrary(library_path)
+        except OSError as e:
+            raise CannotOpenPicoSDKError("PicoSDK (%s) not compatible (check 32 vs 64-bit): %s" % (self.name, e))
         return result
 
     def __init__(self, name):
