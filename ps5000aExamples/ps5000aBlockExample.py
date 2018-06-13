@@ -7,6 +7,23 @@ import numpy as np
 from picosdk.ps5000a import ps5000a as ps
 import matplotlib.pyplot as plt
 
+def adc2mV(bufferADC, range, maxADC):
+    """ 
+        adc2mc(
+                c_short_Array           buffer
+                int                     range
+                c_int32                  maxADC
+                )
+               
+        Takes a buffer of raw adc count values and converts it into milivolts 
+    """
+
+    channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
+    vRange = channelInputRanges[range]
+    bufferV = [(x * vRange) / maxADC.value for x in bufferADC]
+
+    return bufferV
+
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
 status = {}
@@ -127,15 +144,10 @@ status["getValues"] = ps.ps5000aGetValues(chandle, 0, ctypes.byref(cmaxSamples),
 # pointer to value = ctypes.byref(maxADC)
 maxADC = ctypes.c_int16()
 status["maximumValue"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
-# list of possible input ranges in mV
-channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
-# get input range in mV for channel A
-chAVRange = channelInputRanges[chARange]
-#get input range in mV for channel B
-chBVRange = channelInputRanges[chBRange]
+
 # convert ADC counts data to mV
-adc2mVChAMax =  [x * chAVRange / maxADC.value for x in bufferAMax]
-adc2mVChBMax =  [x * chBVRange / maxADC.value for x in bufferBMax]
+adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
+adc2mVChBMax =  adc2mV(bufferBMax, chBRange, maxADC)
 
 # Create time data
 time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
