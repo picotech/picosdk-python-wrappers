@@ -3,7 +3,6 @@
 # This data is then plotted as ADC counts at each sample interval.
 
 import ctypes
-import importlib
 import numpy as np
 from picosdk.ps5000a import ps5000a as ps
 import matplotlib.pyplot as plt
@@ -25,7 +24,8 @@ status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, 2)
 # coupling type = PS5000A_DC = 1
 # range = PS5000A_2V = 7
 # analogue offset = 0 V
-status["setChA"] = ps.ps5000aSetChannel(chandle, 0, 1, 1, 7, 0)
+chARange = 7
+status["setChA"] = ps.ps5000aSetChannel(chandle, 0, 1, 1, chARange, 0)
 
 # Set up channel B
 # handle = chandle
@@ -34,7 +34,8 @@ status["setChA"] = ps.ps5000aSetChannel(chandle, 0, 1, 1, 7, 0)
 # coupling type = PS5000A_DC = 1
 # range = PS5000A_2V = 7
 # analogue offset = 0 V
-status["setChB"] = ps.ps5000aSetChannel(chandle, 1, 1, 1, 7, 0)
+chBRange = 7
+status["setChB"] = ps.ps5000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
 
 # Set up single trigger
 # handle = chandle
@@ -50,6 +51,18 @@ status["trigger"] = ps.ps5000aSetSimpleTrigger(chandle, 1, 0, 1024, 2, 0, 1000)
 preTriggerSamples = 2500
 postTriggerSamples = 2500
 maxSamples = preTriggerSamples + postTriggerSamples
+
+# Get timebase information
+# handle = chandle
+# timebase = 8 = timebase
+# noSamples = maxSamples
+# pointer to timeIntervalNanoseconds = ctypes.byref(timeIntervalns)
+# pointer to maxSamples = ctypes.byref(returnedMaxSamples)
+# segment index = 0
+timebase = 8
+timeIntervalns = ctypes.c_float()
+returnedMaxSamples = ctypes.c_int32()
+status["getTimebase2"] = ps.ps5000aGetTimebase2(chandle, timebase, maxSamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
 
 # Run block capture
 # handle = chandle
@@ -108,11 +121,30 @@ cmaxSamples = ctypes.c_int32(maxSamples)
 # pointer to overflow = ctypes.byref(overflow))
 status["getValues"] = ps.ps5000aGetValues(chandle, 0, ctypes.byref(cmaxSamples), 0, 0, 0, ctypes.byref(overflow))
 
+
+# find maximum ADC count value
+# handle = chandle
+# pointer to value = ctypes.byref(maxADC)
+maxADC = ctypes.c_int16()
+status["maximumValue"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
+# list of possible input ranges in mV
+channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
+# get input range in mV for channel A
+chAVRange = channelInputRanges[chARange]
+#get input range in mV for channel B
+chBVRange = channelInputRanges[chBRange]
+# convert ADC counts data to mV
+adc2mVChAMax =  [x * chAVRange / maxADC.value for x in bufferAMax]
+adc2mVChBMax =  [x * chBVRange / maxADC.value for x in bufferBMax]
+
+# Create time data
+time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
+
 # plot data from channel A and B
-plt.plot(bufferAMax[:])
-plt.plot(bufferBMax[:])
-plt.xlabel('Sample Number')
-plt.ylabel('ADC Counts')
+plt.plot(time, adc2mVChAMax[:])
+plt.plot(time, adc2mVChBMax[:])
+plt.xlabel('Time (ns)')
+plt.ylabel('Voltage (mV)')
 plt.show()
 
 # Stop the scope
