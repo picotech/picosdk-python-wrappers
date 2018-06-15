@@ -1,4 +1,7 @@
-## PS5000A BLOCK MODE EXAMPLE
+#
+# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+#
+# PS5000A BLOCK MODE EXAMPLE
 # This example opens a 5000a driver device, sets up two channels and a trigger then collects a block of data.
 # This data is then plotted as ADC counts at each sample interval.
 
