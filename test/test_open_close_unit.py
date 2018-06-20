@@ -42,14 +42,14 @@ class OpenCloseTest(DriverTest):
             devices = []
             try:
                 devices.append(driver.open_unit())
-            except DeviceNotFoundError:
-                threw = True
+            except DeviceNotFoundError as e:
+                threw = e
             finally:
                 for device in devices:
                     print("closing device %s" % device.handle)
                     device.close()
-            if threw:
-                return "no device found."
+            if threw is not False:
+                return "no device found (%s)." % threw
         self.run_snippet_and_count_problems(drivers_to_use, test)
 
     def test_close_unit_success(self):
@@ -62,8 +62,8 @@ class OpenCloseTest(DriverTest):
             devices = []
             try:
                 devices.append(driver.open_unit())
-            except DeviceNotFoundError:
-                return "no device found."
+            except DeviceNotFoundError as e:
+                return "no device found (%s)." % e
 
             device = devices.pop()
             info = device.info
@@ -72,8 +72,8 @@ class OpenCloseTest(DriverTest):
             # If we fail, then we have not closed it correctly.
             try:
                 devices.append(driver.open_unit(serial=info.serial))
-            except DeviceNotFoundError:
-                return "Could not close and then re-open the device."
+            except DeviceNotFoundError as e:
+                return "Could not close and then re-open the device (%s)." % e
             finally:
                 for device in devices:
                     device.close()
