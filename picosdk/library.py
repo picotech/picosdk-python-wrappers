@@ -42,9 +42,6 @@ serial = batch and serial number as a string (for use with Library.open_unit)"""
 UnitInfo = collections.namedtuple('UnitInfo', ['driver', 'variant', 'serial'])
 
 
-PICO_OK = 0
-
-
 def requires_device(error_message):
     def check_device_decorator(method):
         def check_device_impl(self, device, *args, **kwargs):
@@ -77,6 +74,7 @@ class Library(object):
     def __init__(self, name):
         self.name = name
         self._clib = self.load()
+        # ! some drivers will replace these dicts at import time, where they have different constants (notably ps2000).
         self.PICO_INFO = constants.PICO_INFO
         self.PICO_STATUS = constants.PICO_STATUS
         self.PICO_STATUS_LOOKUP = constants.PICO_STATUS_LOOKUP
@@ -221,7 +219,7 @@ class Library(object):
                                          c_int16(STRING_SIZE),
                                          ctypes.byref(required_size),
                                          c_uint32(info_type))
-            if status == PICO_OK:
+            if status == self.PICO_STATUS['PICO_OK']:
                 if required_size.value < STRING_SIZE:
                     return info.value[:required_size.value]
         return ""
