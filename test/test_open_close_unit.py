@@ -78,3 +78,34 @@ class OpenCloseTest(DriverTest):
                 for device in devices:
                     device.close()
         self.run_snippet_and_count_problems(drivers_to_use, test)
+
+    def test_with_statement_open_close(self):
+        """test_with_statement_open_close
+        note: test assumes you have set test_helpers.drivers_with_device_connected"""
+        if not drivers_with_device_connected:
+            return
+        drivers_to_use = drivers_with_device_connected[:]
+
+        def test(driver):
+            threw = False
+            was_open = False
+            was_closed = False
+            outer_scope_device = None
+            try:
+                with driver.open_unit() as device:
+                    was_open = device.is_open
+                    outer_scope_device = device
+                was_closed = not outer_scope_device.is_open
+            except DeviceNotFoundError as e:
+                threw = e
+            finally:
+                if outer_scope_device is not None and not was_closed:
+                    outer_scope_device.close()
+            if threw is not False:
+                return "no device found (%s)." % threw
+            elif not was_open:
+                return "device was not opened correctly"
+            elif not was_closed:
+                return "device was not closed after exiting the scope"
+
+        self.run_snippet_and_count_problems(drivers_to_use, test)
