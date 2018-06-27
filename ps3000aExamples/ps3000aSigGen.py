@@ -23,8 +23,8 @@ status["openunit"] = ps.ps3000aOpenUnit(ctypes.byref(chandle), None)
 # offsetVoltage = 0
 # pkToPk = 2000000
 # waveType = ctypes.c_int16(0) = PS3000A_SINE
-# startFrequency = 10
-# stopFrequency = 10
+# startFrequency = 10000 Hz
+# stopFrequency = 10000 Hz
 # increment = 0
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS3000A_UP
@@ -39,7 +39,7 @@ sweepType = ctypes.c_int32(0)
 triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
-status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10, 10, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
 
 # pauses the script to show signal
 time.sleep(10)
@@ -49,8 +49,8 @@ time.sleep(10)
 # offsetVoltage = -1000000
 # pkToPk = 1500000
 # waveType = ctypes.c_int16(1) = PS3000A_Sqaure
-# startFrequency = 10
-# stopFrequency = 10
+# startFrequency = 10000 Hz
+# stopFrequency = 10000 Hz
 # increment = 0
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS3000A_UP
@@ -65,7 +65,7 @@ sweepType = ctypes.c_int32(0)
 triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
-status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10, 10, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
 
 # pauses the script to show signal
 time.sleep(10)
@@ -75,8 +75,8 @@ time.sleep(10)
 # offsetVoltage = -1000000
 # pkToPk = 1500000 
 # waveType = ctypes.c_int16(1) = PS3000A_Square
-# startFrequency = 10
-# stopFrequency = 100
+# startFrequency = 10000 Hz
+# stopFrequency = 100000 Hz
 # increment = 5
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS3000A_UP
@@ -91,7 +91,7 @@ sweepType = ctypes.c_int32(2)
 triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
-status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10, 100, 5, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 100000, 5, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
 
 # pauses the script to show signal 
 time.sleep(36)
