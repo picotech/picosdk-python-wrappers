@@ -45,7 +45,8 @@ status["setChA"] = ps.ps3000aSetChannel(chandle, 0, 1, 1, chARange, 0)
 # Source = ps3000A_channel_A = 0
 # Threshold = 1024 ADC counts
 # Direction = ps3000A_Falling = 3
-# Delay = 1000
+# Delay = 0
+# autoTrigger_ms = 1000
 status["trigger"] = ps.ps3000aSetSimpleTrigger(chandle, 1, 0, 1024, 3, 0, 1000)
 
 # Setting the number of sample to be collected
