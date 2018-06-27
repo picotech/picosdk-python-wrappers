@@ -1,4 +1,10 @@
-from __future__ import print_function
+#
+# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+#
+# PS3000A BLOCK MODE EXAMPLE
+# This example opens a 3000a driver device, sets up one channels and a trigger then collects a block of data.
+# This data is then plotted as mV against time in ns.
+
 import ctypes
 from picosdk.ps3000a import ps3000a as ps
 import numpy as np

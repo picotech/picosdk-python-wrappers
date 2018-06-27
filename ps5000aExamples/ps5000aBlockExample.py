@@ -3,7 +3,7 @@
 #
 # PS5000A BLOCK MODE EXAMPLE
 # This example opens a 5000a driver device, sets up two channels and a trigger then collects a block of data.
-# This data is then plotted as ADC counts at each sample interval.
+# This data is then plotted as mV against time in ns.
 
 import ctypes
 import numpy as np
