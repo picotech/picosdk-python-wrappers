@@ -2,8 +2,8 @@
 # Copyright (C) 2014-2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
-This is a Python module defining the functions from the ps3000aApi.h C header
-file for PicoScope 3000 Series oscilloscopes using the ps3000a driver API
+This is a Python module defining the functions from the ps5000aApi.h C header
+file for PicoScope 5000 Series oscilloscopes using the ps5000a driver API
 functions.
 """
 
@@ -630,8 +630,8 @@ ps5000a.make_symbol("_GetNoOfCaptures", "ps5000aGetNoOfCaptures", c_uint32, [c_i
 
 doc = """ PICO_STATUS ps5000aGetNoOfProcessedCaptures
     (
-          int16_t   handle,
-          uint32_t *nProcessedCaptures
+         int16_t   handle,
+         uint32_t *nProcessedCaptures
     ); """
 ps5000a.make_symbol("_GetNoOfProcessedCaptures", "ps5000aGetNoOfProcessedCaptures", c_uint32, [c_int16, c_void_p], doc)
 

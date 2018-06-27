@@ -362,7 +362,7 @@ doc = """ PICO_STATUS ps6000GetValuesTriggerTimeOffsetBulk
         uint32_t           fromSegmentIndex,
         uint32_t           toSegmentIndex
     ); """
-ps6000.make_symbol("_GetTriggerTimeOffsetBulk", "ps6000GetTriggerTimeOffsetBulk", c_uint32,
+ps6000.make_symbol("_ps6000GetValuesTriggerTimeOffsetBulk", "ps6000GetValuesTriggerTimeOffsetBulk", c_uint32,
             [c_int16, c_void_p, c_void_p, c_void_p, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesTriggerTimeOffsetBulk64
