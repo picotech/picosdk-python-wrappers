@@ -37,6 +37,13 @@ status = {}
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, 2)
 
+powerStatus = status["openunit"]
+
+if powerStatus == 286:
+    status["changePowerSource"] = ps.ps4000aChangePowerSource(chandle, powerStatus)
+if powerStatus == 282:
+    status["changePowerSource"] = ps.ps4000aChangePowerSource(chandle, powerStatus)
+
 # Set up channel A
 # handle = chandle
 # channel = PS5000A_CHANNEL_A = 0
