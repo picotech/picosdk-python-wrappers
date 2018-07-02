@@ -18,6 +18,19 @@ chandle = ctypes.c_int16()
 # Opens the device/s
 status["openunit"] = ps.ps3000aOpenUnit(ctypes.byref(chandle), None)
 
+# powerstate becomes the status number of openunit
+powerstate = status["openunit"]
+
+# If powerstate is the same as 282 then it will run this if statement
+if powerstate == 282:
+    # Changes the power input to "PICO_POWER_SUPPLY_NOT_CONNECTED"
+    status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 282)
+
+# If the powerstate is the same as 286 then it will run this if statement
+if powerstate == 286:
+    # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
+    status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286) 
+
 # Generates Sine signal with a 2V pkToPk with a 10KHz frequency 
 # handle = chandle
 # offsetVoltage = 0
