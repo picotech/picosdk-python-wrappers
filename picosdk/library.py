@@ -139,52 +139,10 @@ class Library(object):
         return self._python_get_unit_info_wrapper(device.handle)
 
     def _python_open_unit(self, serial=None, resolution=None):
-        handle = -1
-        status = None
         if serial is None:
-            if len(self._open_unit.argtypes) == 3:
-                if resolution is None:
-                    resolution = self.DEFAULT_RESOLUTION
-                chandle = c_int16()
-                cresolution = c_int32()
-                cresolution.value = resolution
-                status = self._open_unit(ctypes.byref(chandle), None, cresolution)
-                handle = chandle.value
-            elif len(self._open_unit.argtypes) == 2:
-                chandle = c_int16()
-                status = self._open_unit(ctypes.byref(chandle), None)
-                handle = chandle.value
-            else:
-                handle = self._open_unit()
+            handle, status = self._python_open_any_unit(resolution)
         else:
-            if len(self._open_unit.argtypes) == 3:
-                if resolution is None:
-                    resolution = self.DEFAULT_RESOLUTION
-                chandle = c_int16()
-                cresolution = c_int32()
-                cresolution.value = resolution
-                cserial = create_string_buffer(serial)
-                status = self._open_unit(ctypes.byref(chandle), cserial, cresolution)
-                handle = chandle.value
-            elif len(self._open_unit.argtypes) == 2:
-                chandle = c_int16()
-                cserial = create_string_buffer(serial)
-                status = self._open_unit(ctypes.byref(chandle), cserial)
-                handle = chandle.value
-            else:
-                open_handles = []
-                temp_handle = self._open_unit()
-
-                while temp_handle > 0:
-                    this_serial = self._python_get_unit_info(temp_handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
-                    if this_serial == serial:
-                        handle = temp_handle
-                        break
-                    open_handles.append(temp_handle)
-                    temp_handle = self._open_unit()
-
-                for temp_handle in open_handles:
-                    self._python_close_unit(temp_handle)
+            handle, status = self._python_open_specific_unit(serial, resolution)
 
         if handle < 1:
             message = ("Driver %s could find no device" % self.name) + ("s" if serial is None else
@@ -194,6 +152,59 @@ class Library(object):
             raise DeviceNotFoundError(message)
 
         return handle
+
+    def _python_open_any_unit(self, resolution):
+        status = None
+        if len(self._open_unit.argtypes) == 3:
+            if resolution is None:
+                resolution = self.DEFAULT_RESOLUTION
+            chandle = c_int16()
+            cresolution = c_int32()
+            cresolution.value = resolution
+            status = self._open_unit(ctypes.byref(chandle), None, cresolution)
+            handle = chandle.value
+        elif len(self._open_unit.argtypes) == 2:
+            chandle = c_int16()
+            status = self._open_unit(ctypes.byref(chandle), None)
+            handle = chandle.value
+        else:
+            handle = self._open_unit()
+
+        return handle, status
+
+    def _python_open_specific_unit(self, serial, resolution):
+        handle = -1
+        status = None
+        if len(self._open_unit.argtypes) == 3:
+            if resolution is None:
+                resolution = self.DEFAULT_RESOLUTION
+            chandle = c_int16()
+            cresolution = c_int32()
+            cresolution.value = resolution
+            cserial = create_string_buffer(serial)
+            status = self._open_unit(ctypes.byref(chandle), cserial, cresolution)
+            handle = chandle.value
+        elif len(self._open_unit.argtypes) == 2:
+            chandle = c_int16()
+            cserial = create_string_buffer(serial)
+            status = self._open_unit(ctypes.byref(chandle), cserial)
+            handle = chandle.value
+        else:
+            open_handles = []
+            temp_handle = self._open_unit()
+
+            while temp_handle > 0:
+                this_serial = self._python_get_unit_info(temp_handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
+                if this_serial == serial:
+                    handle = temp_handle
+                    break
+                open_handles.append(temp_handle)
+                temp_handle = self._open_unit()
+
+            for temp_handle in open_handles:
+                self._python_close_unit(temp_handle)
+
+        return handle, status
 
     def _python_close_unit(self, handle):
         return self._close_unit(c_int16(handle))
