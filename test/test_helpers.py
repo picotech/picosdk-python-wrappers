@@ -16,6 +16,7 @@ drivers_to_load = [
     'ps4000',
     'ps4000a',
     'ps5000a',
+    'ps6000',
 ]
 
 modules = {}
@@ -33,6 +34,7 @@ drivers_with_device_connected = [
     # 'ps4000',
     # 'ps4000a',
     # 'ps5000a',
+    # 'ps6000',
 ]
 
 
