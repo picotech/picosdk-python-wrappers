@@ -9,29 +9,13 @@ import ctypes
 import numpy as np
 from picosdk.ps4000a import ps4000a as ps
 import matplotlib.pyplot as plt
-
-def adc2mV(bufferADC, range, maxADC):
-    """ 
-        adc2mc(
-                c_short_Array           buffer
-                int                     range
-                c_int32                  maxADC
-                )
-               
-        Takes a buffer of raw adc count values and converts it into milivolts 
-    """
-
-    channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
-    vRange = channelInputRanges[range]
-    bufferV = [(x * vRange) / maxADC.value for x in bufferADC]
-
-    return bufferV
+from picosdk.functions import *
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
 status = {}
 
-# Open 5000 series PicoScope
+# Open 4000 series PicoScope
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps4000aOpenUnit(ctypes.byref(chandle), None)
 

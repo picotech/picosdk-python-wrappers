@@ -1,4 +1,10 @@
-from __future__ import print_function
+#
+# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+#
+# PS3000A BLOCK MODE MSO EXAMPLE
+# This example opens a 3000a driver device, sets up one digital port and a trigger to collect a  block of data.
+# This data is then split into the indivual digital channels and plotted as the binary value against time in ns.
+
 import ctypes
 from picosdk.ps3000a import ps3000a as ps
 from picosdk.functions import *
@@ -6,14 +12,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from array import *
-
-# Creates a string buffer for the serial number to enter 
-def create_empty_string_buffer(buffer_size):
-    try:
-        return ctypes.create_string_buffer("\0", buffer_size)
-    except TypeError:
-        return ctypes.create_string_buffer("\0".encode('utf8'), buffer_size)
-
 
 # Gives the device a handle 
 status = {}
