@@ -1,5 +1,7 @@
+from __future__ import print_function
 import ctypes
 from picosdk.ps3000a import ps3000a as ps
+from picosdk.functions import *
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -36,7 +38,8 @@ if powerstate == 286:
 # Handle
 # PS3000a_DIGITAL_PORT = 0x80
 # Enable = 1
-# logicLevel = 10000 ADC counts
+# logicLevel = 0
+
 status["SetDigitalPort"] = ps.ps3000aSetDigitalPort( chandle, 0x80, 1, 10000)
 
 # Setting the number of sample to be collected
@@ -107,30 +110,7 @@ while ready.value == check.value:
 
 status["GetValues"] = ps.ps3000aGetValues(chandle, 0, ctypes.byref(cmaxSamples), 0, 0, 0, ctypes.byref(overflow))
 
-# Makes an array for each digital channel
-bufferAMaxBinaryD0 = np.chararray(cmaxSamples.value, 1)
-bufferAMaxBinaryD1 = np.chararray(cmaxSamples.value, 1)
-bufferAMaxBinaryD2 = np.chararray(cmaxSamples.value, 1)
-bufferAMaxBinaryD3 = np.chararray(cmaxSamples.value, 1)
-bufferAMaxBinaryD4 = np.chararray(cmaxSamples.value, 1)
-bufferAMaxBinaryD5 = np.chararray(cmaxSamples.value, 1)
-bufferAMaxBinaryD6 = np.chararray(cmaxSamples.value, 1)
-bufferAMaxBinaryD7 = np.chararray(cmaxSamples.value, 1)
-
-# Changes the data from int type to a binary type and then seperates the data for each digital channel
-for i in range(0, cmaxSamples.value):
-    MSOOutput = bufferAMax[i]
-    binaryMSOOutput = bin(MSOOutput)
-    binaryMSOOutput = binaryMSOOutput[2:]
-    binaryMSOOutput=binaryMSOOutput.zfill(8)
-    bufferAMaxBinaryD0[i] = binaryMSOOutput[7]
-    bufferAMaxBinaryD1[i] = binaryMSOOutput[6]
-    bufferAMaxBinaryD2[i] = binaryMSOOutput[5]
-    bufferAMaxBinaryD3[i] = binaryMSOOutput[4]
-    bufferAMaxBinaryD4[i] = binaryMSOOutput[3]
-    bufferAMaxBinaryD5[i] = binaryMSOOutput[2]
-    bufferAMaxBinaryD6[i] = binaryMSOOutput[1]
-    bufferAMaxBinaryD7[i] = binaryMSOOutput[0]
+bufferAMaxBinaryD0, bufferAMaxBinaryD1, bufferAMaxBinaryD2, bufferAMaxBinaryD3, bufferAMaxBinaryD4, bufferAMaxBinaryD5, bufferAMaxBinaryD6, bufferAMaxBinaryD7 = splitMSODataPort0(cmaxSamples, bufferAMax)
 
 # Creates the time data 
 time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
@@ -159,4 +139,3 @@ print(status)
 # Closes the unit 
 # Handle = chandle 
 ps.ps3000aCloseUnit(chandle)
-
