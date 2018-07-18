@@ -35,6 +35,10 @@ class CannotCloseUnitError(Exception):
     pass
 
 
+class ArgumentOutOfRangeError(Exception):
+    pass
+
+
 """UnitInfo: A type for holding the particulars of a connected device.
 driver = a Library subclass
 variant = model name as a string
@@ -78,6 +82,10 @@ class Library(object):
         self.PICO_INFO = constants.PICO_INFO
         self.PICO_STATUS = constants.PICO_STATUS
         self.PICO_STATUS_LOOKUP = constants.PICO_STATUS_LOOKUP
+        # these must be set in each driver file.
+        self.PICO_CHANNEL = {}
+        self.PICO_COUPLING = {}
+        self.PICO_VOLTAGE_RANGE = {}
 
     def __str__(self):
         return "picosdk %s library" % self.name
@@ -242,7 +250,44 @@ class Library(object):
             serial= self._python_get_unit_info(handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
         )
 
+    @requires_device("set_channel requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf')):
+        """optional arguments:
+        channel_name: a single channel (e.g. 'A')
+        enabled: whether to enable the channel (boolean)
+        coupling: string of the relevant enum member for your driver less the driver name prefix. e.g. 'DC' or 'AC'.
+        range: float which is the largest value you expect in the input signal. We will throw an exception if no
+               range on the device is large enough for that value.
+        return value: Max voltage of new range. Raises an exception in error cases."""
 
+        return self._python_set_channel(device.handle,
+                                        self.PICO_CHANNEL[channel_name],
+                                        1 if enabled else 0,
+                                        self.PICO_COUPLING[coupling],
+                                        range_peak)
+
+    def _python_set_channel(self, handle, channel_id, enabled, coupling_id, range_peak):
+        range_id, max_voltage = self._resolve_range(range_peak)
+
+        if len(self._set_channel.argtypes) == 5:
+            return_code = self._set_channel(c_int16(handle),
+                                            c_int16(channel_id),
+                                            c_int16(enabled),
+                                            c_int16(coupling_id),
+                                            c_int16(range_id))
+            if return_code == 0:
+                raise ArgumentOutOfRangeError("Driver thinks %sV is out of range for this device." % self.PICO_VOLTAGE_RANGE[range_id])
+        else:
+            raise NotImplementedError("not done other driver types yet")
+
+        return max_voltage
+
+    def _resolve_range(self, signal_peak):
+        # we use >= so that someone can specify the range they want precisely.
+        possibilities = list(filter(lambda i: i[1] >= signal_peak, self.PICO_VOLTAGE_RANGE.items()))
+        if not possibilities:
+            raise ArgumentOutOfRangeError("%s device doesn't support a range as wide as %sV" % (self.name, signal_peak))
+        return min(possibilities, key=lambda i: i[1])
 
 
 

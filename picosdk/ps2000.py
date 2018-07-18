@@ -7,7 +7,8 @@ for PicoScope 2000 Series oscilloscopes using the ps2000 driver API functions.
 """
 
 from ctypes import *
-from picosdk.library import Library
+from picosdk.library import Library, ArgumentOutOfRangeError
+from picosdk.constants import make_enum
 
 
 class ps2000lib(Library):
@@ -16,6 +17,39 @@ class ps2000lib(Library):
 
 
 ps2000 = ps2000lib()
+
+ps2000.PS2000_CHANNEL = make_enum([
+    "PS2000_CHANNEL_A",
+    "PS2000_CHANNEL_B",
+])
+
+# use the last character, i.e. the channel name, since only A and B exist on this driver:
+ps2000.PICO_CHANNEL = {k[-1]: v for k, v in ps2000.PS2000_CHANNEL.items()}
+
+# This field is passed to the driver as a boolean, not an enum.
+ps2000.PICO_COUPLING = {
+    'AC': 0,
+    'DC': 1
+}
+
+ps2000.PS2000_VOLTAGE_RANGE = {
+    'PS2000_20MV':  1,
+    'PS2000_50MV':  2,
+    'PS2000_100MV': 3,
+    'PS2000_200MV': 4,
+    'PS2000_500MV': 5,
+    'PS2000_1V':    6,
+    'PS2000_2V':    7,
+    'PS2000_5V':    8,
+    'PS2000_10V':   9,
+    'PS2000_20V':   10,
+}
+
+# float voltage value max (multiplier for output voltages). Parse the value in the constant name.
+ps2000.PICO_VOLTAGE_RANGE = {
+    v: float(k.split('_')[1][:-1]) if k[-2] != 'M' else (0.001 * float(k.split('_')[1][:-2]))
+    for k, v in ps2000.PS2000_VOLTAGE_RANGE.items()
+}
 
 doc = """ int16_t ps2000_open_unit
     (
@@ -357,4 +391,3 @@ ps2000.variants = ("2104", "2105", "2202", "2203", "2204", "2205", "2204A", "220
 ps2000.PICO_INFO = { k: v for k, v in ps2000.PICO_INFO.items() if v <= 0x00000005 }
 ps2000.PICO_INFO["PICO_ERROR_CODE"] = 0x00000006
 ps2000.PICO_INFO["PICO_KERNEL_DRIVER_VERSION"] = 0x00000007
-
