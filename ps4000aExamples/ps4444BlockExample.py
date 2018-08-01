@@ -15,7 +15,7 @@ from picosdk.functions import *
 chandle = ctypes.c_int16()
 status = {}
 
-# Open 5000 series PicoScope
+# Open 4000 series PicoScope
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps4000aOpenUnit(ctypes.byref(chandle), None)
 

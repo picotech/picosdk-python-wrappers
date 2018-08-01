@@ -126,8 +126,6 @@ cmaxSamples = ctypes.c_int32(maxSamples)
 status["getValues"] = ps.ps6000GetValues(chandle, 0, ctypes.byref(cmaxSamples), 1, 0, 0, ctypes.byref(overflow))
 
 # find maximum ADC count value
-# handle = chandle
-# pointer to value = ctypes.byref(maxADC)
 maxADC = ctypes.c_int16(32512)
 
 # convert ADC counts data to mV
