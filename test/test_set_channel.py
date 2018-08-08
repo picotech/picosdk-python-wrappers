@@ -14,7 +14,9 @@ from picosdk.library import ArgumentOutOfRangeError
 class SetChannelTest(DriverTest):
     max_volts_by_driver = {
         "ps2000" : 20,
+        "ps2000a": 20,
         "ps3000": 400,
+        "ps3000a": 20,
     }
     def test_set_channel_success(self):
         """test_get_info_success

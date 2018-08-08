@@ -11,7 +11,7 @@ from __future__ import print_function
 
 import sys
 import ctypes
-from ctypes import c_int16, c_int32, c_uint32, create_string_buffer
+from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer
 from ctypes.util import find_library
 import collections
 
@@ -251,7 +251,7 @@ class Library(object):
         )
 
     @requires_device("set_channel requires a picosdk.device.Device instance, passed to the correct owning driver.")
-    def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf')):
+    def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf'), analog_offset=None):
         """optional arguments:
         channel_name: a single channel (e.g. 'A')
         enabled: whether to enable the channel (boolean)
@@ -264,19 +264,33 @@ class Library(object):
                                         self.PICO_CHANNEL[channel_name],
                                         1 if enabled else 0,
                                         self.PICO_COUPLING[coupling],
-                                        range_peak)
+                                        range_peak,
+                                        analog_offset)
 
-    def _python_set_channel(self, handle, channel_id, enabled, coupling_id, range_peak):
+    def _python_set_channel(self, handle, channel_id, enabled, coupling_id, range_peak, analog_offset):
         range_id, max_voltage = self._resolve_range(range_peak)
 
         if len(self._set_channel.argtypes) == 5:
+            if analog_offset is not None:
+                raise ArgumentOutOfRangeError("This device doesn't support analog offset")
             return_code = self._set_channel(c_int16(handle),
                                             c_int16(channel_id),
                                             c_int16(enabled),
                                             c_int16(coupling_id),
                                             c_int16(range_id))
             if return_code == 0:
-                raise ArgumentOutOfRangeError("Driver thinks %sV is out of range for this device." % self.PICO_VOLTAGE_RANGE[range_id])
+                raise ArgumentOutOfRangeError("%sV is out of range for this device." % self.PICO_VOLTAGE_RANGE[range_id])
+        elif len(self._set_channel.argtypes) == 6:
+            if analog_offset is None:
+                analog_offset = 0.0
+            status =  self._set_channel(c_int16(handle),
+                                        c_int32(channel_id),
+                                        c_int16(enabled),
+                                        c_int32(coupling_id),
+                                        c_int32(range_id),
+                                        c_float(analog_offset))
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
         else:
             raise NotImplementedError("not done other driver types yet")
 

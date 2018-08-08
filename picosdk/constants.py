@@ -32,7 +32,15 @@ def pico_num(tag):
 
 def make_enum(members):
     """All C enums with no specific values follow the pattern 0, 1, 2... in the order they are in source."""
-    return {member: i for i, member in enumerate(members)}
+    enum = {}
+    for i, member in enumerate(members):
+        keys = [member]
+        if isinstance(member, tuple):
+            # this member has multiple names!
+            keys = member
+        for key in keys:
+            enum[key] = i
+    return enum
 
 
 PICO_STATUS = {

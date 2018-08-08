@@ -9,6 +9,7 @@ functions.
 
 from ctypes import *
 from picosdk.library import Library
+from picosdk.constants import make_enum
 
 
 class ps3000alib(Library):
@@ -17,6 +18,50 @@ class ps3000alib(Library):
 
 
 ps3000a = ps3000alib()
+
+ps3000a.PS3000A_COUPLING = make_enum([
+    'PS3000A_AC',
+    'PS3000A_DC',
+])
+
+# Just use AC and DC.
+ps3000a.PICO_COUPLING = {k[-2:]: v for k, v in ps3000a.PS3000A_COUPLING.items()}
+
+# A tuple in an enum like this is 2 names for the same value.
+ps3000a.PS3000A_CHANNEL = make_enum([
+    "PS3000A_CHANNEL_A",
+    "PS3000A_CHANNEL_B",
+    "PS3000A_CHANNEL_C",
+    "PS3000A_CHANNEL_D",
+    ("PS3000A_EXTERNAL", "PS3000A_MAX_CHANNELS"),
+    "PS3000A_TRIGGER_AUX",
+    "PS3000A_MAX_TRIGGER_SOURCE",
+])
+
+# only include the normal analog channels for now:
+ps3000a.PICO_CHANNEL = {k[-1]: v for k, v in ps3000a.PS3000A_CHANNEL.items() if "PS3000A_CHANNEL_" in k}
+
+ps3000a.PS3000A_RANGE = make_enum([
+    "PS3000A_10MV",
+    "PS3000A_20MV",
+    "PS3000A_50MV",
+    "PS3000A_100MV",
+    "PS3000A_200MV",
+    "PS3000A_500MV",
+    "PS3000A_1V",
+    "PS3000A_2V",
+    "PS3000A_5V",
+    "PS3000A_10V",
+    "PS3000A_20V",
+    "PS3000A_50V",
+    "PS3000A_MAX_RANGES",
+])
+
+ps3000a.PICO_VOLTAGE_RANGE = {
+    v: float(k.split('_')[1][:-1]) if k[-2] != 'M' else (0.001 * float(k.split('_')[1][:-2]))
+    for k, v in ps3000a.PS3000A_RANGE.items() if k != "PS3000A_MAX_RANGES"
+}
+
 
 doc = """ PICO_STATUS ps3000aOpenUnit
     (

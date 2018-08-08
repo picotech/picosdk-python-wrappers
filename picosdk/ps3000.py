@@ -25,7 +25,7 @@ ps3000.PS3000_CHANNEL = make_enum([
     "PS3000_CHANNEL_D",
 ])
 
-# use the last character, i.e. the channel name, since only A and B exist on this driver:
+# use the last character, i.e. the channel name:
 ps3000.PICO_CHANNEL = {k[-1]: v for k, v in ps3000.PS3000_CHANNEL.items()}
 
 # This field is passed to the driver as a boolean, not an enum.

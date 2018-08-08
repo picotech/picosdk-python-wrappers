@@ -8,6 +8,7 @@ file for PicoScope 2000 Series oscilloscopes using the ps2000a driver API functi
 
 from ctypes import *
 from picosdk.library import Library
+from picosdk.constants import make_enum
 
 
 class ps2000alib(Library):
@@ -16,6 +17,51 @@ class ps2000alib(Library):
 
 
 ps2000a = ps2000alib()
+
+# A tuple in an enum like this is 2 names for the same value.
+ps2000a.PS2000A_CHANNEL = make_enum([
+    "PS2000A_CHANNEL_A",
+    "PS2000A_CHANNEL_B",
+    "PS2000A_CHANNEL_C",
+    "PS2000A_CHANNEL_D",
+    ("PS2000A_EXTERNAL", "PS2000A_MAX_CHANNELS"),
+    "PS2000A_TRIGGER_AUX",
+    "PS2000A_MAX_TRIGGER_SOURCE",
+])
+
+# only include the normal analog channels for now:
+ps2000a.PICO_CHANNEL = {k[-1]: v for k, v in ps2000a.PS2000A_CHANNEL.items() if "PS2000A_CHANNEL_" in k}
+
+
+ps2000a.PS2000A_COUPLING = make_enum([
+    'PS2000A_AC',
+    'PS2000A_DC',
+])
+
+# Just use AC and DC.
+ps2000a.PICO_COUPLING = {k[-2:]: v for k, v in ps2000a.PS2000A_COUPLING.items()}
+
+ps2000a.PS2000A_RANGE = make_enum([
+    "PS2000A_10MV",
+    "PS2000A_20MV",
+    "PS2000A_50MV",
+    "PS2000A_100MV",
+    "PS2000A_200MV",
+    "PS2000A_500MV",
+    "PS2000A_1V",
+    "PS2000A_2V",
+    "PS2000A_5V",
+    "PS2000A_10V",
+    "PS2000A_20V",
+    "PS2000A_50V",
+    "PS2000A_MAX_RANGES",
+])
+
+ps2000a.PICO_VOLTAGE_RANGE = {
+    v: float(k.split('_')[1][:-1]) if k[-2] != 'M' else (0.001 * float(k.split('_')[1][:-2]))
+    for k, v in ps2000a.PS2000A_RANGE.items() if k != "PS2000A_MAX_RANGES"
+}
+
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (
