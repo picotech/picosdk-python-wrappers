@@ -8,6 +8,7 @@ for PicoScope 3000 Series oscilloscopes using the ps3000 driver API functions.
 
 from ctypes import *
 from picosdk.library import Library
+from picosdk.constants import make_enum
 
 
 class ps3000lib(Library):
@@ -16,6 +17,45 @@ class ps3000lib(Library):
 
 
 ps3000 = ps3000lib()
+
+ps3000.PS3000_CHANNEL = make_enum([
+    "PS3000_CHANNEL_A",
+    "PS3000_CHANNEL_B",
+    "PS3000_CHANNEL_C",
+    "PS3000_CHANNEL_D",
+])
+
+# use the last character, i.e. the channel name, since only A and B exist on this driver:
+ps3000.PICO_CHANNEL = {k[-1]: v for k, v in ps3000.PS3000_CHANNEL.items()}
+
+# This field is passed to the driver as a boolean, not an enum.
+ps3000.PICO_COUPLING = {
+    'AC': 0,
+    'DC': 1
+}
+
+ps3000.PS3000_VOLTAGE_RANGE = {
+    'PS3000_20MV':  1,
+    'PS3000_50MV':  2,
+    'PS3000_100MV': 3,
+    'PS3000_200MV': 4,
+    'PS3000_500MV': 5,
+    'PS3000_1V':    6,
+    'PS3000_2V':    7,
+    'PS3000_5V':    8,
+    'PS3000_10V':   9,
+    'PS3000_20V':   10,
+    'PS3000_50V':   11,
+    'PS3000_100V':  12,
+    'PS3000_200V':  13,
+    'PS3000_400V':  14,
+}
+
+# float voltage value max (multiplier for output voltages). Parse the value in the constant name.
+ps3000.PICO_VOLTAGE_RANGE = {
+    v: float(k.split('_')[1][:-1]) if k[-2] != 'M' else (0.001 * float(k.split('_')[1][:-2]))
+    for k, v in ps3000.PS3000_VOLTAGE_RANGE.items()
+}
 
 doc = """ int16_t ps3000_open_unit
     (
