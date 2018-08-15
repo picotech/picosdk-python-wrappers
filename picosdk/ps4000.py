@@ -9,6 +9,7 @@ functions.
 
 from ctypes import *
 from picosdk.library import Library
+from picosdk.constants import make_enum
 
 
 class ps4000lib(Library):
@@ -17,6 +18,89 @@ class ps4000lib(Library):
 
 
 ps4000 = ps4000lib()
+
+# This field is passed to the driver as a boolean, not an enum.
+ps4000.PICO_COUPLING = {
+    'AC': 0,
+    'DC': 1
+}
+
+# A tuple in an enum like this is 2 names for the same value.
+ps4000.PS4000_CHANNEL = make_enum([
+    "PS4000_CHANNEL_A",
+    "PS4000_CHANNEL_B",
+    "PS4000_CHANNEL_C",
+    "PS4000_CHANNEL_D",
+    ("PS4000_EXTERNAL", "PS4000_MAX_CHANNELS"),
+    "PS4000_TRIGGER_AUX",
+    "PS4000_MAX_TRIGGER_SOURCE",
+])
+
+# only include the normal analog channels for now:
+ps4000.PICO_CHANNEL = {k[-1]: v for k, v in ps4000.PS4000_CHANNEL.items() if "PS4000_CHANNEL_" in k}
+
+ps4000.PS4000_RANGE = make_enum([
+    "PS4000_10MV",
+    "PS4000_20MV",
+    "PS4000_50MV",
+    "PS4000_100MV",
+    "PS4000_200MV",
+    "PS4000_500MV",
+    "PS4000_1V",
+    "PS4000_2V",
+    "PS4000_5V",
+    "PS4000_10V",
+    "PS4000_20V",
+    "PS4000_50V",
+    "PS4000_100V",
+    ("PS4000_RESISTANCE_100R", "PS4000_MAX_RANGES"),
+    "PS4000_RESISTANCE_1K",
+    "PS4000_RESISTANCE_10K",
+    "PS4000_RESISTANCE_100K",
+    "PS4000_RESISTANCE_1M",
+    ("PS4000_ACCELEROMETER_10MV", "PS4000_MAX_RESISTANCES"),
+    "PS4000_ACCELEROMETER_20MV",
+    "PS4000_ACCELEROMETER_50MV",
+    "PS4000_ACCELEROMETER_100MV",
+    "PS4000_ACCELEROMETER_200MV",
+    "PS4000_ACCELEROMETER_500MV",
+    "PS4000_ACCELEROMETER_1V",
+    "PS4000_ACCELEROMETER_2V",
+    "PS4000_ACCELEROMETER_5V",
+    "PS4000_ACCELEROMETER_10V",
+    "PS4000_ACCELEROMETER_20V",
+    "PS4000_ACCELEROMETER_50V",
+    "PS4000_ACCELEROMETER_100V",
+    ("PS4000_TEMPERATURE_UPTO_40", "PS4000_MAX_ACCELEROMETER"),
+    "PS4000_TEMPERATURE_UPTO_70",
+    "PS4000_TEMPERATURE_UPTO_100",
+    "PS4000_TEMPERATURE_UPTO_130",
+    ("PS4000_RESISTANCE_5K", "PS4000_MAX_TEMPERATURES"),
+    "PS4000_RESISTANCE_25K",
+    "PS4000_RESISTANCE_50K",
+    "PS4000_MAX_EXTRA_RESISTANCES",
+])
+
+def process_enum(enum):
+    """The PS4000 range enum is complicated enough that we need some clearer logic:"""
+    import re
+    pattern = re.compile(r'PS4000_([0-9]+M?)V')
+
+    voltage_range = {}
+
+    for enum_item_name, enum_item_value in enum.items():
+        match = pattern.match(enum_item_name)
+        if match is None:
+            continue
+        voltage_string = match.group(1)
+        voltage = float(voltage_string) if voltage_string[-1] != 'M' else (0.001 * float(voltage_string[:-1]))
+
+        voltage_range[enum_item_value] = voltage
+
+    return voltage_range
+
+
+ps4000.PICO_VOLTAGE_RANGE = process_enum(ps4000.PS4000_RANGE)
 
 doc = """ PICO_STATUS ps4000OpenUnit
     (

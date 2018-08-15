@@ -270,7 +270,7 @@ class Library(object):
     def _python_set_channel(self, handle, channel_id, enabled, coupling_id, range_peak, analog_offset):
         range_id, max_voltage = self._resolve_range(range_peak)
 
-        if len(self._set_channel.argtypes) == 5:
+        if len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int16:
             if analog_offset is not None:
                 raise ArgumentOutOfRangeError("This device doesn't support analog offset")
             return_code = self._set_channel(c_int16(handle),
@@ -289,6 +289,16 @@ class Library(object):
                                         c_int32(coupling_id),
                                         c_int32(range_id),
                                         c_float(analog_offset))
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
+        elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32:
+            if analog_offset is not None:
+                raise ArgumentOutOfRangeError("This device doesn't support analog offset")
+            status =  self._set_channel(c_int16(handle),
+                                        c_int32(channel_id),
+                                        c_int16(enabled),
+                                        c_int16(coupling_id),
+                                        c_int32(range_id))
             if status != self.PICO_STATUS['PICO_OK']:
                 raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
         else:

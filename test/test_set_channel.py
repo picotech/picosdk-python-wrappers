@@ -17,6 +17,7 @@ class SetChannelTest(DriverTest):
         "ps2000a": 20,
         "ps3000": 400,
         "ps3000a": 20,
+        "ps4000": 100,
     }
     def test_set_channel_success(self):
         """test_get_info_success
