@@ -12,6 +12,8 @@ from picosdk.library import ArgumentOutOfRangeError
 
 
 class SetChannelTest(DriverTest):
+    # Both 3000a and 5000a define a 50V enum member, but neither actually has a device which
+    # supports that range.
     max_volts_by_driver = {
         "ps2000" : 20,
         "ps2000a": 20,
@@ -19,9 +21,10 @@ class SetChannelTest(DriverTest):
         "ps3000a": 20,
         "ps4000": 100,
         "ps4000a": 50,
+        "ps5000a": 20,
     }
     def test_set_channel_success(self):
-        """test_get_info_success
+        """test_set_channel_success
         note: test assumes you have set test_helpers.drivers_with_device_connected"""
         if not drivers_with_device_connected:
             return
@@ -29,8 +32,8 @@ class SetChannelTest(DriverTest):
         def test(driver):
             expected_max_volts = self.max_volts_by_driver[driver.name]
             with driver.open_unit() as device:
-                # we don't have a device call which calls this function and only this function. So we invoke it
-                # carefully from outside the class.
+                # we don't have a device call which calls this function and only this function. So
+                # we invoke it carefully from outside the class.
                 actual_max_voltage = driver.set_channel(device, range_peak=expected_max_volts)
 
             self.assertEqual(expected_max_volts, actual_max_voltage)
@@ -38,7 +41,7 @@ class SetChannelTest(DriverTest):
         self.run_snippet_and_count_problems(drivers_to_use, test)
 
     def test_set_channel_range_too_large(self):
-        """test_get_info_success
+        """test_set_channel_range_too_large
         note: test assumes you have set test_helpers.drivers_with_device_connected"""
         if not drivers_with_device_connected:
             return

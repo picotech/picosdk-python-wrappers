@@ -29,6 +29,51 @@ ps5000a.PS5000A_DEVICE_RESOLUTION = make_enum([
 
 ps5000a.DEFAULT_RESOLUTION = ps5000a.PS5000A_DEVICE_RESOLUTION["PS5000A_DR_8BIT"]
 
+ps5000a.PS5000A_COUPLING = make_enum([
+    'PS5000A_AC',
+    'PS5000A_DC',
+])
+
+# Just use AC and DC.
+ps5000a.PICO_COUPLING = {k[-2:]: v for k, v in ps5000a.PS5000A_COUPLING.items()}
+
+# A tuple in an enum like this is 2 names for the same value.
+ps5000a.PS5000A_CHANNEL = make_enum([
+    "PS5000A_CHANNEL_A",
+    "PS5000A_CHANNEL_B",
+    "PS5000A_CHANNEL_C",
+    "PS5000A_CHANNEL_D",
+    ("PS5000A_EXTERNAL", "PS5000A_MAX_CHANNELS"),
+    "PS5000A_TRIGGER_AUX",
+    "PS5000A_MAX_TRIGGER_SOURCE",
+])
+
+# only include the normal analog channels for now:
+ps5000a.PICO_CHANNEL = {k[-1]: v for k, v in ps5000a.PS5000A_CHANNEL.items() if "PS5000A_CHANNEL_" in k}
+
+
+ps5000a.PS5000A_RANGE = make_enum([
+    "PS5000A_10MV",
+    "PS5000A_20MV",
+    "PS5000A_50MV",
+    "PS5000A_100MV",
+    "PS5000A_200MV",
+    "PS5000A_500MV",
+    "PS5000A_1V",
+    "PS5000A_2V",
+    "PS5000A_5V",
+    "PS5000A_10V",
+    "PS5000A_20V",
+    "PS5000A_50V",
+    "PS5000A_MAX_RANGES",
+])
+
+ps5000a.PICO_VOLTAGE_RANGE = {
+    v: float(k.split('_')[1][:-1]) if k[-2] != 'M' else (0.001 * float(k.split('_')[1][:-2]))
+    for k, v in ps5000a.PS5000A_RANGE.items() if k != "PS5000A_MAX_RANGES"
+}
+
+
 doc = """ PICO_STATUS (ps5000aOpenUnit)
     (
         int16_t                   *handle,
