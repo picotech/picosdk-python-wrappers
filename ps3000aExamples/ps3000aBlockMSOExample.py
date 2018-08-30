@@ -7,7 +7,7 @@
 
 import ctypes
 from picosdk.ps3000a import ps3000a as ps
-from picosdk.functions import *
+from picosdk.functions import splitMSODataPort0
 import numpy as np
 import matplotlib.pyplot as plt
 import time

@@ -9,7 +9,7 @@ import ctypes
 import numpy as np
 from picosdk.ps5000a import ps5000a as ps
 import matplotlib.pyplot as plt
-from picosdk.functions import *
+from picosdk.functions import adc2mV
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -21,12 +21,20 @@ status = {}
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, 2)
 
-powerStatus = status["openunit"]
+try:
+    assert_pico_ok(status["open_unit"])
+except PicoNotOkError:
 
-if powerStatus == 286:
-    status["changePowerSource"] = ps.ps4000aChangePowerSource(chandle, powerStatus)
-if powerStatus == 282:
-    status["changePowerSource"] = ps.ps4000aChangePowerSource(chandle, powerStatus)
+    powerStatus = status["openunit"]
+
+    if powerStatus == 286:
+        status["changePowerSource"] = ps.ps5000aChangePowerSource(chandle, powerStatus)
+    elif powerStatus == 282:
+        status["changePowerSource"] = ps.ps5000aChangePowerSource(chandle, powerStatus)
+    else:
+        raise
+
+    assert_pico_ok(status["changePowerSource"])
 
 # Set up channel A
 # handle = chandle
@@ -56,7 +64,7 @@ status["setChB"] = ps.ps5000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
 # direction = PS5000A_RISING = 2
 # delay = 0 s
 # auto Trigger = 1000 ms
-status["trigger"] = ps.ps5000aSetSimpleTrigger(chandle, 1, 0, 1024, 2, 0, 1000)
+status["trigger"] = ps.ps5000aSetSimpleTrigger(chandle, 1, 0, 0, 2, 0, 1000)
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500

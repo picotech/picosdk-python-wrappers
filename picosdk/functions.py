@@ -1,10 +1,11 @@
+from __future__ import division
 import numpy as np
 
 
 def adc2mV(bufferADC, range, maxADC):
     """ 
         adc2mc(
-                c_short_Array           buffer
+                c_short_Array           bufferADC
                 int                     range
                 c_int32                  maxADC
                 )
@@ -27,14 +28,14 @@ def splitMSODataPort0(cmaxSamples, bufferMax):
                         )
     """
     # Makes an array for each digital channel
-    bufferMaxBinaryD0 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD1 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD2 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD3 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD4 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD5 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD6 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD7 = np.chararray(cmaxSamples.value, 1)
+    bufferMaxBinaryD0 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD1 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD2 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD3 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD4 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD7 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD5 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD6 = np.chararray((cmaxSamples.value, 1))
     
     # Changes the data from int type to a binary type and then seperates the data for each digital channel
     for i in range(0, cmaxSamples.value):
@@ -61,14 +62,14 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
                         )
     """
     # Makes an array for each digital channel
-    bufferMaxBinaryD8 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD9 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD10 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD11 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD12 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD13 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD14 = np.chararray(cmaxSamples.value, 1)
-    bufferMaxBinaryD15 = np.chararray(cmaxSamples.value, 1)
+    bufferMaxBinaryD8 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD9 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD10 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD11 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD12 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD13 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD14 = np.chararray((cmaxSamples.value, 1))
+    bufferMaxBinaryD15 = np.chararray((cmaxSamples.value, 1))
     
     # Changes the data from int type to a binary type and then seperates the data for each digital channel
     for i in range(0, cmaxSamples.value):
@@ -86,3 +87,5 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
         bufferMaxBinaryD15[i] = binaryMSOData[0]
 
     return bufferMaxBinaryD8, bufferAMaxBinaryD9, bufferAMaxBinaryD10, bufferAMaxBinaryD11, bufferAMaxBinaryD12, bufferAMaxBinaryD13, bufferAMaxBinaryD14, bufferAMaxBinaryD15
+
+# def assert_pico_ok(status):

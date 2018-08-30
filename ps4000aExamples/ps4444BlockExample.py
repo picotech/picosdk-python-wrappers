@@ -9,7 +9,7 @@ import ctypes
 import numpy as np
 from picosdk.ps4000a import ps4000a as ps
 import matplotlib.pyplot as plt
-from picosdk.functions import *
+from picosdk.functions import adc2mV
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()

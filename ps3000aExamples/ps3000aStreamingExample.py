@@ -9,7 +9,7 @@ import ctypes
 from picosdk.ps3000a import ps3000a as ps
 import numpy as np
 import matplotlib.pyplot as plt
-from picosdk.functions import *
+from picosdk.functions import adc2mV
 
 # Create chandle and status ready for use
 status = {}

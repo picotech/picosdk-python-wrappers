@@ -9,7 +9,7 @@ import ctypes
 import numpy as np
 from picosdk.ps2000 import ps2000 as ps
 import matplotlib.pyplot as plt
-from picosdk.functions import *
+from picosdk.functions import adc2mV
 
 # Create status ready for use
 status = {}
