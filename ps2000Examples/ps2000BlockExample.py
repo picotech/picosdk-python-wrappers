@@ -9,7 +9,7 @@ import ctypes
 import numpy as np
 from picosdk.ps2000 import ps2000 as ps
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV
+from picosdk.functions import adc2mV, assert_pico2000_ok
 
 # Create status ready for use
 status = {}
@@ -17,6 +17,7 @@ status = {}
 # Open 2000 series PicoScope
 # Returns handle to chandle for use in future API functions
 status["openUnit"] = ps.ps2000_open_unit()
+assert_pico2000_ok(status["openunit"])
 
 # Create chandle for use
 chandle = ctypes.c_int16(status["openUnit"])
@@ -30,6 +31,7 @@ chandle = ctypes.c_int16(status["openUnit"])
 # analogue offset = 0 V
 chARange = 7
 status["setChA"] = ps.ps2000_set_channel(chandle, 0, 1, 1, chARange)
+assert_pico2000_ok(status["setChA"])
 
 # Set up channel B
 # handle = chandle
@@ -40,6 +42,7 @@ status["setChA"] = ps.ps2000_set_channel(chandle, 0, 1, 1, chARange)
 # analogue offset = 0 V
 chBRange = 7
 status["setChB"] = ps.ps2000_set_channel(chandle, 1, 1, 1, chBRange)
+assert_pico2000_ok(status["setChB"])
 
 # Set up single trigger
 # handle = chandle
@@ -49,6 +52,7 @@ status["setChB"] = ps.ps2000_set_channel(chandle, 1, 1, 1, chBRange)
 # delay = 0 s
 # auto Trigger = 1000 ms
 status["trigger"] = ps.ps2000_set_trigger(chandle, 0, 64, 2, 0, 1000)
+assert_pico2000_ok(status["trigger"])
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
@@ -69,6 +73,7 @@ timeUnits = ctypes.c_int32()
 oversample = ctypes.c_int16(1)
 maxSamplesReturn = ctypes.c_int32()
 status["getTimebase"] = ps.ps2000_get_timebase(chandle, timebase, maxSamples, ctypes.byref(timeInterval), ctypes.byref(timeUnits), oversample, ctypes.byref(maxSamplesReturn))
+assert_pico2000_ok(status["getTimebase"])
 
 # Run block capture
 # handle = chandle
@@ -78,6 +83,7 @@ status["getTimebase"] = ps.ps2000_get_timebase(chandle, timebase, maxSamples, ct
 # pointer to time_indisposed_ms = ctypes.byref(timeIndisposedms)
 timeIndisposedms = ctypes.c_int32()
 status["runBlock"] = ps.ps2000_run_block(chandle, maxSamples, timebase, oversample, ctypes.byref(timeIndisposedms))
+assert_pico2000_ok(status["runBlock"])
 
 # Check for data collection to finish using ps5000aIsReady
 ready = ctypes.c_int16(0)
@@ -98,6 +104,7 @@ bufferB = (ctypes.c_int16 * maxSamples)()
 # no_of_values = cmaxSamples
 cmaxSamples = ctypes.c_int32(maxSamples)
 status["getValues"] = ps.ps2000_get_values(chandle, ctypes.byref(bufferA), ctypes.byref(bufferB), None, None, ctypes.byref(oversample), cmaxSamples)
+assert_pico2000_ok(status["getValues"])
 
 # find maximum ADC count value
 maxADC = ctypes.c_int16(32767)
@@ -119,10 +126,12 @@ plt.show()
 # Stop the scope
 # handle = chandle
 status["stop"] = ps.ps2000_stop(chandle)
-
-# display status returns
-print(status)
+assert_pico2000_ok(status["stop"])
 
 # Close unitDisconnect the scope
 # handle = chandle
-ps.ps2000_close_unit(chandle)
+status["close"] = ps.ps2000_close_unit(chandle)
+assert_pico2000_ok(status["close"])
+
+# display status returns
+print(status)

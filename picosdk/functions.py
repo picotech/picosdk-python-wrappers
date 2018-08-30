@@ -118,3 +118,16 @@ def assert_pico_ok(status):
         errorCheck = False
         raise BaseException("Pico_OK not returned")
 
+
+def assert_pico2000_ok(status):
+    """
+        assert_pico_ok(
+                        status
+                       )
+    """
+    # checks for PICO_OK status return
+    if status > 0:
+        errorCheck = True
+    else:
+        errorCheck = False
+        raise BaseException("Unsuccessful API call")
