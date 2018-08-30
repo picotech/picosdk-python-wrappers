@@ -17,9 +17,9 @@ status = {}
 
 # Open 5000 series PicoScope
 # Resolution set to 12 Bit
-# PS5000A_DR_12BIT = 2
+resolution =ps.PS5000A_DEVICE_RESOLUTION["PS5000A_DR_12BIT"]
 # Returns handle to chandle for use in future API functions
-status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, 2)
+status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, resolution)
 
 try:
     assert_pico_ok(status["open_unit"])

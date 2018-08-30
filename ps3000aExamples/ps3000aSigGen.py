@@ -18,18 +18,25 @@ chandle = ctypes.c_int16()
 # Opens the device/s
 status["openunit"] = ps.ps3000aOpenUnit(ctypes.byref(chandle), None)
 
-# powerstate becomes the status number of openunit
-powerstate = status["openunit"]
+try:
+    assert_pico_ok(status["openunit"]) 
+except:
 
-# If powerstate is the same as 282 then it will run this if statement
-if powerstate == 282:
-    # Changes the power input to "PICO_POWER_SUPPLY_NOT_CONNECTED"
-    status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 282)
+    # powerstate becomes the status number of openunit
+    powerstate = status["openunit"]
 
-# If the powerstate is the same as 286 then it will run this if statement
-if powerstate == 286:
-    # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
-    status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286) 
+    # If powerstate is the same as 282 then it will run this if statement
+    if powerstate == 282:
+        # Changes the power input to "PICO_POWER_SUPPLY_NOT_CONNECTED"
+        status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 282)
+    # If the powerstate is the same as 286 then it will run this if statement
+    elif powerstate == 286:
+        # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
+        status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286) 
+    else:
+        raise
+
+    assert_pico_ok(status["ChangePowerSource"])
 
 # Generates Sine signal with a 2V pkToPk with a 10KHz frequency 
 # handle = chandle
@@ -53,6 +60,7 @@ triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
 status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # pauses the script to show signal
 time.sleep(10)
@@ -79,6 +87,7 @@ triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
 status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # pauses the script to show signal
 time.sleep(10)
@@ -105,6 +114,7 @@ triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
 status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 100000, 5, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # pauses the script to show signal 
 time.sleep(36)
@@ -112,10 +122,12 @@ time.sleep(36)
 # Stops the scope 
 # Handle = chandle
 status["stop"] = ps.ps3000aStop(chandle)
-
-# Displays the staus returns
-print(status)
+assert_pico_ok(status["stop"])
 
 # Closes the unit 
 # Handle = chandle 
-ps.ps3000aCloseUnit(chandle)
+status["close"] = ps.ps3000aCloseUnit(chandle)
+assert_pico_ok(status["close"])
+
+# Displays the staus returns
+print(status)

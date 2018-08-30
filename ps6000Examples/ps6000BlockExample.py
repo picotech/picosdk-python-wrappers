@@ -18,6 +18,7 @@ status = {}
 # Open 6000 series PicoScope
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps6000OpenUnit(ctypes.byref(chandle), None)
+assert_pico_ok(status["openunit"])
 
 # Set up channel A
 # handle = chandle
@@ -29,6 +30,7 @@ status["openunit"] = ps.ps6000OpenUnit(ctypes.byref(chandle), None)
 # bandwidth limiter = PS6000_BW_FULL = 0
 chARange = 7
 status["setChA"] = ps.ps6000SetChannel(chandle, 0, 1, 1, chARange, 0, 0)
+assert_pico_ok(status["setChA"])
 
 # Set up channel B
 # handle = chandle
@@ -40,6 +42,7 @@ status["setChA"] = ps.ps6000SetChannel(chandle, 0, 1, 1, chARange, 0, 0)
 # bandwidth limiter = PS6000_BW_FULL = 0
 chBRange = 7
 status["setChB"] = ps.ps6000SetChannel(chandle, 1, 1, 1, chBRange, 0, 0)
+assert_pico_ok(status["setChB"])
 
 # Set up single trigger
 # handle = chandle
@@ -50,6 +53,7 @@ status["setChB"] = ps.ps6000SetChannel(chandle, 1, 1, 1, chBRange, 0, 0)
 # delay = 0 s
 # auto Trigger = 1000 ms
 status["trigger"] = ps.ps6000SetSimpleTrigger(chandle, 1, 0, 64, 2, 0, 1000)
+assert_pico_ok(status["trigger"])
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
@@ -68,6 +72,7 @@ timebase = 8
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int32()
 status["getTimebase2"] = ps.ps6000GetTimebase2(chandle, timebase, maxSamples, ctypes.byref(timeIntervalns), 1, ctypes.byref(returnedMaxSamples), 0)
+assert_pico_ok(status["getTimebase2"])
 
 # Run block capture
 # handle = chandle
@@ -80,6 +85,7 @@ status["getTimebase2"] = ps.ps6000GetTimebase2(chandle, timebase, maxSamples, ct
 # lpReady = None (using ps6000IsReady rather than ps6000BlockReady)
 # pParameter = None
 status["runBlock"] = ps.ps6000RunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, 0, None, 0, None, None)
+assert_pico_ok(status["runBlock"])
 
 # Check for data collection to finish using ps6000IsReady
 ready = ctypes.c_int16(0)
@@ -101,6 +107,7 @@ bufferBMin = (ctypes.c_int16 * maxSamples)()
 # buffer length = maxSamples
 # ratio mode = PS6000_RATIO_MODE_NONE = 0
 status["setDataBuffersA"] = ps.ps6000SetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxSamples, 0)
+assert_pico_ok(status["setDataBuffersA"])
 
 # Set data buffer location for data collection from channel B
 # handle = chandle
@@ -110,6 +117,7 @@ status["setDataBuffersA"] = ps.ps6000SetDataBuffers(chandle, 0, ctypes.byref(buf
 # buffer length = maxSamples
 # ratio mode = PS6000_RATIO_MODE_NONE = 0
 status["setDataBuffersB"] = ps.ps6000SetDataBuffers(chandle, 1, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), maxSamples, 0)
+assert_pico_ok(status["setDataBuffersB"])
 
 # create overflow loaction
 overflow = ctypes.c_int16()
@@ -124,6 +132,7 @@ cmaxSamples = ctypes.c_int32(maxSamples)
 # downsample ratio mode = PS6000_RATIO_MODE_NONE
 # pointer to overflow = ctypes.byref(overflow))
 status["getValues"] = ps.ps6000GetValues(chandle, 0, ctypes.byref(cmaxSamples), 1, 0, 0, ctypes.byref(overflow))
+assert_pico_ok(status["getValues"])
 
 # find maximum ADC count value
 maxADC = ctypes.c_int16(32512)
@@ -142,9 +151,12 @@ plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
 
-# display status returns
-print(status)
+status["stop"] = ps.ps6000aStop(chandle)
+assert_pico_ok(status["stop"])
 
 # Close unitDisconnect the scope
 # handle = chandle
 ps.ps6000CloseUnit(chandle)
+
+# display status returns
+print(status)

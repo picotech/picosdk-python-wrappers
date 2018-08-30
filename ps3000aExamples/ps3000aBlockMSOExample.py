@@ -20,25 +20,32 @@ chandle = ctypes.c_int16()
 # Opens the device/s
 status["openunit"] = ps.ps3000aOpenUnit(ctypes.byref(chandle), None)
 
-# powerstate becomes the status number of openunit
-powerstate = status["openunit"]
+try:
+    assert_pico_ok(status["openunit"])
+except:
+    # powerstate becomes the status number of openunit
+    powerstate = status["openunit"]
 
-# If powerstate is the same as 282 then it will run this if statement
-if powerstate == 282:
-    # Changes the power input to "PICO_POWER_SUPPLY_NOT_CONNECTED"
-    status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 282)
+    # If powerstate is the same as 282 then it will run this if statement
+    if powerstate == 282:
+        # Changes the power input to "PICO_POWER_SUPPLY_NOT_CONNECTED"
+        status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 282)
+    # If the powerstate is the same as 286 then it will run this if statement
+    elif powerstate == 286:
+        # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
+        status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286) 
+    else:
+        raise
+    
+    assert_pico_ok(status["ChangePowerSource"])
 
-# If the powerstate is the same as 286 then it will run this if statement
-if powerstate == 286:
-    # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
-    status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286) 
-
-# Handle
+# set up digital port
+# handle = chandle
 # PS3000a_DIGITAL_PORT = 0x80
 # Enable = 1
-# logicLevel = 0
-
+# logicLevel = 10000
 status["SetDigitalPort"] = ps.ps3000aSetDigitalPort( chandle, 0x80, 1, 10000)
+assert_pico_ok(status["SetDigitalPort"])
 
 # Setting the number of sample to be collected
 preTriggerSamples = 400
@@ -56,6 +63,7 @@ timebase = 8
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
 status["GetTimebase"] = ps.ps3000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), 1, ctypes.byref(returnedMaxSamples), 0)
+assert_pico_ok(status["GetTimebase"])
 
 # Creates a overlow location for data
 overflow = ctypes.c_int16()
@@ -75,6 +83,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)()
 # Segment index = 0 
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0x80, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
+assert_pico_ok(status["SetDataBuffers"])
 
 # Starts the block capture
 # Handle = chandle
@@ -86,6 +95,7 @@ status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0x80, ctypes.byref(
 # LpRead = None
 # pParameter = None
 status["runblock"] = ps.ps3000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, 1, None, 0, None, None)
+assert_pico_ok(status["runblock"])
 
 # Creates a overlow location for data
 overflow = (ctypes.c_int16 * 10)()
@@ -107,6 +117,7 @@ while ready.value == check.value:
 # Overflow = ctypes.byref(overflow)
 
 status["GetValues"] = ps.ps3000aGetValues(chandle, 0, ctypes.byref(cmaxSamples), 0, 0, 0, ctypes.byref(overflow))
+assert_pico_ok(status["GetValues"])
 
 bufferAMaxBinaryD0, bufferAMaxBinaryD1, bufferAMaxBinaryD2, bufferAMaxBinaryD3, bufferAMaxBinaryD4, bufferAMaxBinaryD5, bufferAMaxBinaryD6, bufferAMaxBinaryD7 = splitMSODataPort0(cmaxSamples, bufferAMax)
 
@@ -130,10 +141,12 @@ plt.show()
 # Stops the scope 
 # Handle = chandle
 status["stop"] = ps.ps3000aStop(chandle)
-
-# Displays the staus returns
-print(status)
+assert_pico_ok(status["stop"])
 
 # Closes the unit 
 # Handle = chandle 
-ps.ps3000aCloseUnit(chandle)
+status["stop"] = ps.ps3000aCloseUnit(chandle)
+assert_pico_ok(status["stop"])
+
+# Displays the staus returns
+print(status)

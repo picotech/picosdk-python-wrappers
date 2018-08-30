@@ -18,29 +18,32 @@ chandle = ctypes.c_int16()
 # Opens the device/s
 status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, 1)
 
-# powerstate becomes the status number of openunit
-powerstate = status["openunit"]
 
-# If powerstate is the same as 282 then it will run this if statement
-if powerstate == 282:
-    # Changes the power input to "PICO_POWER_SUPPLY_NOT_CONNECTED"
-    status["ChangePowerSource"] = ps.ps5000aChangePowerSource(chandle, 282)
+try:
+    assert_pico_ok(status["open_unit"])
+except: # PicoNotOkError:
 
-# If the powerstate is the same as 286 then it will run this if statement
-if powerstate == 286:
-    # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
-    status["ChangePowerSource"] = ps.ps5000aChangePowerSource(chandle, 286) 
+    powerStatus = status["openunit"]
+
+    if powerStatus == 286:
+        status["changePowerSource"] = ps.ps5000aChangePowerSource(chandle, powerStatus)
+    elif powerStatus == 282:
+        status["changePowerSource"] = ps.ps5000aChangePowerSource(chandle, powerStatus)
+    else:
+        raise
+
+    assert_pico_ok(status["changePowerSource"])
 
 # Generates Sine signal with a 2V pkToPk with a 10KHz frequency 
 # handle = chandle
 # offsetVoltage = 0
 # pkToPk = 2000000
-# waveType = ctypes.c_int16(0) = PS5000a_SINE
+# waveType = ctypes.c_int16(0) = PS5000A_SINE
 # startFrequency = 10000 Hz
 # stopFrequency = 10000 Hz
 # increment = 0
 # dwellTime = 1
-# sweepType = ctypes.c_int16(1) = PS5000a_UP
+# sweepType = ctypes.c_int16(1) = PS5000A_UP
 # operation = 0
 # shots = 0
 # sweeps = 0
@@ -53,6 +56,8 @@ triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
 status["SetSigGenBuiltIn"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+assert_pico_ok(status["SetSigGenBuiltIn"])
+
 
 # pauses the script to show signal
 time.sleep(10)
@@ -61,17 +66,17 @@ time.sleep(10)
 # handle = chandle
 # offsetVoltage = -1000000
 # pkToPk = 1500000
-# waveType = ctypes.c_int16(1) = PS5000a_Sqaure
+# waveType = ctypes.c_int16(1) = PS5000A_Sqaure
 # startFrequency = 10000 Hz
 # stopFrequency = 10000 Hz
 # increment = 0
 # dwellTime = 1
-# sweepType = ctypes.c_int16(1) = PS5000a_UP
+# sweepType = ctypes.c_int16(1) = PS5000A_UP
 # operation = 0
 # shots = 0
 # sweeps = 0
-# triggerType = ctypes.c_int16(1) = PS5000a_SIGGEN_NONE
-# triggerSource = ctypes.c_int16(1) = P5000a_SIGGEN_NONE 
+# triggerType = ctypes.c_int16(1) = PS5000A_SIGGEN_NONE
+# triggerSource = ctypes.c_int16(1) = P5000A_SIGGEN_NONE 
 # extInThreshold = 1
 wavetype = ctypes.c_int32(1)
 sweepType = ctypes.c_int32(0)
@@ -79,6 +84,7 @@ triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
 status["SetSigGenBuiltIn"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # pauses the script to show signal
 time.sleep(10)
@@ -105,6 +111,7 @@ triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
 status["SetSigGenBuiltIn"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 100000, 5, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # pauses the script to show signal 
 time.sleep(36)
@@ -112,10 +119,12 @@ time.sleep(36)
 # Stops the scope 
 # Handle = chandle
 status["stop"] = ps.ps5000aStop(chandle)
-
-# Displays the staus returns
-print(status)
+assert_pico_ok(status["stop"])
 
 # Closes the unit 
 # Handle = chandle 
-ps.ps5000aCloseUnit(chandle)
+status["stop"] = ps.ps5000aCloseUnit(chandle)
+assert_pico_ok(status["stop"])
+
+# Displays the staus returns
+print(status)

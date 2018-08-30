@@ -17,19 +17,7 @@ chandle = ctypes.c_int16()
 
 # Opens the device/s
 status["openunit"] = ps.ps6000OpenUnit(ctypes.byref(chandle), None)
-
-# powerstate becomes the status number of openunit
-powerstate = status["openunit"]
-
-# If powerstate is the same as 282 then it will run this if statement
-if powerstate == 282:
-    # Changes the power input to "PICO_POWER_SUPPLY_NOT_CONNECTED"
-    status["ChangePowerSource"] = ps.ps6000ChangePowerSource(chandle, 282)
-
-# If the powerstate is the same as 286 then it will run this if statement
-if powerstate == 286:
-    # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
-    status["ChangePowerSource"] = ps.ps6000ChangePowerSource(chandle, 286) 
+assert_pico_ok(status[""])
 
 # Displays the serial number and handle 
 print(chandle.value)
@@ -43,6 +31,7 @@ print(chandle.value)
 # analogue offset = 0 V
 chARange = 8
 status["setChA"] = ps.ps6000SetChannel(chandle, 0, 1, 1, chARange, 0, 0)
+assert_pico_ok(status["setChA"])
 
 # Sets up single trigger
 # Handle = Chandle
@@ -53,6 +42,7 @@ status["setChA"] = ps.ps6000SetChannel(chandle, 0, 1, 1, chARange, 0, 0)
 # Delay = 0
 # autoTrigger_ms = 1000
 status["trigger"] = ps.ps6000SetSimpleTrigger(chandle, 1, 0, 1024, 3, 0, 1000)
+assert_pico_ok(status["setChA"])
 
 # Setting the number of sample to be collected
 preTriggerSamples = 400
@@ -70,6 +60,7 @@ timebase = 2
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
 status["GetTimebase"] = ps.ps6000GetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), 1, ctypes.byref(returnedMaxSamples), 0)
+assert_pico_ok(status["GetTimebase"])
 
 # Creates a overlow location for data
 overflow = ctypes.c_int16()
@@ -81,9 +72,11 @@ cmaxSamples = ctypes.c_int32(maxsamples)
 # nMaxSamples = ctypes.byref(cmaxSamples)
 
 status["MemorySegments"] = ps.ps6000MemorySegments(chandle, 10, ctypes.byref(cmaxSamples))
+assert_pico_ok(status["MemorySegments"])
 
 # sets number of captures
 status["SetNoOfCaptures"] = ps.ps6000SetNoOfCaptures(chandle, 10)
+assert_pico_ok(status["SetNoOfCaptures"])
 
 # Starts the block capture
 # Handle = chandle
@@ -95,6 +88,7 @@ status["SetNoOfCaptures"] = ps.ps6000SetNoOfCaptures(chandle, 10)
 # LpRead = None
 # pParameter = None
 status["runblock"] = ps.ps6000RunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, 1, None, 0, None, None)
+assert_pico_ok(status["runblock"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax = (ctypes.c_int16 * maxsamples)()
@@ -109,6 +103,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)()
 # Segment index = 0 
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax1 = (ctypes.c_int16 * maxsamples)()
@@ -123,6 +118,7 @@ bufferAMin1 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 1
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax1), ctypes.byref(bufferAMin1), maxsamples, 1, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax2 = (ctypes.c_int16 * maxsamples)()
@@ -137,6 +133,8 @@ bufferAMin2 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 2
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax2), ctypes.byref(bufferAMin2), maxsamples, 2, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
+
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax3 = (ctypes.c_int16 * maxsamples)()
@@ -151,6 +149,8 @@ bufferAMin3 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 3
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax3), ctypes.byref(bufferAMin3), maxsamples, 3, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
+
 # Create buffers ready for assigning pointers for data collection
 bufferAMax4 = (ctypes.c_int16 * maxsamples)()
 bufferAMin4 = (ctypes.c_int16 * maxsamples)()
@@ -164,6 +164,7 @@ bufferAMin4 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 4
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax4), ctypes.byref(bufferAMin4), maxsamples, 4, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax5 = (ctypes.c_int16 * maxsamples)()
@@ -178,6 +179,7 @@ bufferAMin5 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 5
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax5), ctypes.byref(bufferAMin5), maxsamples, 5, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax6 = (ctypes.c_int16 * maxsamples)()
@@ -192,6 +194,7 @@ bufferAMin6 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 6
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax6), ctypes.byref(bufferAMin6), maxsamples, 6, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax7 = (ctypes.c_int16 * maxsamples)()
@@ -206,6 +209,7 @@ bufferAMin7 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 7
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax7), ctypes.byref(bufferAMin7), maxsamples, 7, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax8 = (ctypes.c_int16 * maxsamples)()
@@ -220,6 +224,7 @@ bufferAMin8 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 8 
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax8), ctypes.byref(bufferAMin8), maxsamples, 8, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax9 = (ctypes.c_int16 * maxsamples)()
@@ -234,6 +239,7 @@ bufferAMin9 = (ctypes.c_int16 * maxsamples)()
 # Segment index = 9
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax9), ctypes.byref(bufferAMin9), maxsamples, 9, 0)
+assert_pico_ok(status["SetDataBuffersBulk"])
 
 # Creates a overlow location for data
 overflow = (ctypes.c_int16 * 10)()
@@ -255,6 +261,7 @@ while ready.value == check.value:
 # Overflow = ctypes.byref(overflow)
 
 status["GetValuesBulk"] = ps.ps6000GetValuesBulk(chandle, ctypes.byref(cmaxSamples), 0, 9, 0, 0, ctypes.byref(overflow))
+assert_pico_ok(status["GetValuesBulk"])
 
 # Handle = chandle
 # Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times) 
@@ -264,6 +271,7 @@ status["GetValuesBulk"] = ps.ps6000GetValuesBulk(chandle, ctypes.byref(cmaxSampl
 Times = (ctypes.c_int16*10)()
 TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps6000GetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
+assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
 # Finds the max ADC count 
 maxADC = ctypes.c_int16(32512)
@@ -301,14 +309,13 @@ plt.show()
 # Stops the scope 
 # Handle = chandle
 status["stop"] = ps.ps6000Stop(chandle)
-
-# Displays the staus returns
-# currently crashes the script
-# print(status)
-
+assert_pico_ok(status["stop"])
 
 # Closes the unit 
 # Handle = chandle 
-ps.ps6000CloseUnit(chandle)
+status["close"] = ps.ps6000CloseUnit(chandle)
+assert_pico_ok(status["close"])
 
+# Displays the staus returns
+print(status)
 

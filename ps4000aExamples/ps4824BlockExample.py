@@ -19,10 +19,18 @@ status = {}
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps4000aOpenUnit(ctypes.byref(chandle), None)
 
-powerStatus = status["openunit"]
+try:
+    assert_pico_ok(status["openunit"])
+except:
 
-if powerStatus == 286:
-    status["changePowerSource"] = ps.ps4000aChangePowerSource(chandle, powerStatus)
+    powerStatus = status["openunit"]
+
+    if powerStatus == 286:
+        status["changePowerSource"] = ps.ps4000aChangePowerSource(chandle, powerStatus)
+    else:
+        raise
+
+    assert_pico_ok(status["changePowerSource"])
 
 # Set up channel A
 # handle = chandle
@@ -33,6 +41,7 @@ if powerStatus == 286:
 # analogOffset = 0 V
 chARange = 7
 status["setChA"] = ps.ps4000aSetChannel(chandle, 0, 1, 1, chARange, 0)
+assert_pico_ok(status["setChA"])
 
 # Set up channel B
 # handle = chandle
@@ -43,6 +52,7 @@ status["setChA"] = ps.ps4000aSetChannel(chandle, 0, 1, 1, chARange, 0)
 # analogOffset = 0 V
 chBRange = 7
 status["setChB"] = ps.ps4000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
+assert_pico_ok(status["setChB"])
 
 # Set up channel C
 # handle = chandle
@@ -53,6 +63,7 @@ status["setChB"] = ps.ps4000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
 # analogOffset = 0 V
 chCRange = 7
 status["setChC"] = ps.ps4000aSetChannel(chandle, 2, 0, 1, chCRange, 0)
+assert_pico_ok(status["setChC"])
 
 # Set up channel D
 # handle = chandle
@@ -63,6 +74,7 @@ status["setChC"] = ps.ps4000aSetChannel(chandle, 2, 0, 1, chCRange, 0)
 # analogOffset = 0 V
 chDRange = 7
 status["setChD"] = ps.ps4000aSetChannel(chandle, 3, 0, 1, chDRange, 0)
+assert_pico_ok(status["setChD"])
 
 # Set up channel E
 # handle = chandle
@@ -73,6 +85,7 @@ status["setChD"] = ps.ps4000aSetChannel(chandle, 3, 0, 1, chDRange, 0)
 # analogOffset = 0 V
 chERange = 7
 status["setChE"] = ps.ps4000aSetChannel(chandle, 4, 0, 1, chERange, 0)
+assert_pico_ok(status["setChE"])
 
 # Set up channel F
 # handle = chandle
@@ -83,6 +96,7 @@ status["setChE"] = ps.ps4000aSetChannel(chandle, 4, 0, 1, chERange, 0)
 # analogOffset = 0 V
 chFRange = 7
 status["setChF"] = ps.ps4000aSetChannel(chandle, 5, 0, 1, chFRange, 0)
+assert_pico_ok(status["setChF"])
 
 # Set up channel G
 # handle = chandle
@@ -93,6 +107,7 @@ status["setChF"] = ps.ps4000aSetChannel(chandle, 5, 0, 1, chFRange, 0)
 # analogOffset = 0 V
 chGRange = 7
 status["setChG"] = ps.ps4000aSetChannel(chandle, 6, 0, 1, chGRange, 0)
+assert_pico_ok(status["setChG"])
 
 # Set up channel H
 # handle = chandle
@@ -103,6 +118,7 @@ status["setChG"] = ps.ps4000aSetChannel(chandle, 6, 0, 1, chGRange, 0)
 # analogOffset = 0 V
 chHRange = 7
 status["setChH"] = ps.ps4000aSetChannel(chandle, 7, 0, 1, chHRange, 0)
+assert_pico_ok(status["setChH"])
 
 # Set up single trigger
 # handle = chandle
@@ -113,6 +129,7 @@ status["setChH"] = ps.ps4000aSetChannel(chandle, 7, 0, 1, chHRange, 0)
 # delay = 0 s
 # auto Trigger = 1000 ms
 status["trigger"] = ps.ps4000aSetSimpleTrigger(chandle, 1, 0, 1024, 2, 0, 100)
+assert_pico_ok(status["trigger"])
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
@@ -131,6 +148,7 @@ timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int32()
 oversample = ctypes.c_int16(1)
 status["getTimebase2"] = ps.ps4000aGetTimebase2(chandle, timebase, maxSamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
+assert_pico_ok(status["getTimebase2"])
 
 # Run block capture
 # handle = chandle
@@ -142,6 +160,7 @@ status["getTimebase2"] = ps.ps4000aGetTimebase2(chandle, timebase, maxSamples, c
 # lpReady = None (using ps4000aIsReady rather than ps4000aBlockReady)
 # pParameter = None
 status["runBlock"] = ps.ps4000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, None, 0, None, None)
+assert_pico_ok(status["runBlock"])
 
 # Check for data collection to finish using ps4000aIsReady
 ready = ctypes.c_int16(0)
@@ -164,6 +183,7 @@ bufferBMin = (ctypes.c_int16 * maxSamples)()
 # segementIndex = 0
 # mode = PS4000A_RATIO_MODE_NONE = 0
 status["setDataBuffersA"] = ps.ps4000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxSamples, 0 , 0)
+assert_pico_ok(status["setDataBuffersA"])
 
 # Set data buffer location for data collection from channel B
 # handle = chandle
@@ -174,6 +194,7 @@ status["setDataBuffersA"] = ps.ps4000aSetDataBuffers(chandle, 0, ctypes.byref(bu
 # segementIndex = 0
 # mode = PS4000A_RATIO_MODE_NONE = 0
 status["setDataBuffersB"] = ps.ps4000aSetDataBuffers(chandle, 1, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), maxSamples, 0 , 0)
+assert_pico_ok(status["setDataBuffersB"])
 
 # create overflow loaction
 overflow = ctypes.c_int16()
@@ -188,6 +209,7 @@ cmaxSamples = ctypes.c_int32(maxSamples)
 # downsample ratio mode = PS4000a_RATIO_MODE_NONE
 # pointer to overflow = ctypes.byref(overflow))
 status["getValues"] = ps.ps4000aGetValues(chandle, 0, ctypes.byref(cmaxSamples), 0, 0, 0, ctypes.byref(overflow))
+assert_pico_ok(status["getValues"])
 
 
 # find maximum ADC count value
@@ -212,10 +234,12 @@ plt.show()
 # Stop the scope
 # handle = chandle
 status["stop"] = ps.ps4000aStop(chandle)
-
-# display status returns
-print(status)
+assert_pico_ok(status["stop"])
 
 # Close unitDisconnect the scope
 # handle = chandle
-ps.ps4000aCloseUnit(chandle)
+status["close"] = ps.ps4000aCloseUnit(chandle)
+assert_pico_ok(status["close"])
+
+# display status returns
+print(status)
