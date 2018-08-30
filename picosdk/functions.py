@@ -105,6 +105,30 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
 
     return bufferMaxBinaryD8, bufferAMaxBinaryD9, bufferAMaxBinaryD10, bufferAMaxBinaryD11, bufferAMaxBinaryD12, bufferAMaxBinaryD13, bufferAMaxBinaryD14, bufferAMaxBinaryD15
 
+def splitMSOData(cmaxSamples, data):
+    """
+        splitMSODataPort1(
+                        c_int32         cmaxSamples
+                        c_int16 array   data
+                        )
+    """
+    # Makes an array for each digital channel
+    bufferBinaryD0 = np.chararray((cmaxSamples.value, 1))
+    bufferBinaryD1 = np.chararray((cmaxSamples.value, 1))
+    bufferBinaryD2 = np.chararray((cmaxSamples.value, 1))
+    bufferBinaryD3 = np.chararray((cmaxSamples.value, 1))
+    bufferBinaryD4 = np.chararray((cmaxSamples.value, 1))
+    bufferBinaryD5 = np.chararray((cmaxSamples.value, 1))
+    bufferBinaryD6 = np.chararray((cmaxSamples.value, 1))
+    bufferBinaryD7 = np.chararray((cmaxSamples.value, 1))
+    # Changes the data from int type to a binary type and then seperates the data for each digital channel
+    for i in range(cmaxSamples.value):
+        for j in range(7):
+            bufferBinaryDj[i] = 1 if (data[i] & 1 << (7-j)) else 0
+
+
+    return bufferBinaryD0, bufferBinaryD1, bufferBinaryD2, bufferBinaryD3, bufferBinaryD4, bufferBinaryD5, bufferBinaryD6, bufferBinaryD7
+
 def assert_pico_ok(status):
     """
         assert_pico_ok(
