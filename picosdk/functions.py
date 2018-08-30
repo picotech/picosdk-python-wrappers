@@ -1,5 +1,6 @@
 from __future__ import division
 import numpy as np
+import ctypes
 
 
 def adc2mV(bufferADC, range, maxADC):
@@ -7,7 +8,7 @@ def adc2mV(bufferADC, range, maxADC):
         adc2mc(
                 c_short_Array           bufferADC
                 int                     range
-                c_int32                  maxADC
+                c_int32                 maxADC
                 )
                
         Takes a buffer of raw adc count values and converts it into milivolts 
@@ -18,6 +19,22 @@ def adc2mV(bufferADC, range, maxADC):
     bufferV = [(x * vRange) / maxADC.value for x in bufferADC]
 
     return bufferV
+
+def mV2adc(volts, range, maxADC):
+    """
+        mV2adc(
+                float                   volts
+                int                     range
+                c_int32                 maxADC
+                )
+        Takes a voltage value and converts it into adc counts
+    """
+    channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
+    vRange = channelInputRanges[range]
+    adcValue = round((volts * maxADC.value)/vRange)
+
+    return adcValue
+
 
 
 def splitMSODataPort0(cmaxSamples, bufferMax):
@@ -88,4 +105,16 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
 
     return bufferMaxBinaryD8, bufferAMaxBinaryD9, bufferAMaxBinaryD10, bufferAMaxBinaryD11, bufferAMaxBinaryD12, bufferAMaxBinaryD13, bufferAMaxBinaryD14, bufferAMaxBinaryD15
 
-# def assert_pico_ok(status):
+def assert_pico_ok(status):
+    """
+        assert_pico_ok(
+                        status
+                       )
+    """
+    # checks for PICO_OK status return
+    if status == 0:
+        errorCheck = True
+    else:
+        errorCheck = False
+        raise BaseException("Pico_OK not returned")
+
