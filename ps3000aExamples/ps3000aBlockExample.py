@@ -97,7 +97,7 @@ assert_pico_ok(status["runblock"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax = (ctypes.c_int16 * maxsamples)()
-bufferAMin = (ctypes.c_int16 * maxsamples)()
+bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle

@@ -111,7 +111,7 @@ assert_pico_ok(status["runBlock"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax = (ctypes.c_int16 * maxsamples)()
-bufferAMin = (ctypes.c_int16 * maxsamples)()
+bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -126,7 +126,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax1 = (ctypes.c_int16 * maxsamples)()
-bufferAMin1 = (ctypes.c_int16 * maxsamples)()
+bufferAMin1 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -141,7 +141,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax2 = (ctypes.c_int16 * maxsamples)()
-bufferAMin2 = (ctypes.c_int16 * maxsamples)()
+bufferAMin2 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -156,7 +156,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax3 = (ctypes.c_int16 * maxsamples)()
-bufferAMin3 = (ctypes.c_int16 * maxsamples)()
+bufferAMin3 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -171,7 +171,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax4 = (ctypes.c_int16 * maxsamples)()
-bufferAMin4 = (ctypes.c_int16 * maxsamples)()
+bufferAMin4 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -186,7 +186,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax5 = (ctypes.c_int16 * maxsamples)()
-bufferAMin5 = (ctypes.c_int16 * maxsamples)()
+bufferAMin5 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -201,7 +201,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax6 = (ctypes.c_int16 * maxsamples)()
-bufferAMin6 = (ctypes.c_int16 * maxsamples)()
+bufferAMin6 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -216,7 +216,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax7 = (ctypes.c_int16 * maxsamples)()
-bufferAMin7 = (ctypes.c_int16 * maxsamples)()
+bufferAMin7 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -231,7 +231,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax8 = (ctypes.c_int16 * maxsamples)()
-bufferAMin8 = (ctypes.c_int16 * maxsamples)()
+bufferAMin8 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -246,7 +246,7 @@ assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax9 = (ctypes.c_int16 * maxsamples)()
-bufferAMin9 = (ctypes.c_int16 * maxsamples)()
+bufferAMin9 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle

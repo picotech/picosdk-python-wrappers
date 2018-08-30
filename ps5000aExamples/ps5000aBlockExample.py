@@ -112,9 +112,9 @@ while ready.value == check.value:
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax = (ctypes.c_int16 * maxSamples)()
-bufferAMin = (ctypes.c_int16 * maxSamples)()
+bufferAMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't in the scope of this example
 bufferBMax = (ctypes.c_int16 * maxSamples)()
-bufferBMin = (ctypes.c_int16 * maxSamples)()
+bufferBMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't in the scope of this example
 
 # Set data buffer location for data collection from channel A
 # handle = chandle
