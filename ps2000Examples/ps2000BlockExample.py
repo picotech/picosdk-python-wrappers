@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS6000 BLOCK MODE EXAMPLE
+# PS2000 BLOCK MODE EXAMPLE
 # This example opens a 2000 driver device, sets up two channels and a trigger then collects a block of data.
 # This data is then plotted as mV against time in ns.
 
