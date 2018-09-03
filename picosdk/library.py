@@ -39,6 +39,10 @@ class ArgumentOutOfRangeError(Exception):
     pass
 
 
+class ValidRangeEnumValueNotValidForThisDevice(Exception):
+    pass
+
+
 """UnitInfo: A type for holding the particulars of a connected device.
 driver = a Library subclass
 variant = model name as a string
@@ -261,16 +265,49 @@ class Library(object):
         analog_offset: the meaning of 0 for this channel.
         return value: Max voltage of new range. Raises an exception in error cases."""
 
-        return self._python_set_channel(device.handle,
-                                        self.PICO_CHANNEL[channel_name],
-                                        1 if enabled else 0,
-                                        self.PICO_COUPLING[coupling],
-                                        range_peak,
-                                        analog_offset)
+        excluded = ()
+        reliably_resolved = False
 
-    def _python_set_channel(self, handle, channel_id, enabled, coupling_id, range_peak, analog_offset):
-        range_id, max_voltage = self._resolve_range(range_peak)
+        max_voltage = None
 
+        while not reliably_resolved:
+            if enabled:
+                range_id, max_voltage = self._resolve_range(range_peak, excluded)
+            else:
+                range_id = 0
+                max_voltage = None
+
+            try:
+                self._python_set_channel(device.handle,
+                                         self.PICO_CHANNEL[channel_name],
+                                         1 if enabled else 0,
+                                         self.PICO_COUPLING[coupling],
+                                         range_id,
+                                         analog_offset)
+
+                reliably_resolved = True
+            except ValidRangeEnumValueNotValidForThisDevice:
+                excluded += (range_id,)
+
+        return max_voltage
+
+    def _resolve_range(self, signal_peak, exclude=()):
+        # we use >= so that someone can specify the range they want precisely.
+        # we allow exclude so that if the smallest range in the header file isn't available on this device (or in this
+        # configuration) we can exclude it from the collection. It should be the numerical enum constant (the key in
+        # PICO_VOLTAGE_RANGE).
+
+        def predicate((key, value)):
+            return value >= signal_peak and key not in exclude
+
+        possibilities = list(filter(predicate, self.PICO_VOLTAGE_RANGE.items()))
+
+        if not possibilities:
+            raise ArgumentOutOfRangeError("%s device doesn't support a range as wide as %sV" % (self.name, signal_peak))
+
+        return min(possibilities, key=lambda i: i[1])
+
+    def _python_set_channel(self, handle, channel_id, enabled, coupling_id, range_id, analog_offset):
         if len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int16:
             if analog_offset is not None:
                 raise ArgumentOutOfRangeError("This device doesn't support analog offset")
@@ -280,8 +317,8 @@ class Library(object):
                                             c_int16(coupling_id),
                                             c_int16(range_id))
             if return_code == 0:
-                raise ArgumentOutOfRangeError("%sV is out of range for this device." % (
-                                              self.PICO_VOLTAGE_RANGE[range_id]))
+                raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
+                    self.PICO_VOLTAGE_RANGE[range_id]))
         elif len(self._set_channel.argtypes) == 6:
             if analog_offset is None:
                 analog_offset = 0.0
@@ -292,6 +329,9 @@ class Library(object):
                                        c_int32(range_id),
                                        c_float(analog_offset))
             if status != self.PICO_STATUS['PICO_OK']:
+                if status == self.PICO_STATUS['PICO_INVALID_VOLTAGE_RANGE']:
+                    raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
+                        self.PICO_VOLTAGE_RANGE[range_id]))
                 raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
         elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32:
             if analog_offset is not None:
@@ -305,12 +345,3 @@ class Library(object):
                 raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
         else:
             raise NotImplementedError("not done other driver types yet")
-
-        return max_voltage
-
-    def _resolve_range(self, signal_peak):
-        # we use >= so that someone can specify the range they want precisely.
-        possibilities = list(filter(lambda i: i[1] >= signal_peak, self.PICO_VOLTAGE_RANGE.items()))
-        if not possibilities:
-            raise ArgumentOutOfRangeError("%s device doesn't support a range as wide as %sV" % (self.name, signal_peak))
-        return min(possibilities, key=lambda i: i[1])

@@ -43,6 +43,15 @@ def requires_open(error_message="This operation requires a device to be connecte
     return check_open_decorator
 
 
+"""ChannelConfig: A type for specifying channel setup for capture (pass into Device.set_channel, or Device.capture_*)
+name = The channel name as a string (e.g. 'A'.)
+enabled = bool indicating whether the channel should be enabled or disabled.
+coupling (optional) = 'AC' or 'DC', default is 'DC'.
+range_peak (optional) = +/- max volts, the highest precision range which includes your value will be selected.
+analog_offset (optional) = the meaning of 0 for this channel."""
+ChannelConfig = collections.namedtuple('ChannelConfig', ['name', 'enabled', 'coupling', 'range_peak', 'analog_offset'])
+ChannelConfig.__new__.__defaults__ = (None, None, None)
+
 
 class Device(object):
     def __init__(self, driver, handle):
@@ -52,6 +61,7 @@ class Device(object):
 
         # if a channel is missing from here, its range is not yet defined.
         self._channel_ranges = {}
+        self._channel_offsets = {}
 
     @requires_open("The device either did not initialise correctly or has already been closed.")
     def close(self):
@@ -74,19 +84,48 @@ class Device(object):
         return False
 
     @requires_open()
-    def capture_block(self):#, channels=('A'), range=float('inf'), coupling='DC'):
-        """device.capture_block(channels=('A', 'B'), range=2)
-        channels: a tuple of channel letters.
-        range = +/- max volts, this code will choose the range which includes your value, if possible, or the max.
-        coupling = 'AC' or 'DC', default is 'DC'.
+    def set_channel(self, channel_config):
+        name = channel_config.name
+        if not channel_config.enabled:
+            self.driver.set_channel(self,
+                                    channel_name=name,
+                                    enabled=channel_config.enabled)
+            try:
+                del self._channel_ranges[name]
+                del self._channel_offsets[name]
+            except KeyError:
+                pass
+            return
+        # if enabled, we pass through the values from the channel config:
+        self._channel_ranges[name] = self.driver.set_channel(self,
+                                                             channel_name=name,
+                                                             enabled=channel_config.enabled,
+                                                             coupling=channel_config.coupling,
+                                                             range_peak=channel_config.range_peak,
+                                                             analog_offset=channel_config.analog_offset)
+        self._channel_offsets[name] = channel_config.analog_offset
+        return self._channel_ranges[name]
+
+    @requires_open()
+    def capture_block(self, channel_configs):
+        """device.capture_block(channel_configs)
+        channel_configs: a collection of ChannelConfig objects, specifying channel settings. Can be empty if you've
+        already called set_channel. If not empty, any channels which are missing from this collection will be disabled.
         """
-        # to start with, we only capture on channel 1, at widest available range, with no trigger.
-        times = make_array([])
-        voltages = make_array([])
+        times = []
+        voltages = []
 
-        channel = 'A'
+        if channel_configs:
+            # Add channels which are missing as "disabled".
+            if len(channel_configs) < len(self.driver.PICO_CHANNEL):
+                present_channels = set(c.name for c in channel_configs)
+                missing_channels = [cn for cn in self.driver.PICO_CHANNEL.keys() if cn not in present_channels]
+                for channel_name in missing_channels:
+                    channel_configs.append(ChannelConfig(channel_name, False))
 
-        # These are passing the default values explicitly for now.
-        self._channel_ranges[channel] = self.driver.set_channel(self, channel_name=channel, coupling='DC', range=20.0)
+        for channel_config in channel_configs:
+            self.set_channel(channel_config)
+
+        # throw error if no channels enabled?
 
         return times, voltages
