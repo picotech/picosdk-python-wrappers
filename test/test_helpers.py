@@ -38,11 +38,11 @@ drivers_with_device_connected = [
 ]
 
 
-class error_failure(Exception):
+class TestFailAndError(Exception):
     pass
 
 
-class error(Exception):
+class TestError(Exception):
     pass
 
 
@@ -68,8 +68,8 @@ class DriverTest(_unittest.TestCase):
         errors = ", ".join(["%s (%r)" % e for e in errors])
         failures = ", ".join(["%s (%s)" % f for f in failures])
         if failures and errors:
-            raise error_failure("drivers error'd: %s\nand drivers failed: %s" % (errors, failures))
+            raise TestFailAndError("drivers error'd: %s\nand drivers failed: %s" % (errors, failures))
         elif errors:
-            raise error("drivers error'd: %s" % errors)
+            raise TestError("drivers error'd: %s" % errors)
         else:
             self.assertEqual(len(failures), 0, "Drivers failed: %s" % failures)

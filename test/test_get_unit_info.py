@@ -24,6 +24,7 @@ class GetInfoTest(DriverTest):
         if not drivers_with_device_connected:
             return
         drivers_to_use = drivers_with_device_connected
+
         def test(driver):
             devices = []
             try:
