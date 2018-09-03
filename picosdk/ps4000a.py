@@ -12,11 +12,12 @@ from picosdk.library import Library
 from picosdk.constants import make_enum
 
 
-class ps4000alib(Library):
+class Ps4000alib(Library):
     def __init__(self):
-        super(ps4000alib, self).__init__("ps4000a")
+        super(Ps4000alib, self).__init__("ps4000a")
 
-ps4000a = ps4000alib()
+
+ps4000a = Ps4000alib()
 
 ps4000a.PS4000A_COUPLING = make_enum([
     'PS4000A_AC',
@@ -51,116 +52,120 @@ ps4000a.PICO_CHANNEL = {k[-1]: v for k, v in ps4000a.PS4000A_CHANNEL.items() if 
 # to use make_enum:
 
 def _define_ranges():
-    PICO_X1_PROBE_10MV = 0
-    PICO_X1_PROBE_20MV = 1
-    PICO_X1_PROBE_50MV = 2
-    PICO_X1_PROBE_100MV = 3
-    PICO_X1_PROBE_200MV = 4
-    PICO_X1_PROBE_500MV = 5
-    PICO_X1_PROBE_1V = 6
-    PICO_X1_PROBE_2V = 7
-    PICO_X1_PROBE_5V = 8
-    PICO_X1_PROBE_10V = 9
-    PICO_X1_PROBE_20V = 10
-    PICO_X1_PROBE_50V = 11
-    PICO_X1_PROBE_100V = 12
-    PICO_X1_PROBE_200V = 13
-    PICO_X1_PROBE_RANGES = (PICO_X1_PROBE_200V + 1) - PICO_X1_PROBE_10MV
+    # These are lower case to keep the python style police happy. They are available in the range dictionary with their
+    # usual upper case names precisely as in the C header file.
+    pico_x1_probe_10mv = 0
+    pico_x1_probe_20mv = 1
+    pico_x1_probe_50mv = 2
+    pico_x1_probe_100mv = 3
+    pico_x1_probe_200mv = 4
+    pico_x1_probe_500mv = 5
+    pico_x1_probe_1v = 6
+    pico_x1_probe_2v = 7
+    pico_x1_probe_5v = 8
+    pico_x1_probe_10v = 9
+    pico_x1_probe_20v = 10
+    pico_x1_probe_50v = 11
+    pico_x1_probe_100v = 12
+    pico_x1_probe_200v = 13
+    pico_x1_probe_ranges = (pico_x1_probe_200v + 1) - pico_x1_probe_10mv
 
-    PICO_PS4000A_RESISTANCE_315K = 0x00000200
-    PICO_PS4000A_RESISTANCE_1100K = PICO_PS4000A_RESISTANCE_315K + 1
-    PICO_PS4000A_RESISTANCE_10M = PICO_PS4000A_RESISTANCE_315K + 2
-    PICO_PS4000A_MAX_RESISTANCE_RANGES = (PICO_PS4000A_RESISTANCE_10M + 1) - PICO_PS4000A_RESISTANCE_315K
-    PICO_PS4000A_RESISTANCE_ADCV_FLAG = 0x10000000
+    pico_ps4000a_resistance_315k = 0x00000200
+    pico_ps4000a_resistance_1100k = pico_ps4000a_resistance_315k + 1
+    pico_ps4000a_resistance_10m = pico_ps4000a_resistance_315k + 2
+    pico_ps4000a_max_resistance_ranges = (pico_ps4000a_resistance_10m + 1) - pico_ps4000a_resistance_315k
+    pico_ps4000a_resistance_adcv_flag = 0x10000000
 
-    PICO_CONNECT_PROBE_OFF = 1024
+    pico_connect_probe_off = 1024
 
-    PICO_D9_BNC_10MV = 0
-    PICO_D9_BNC_20MV = 1
-    PICO_D9_BNC_50MV = 2
-    PICO_D9_BNC_100MV = 3
-    PICO_D9_BNC_200MV = 4
-    PICO_D9_BNC_500MV = 5
-    PICO_D9_BNC_1V = 6
-    PICO_D9_BNC_2V = 7
-    PICO_D9_BNC_5V = 8
-    PICO_D9_BNC_10V = 9
-    PICO_D9_BNC_20V = 10
-    PICO_D9_BNC_50V = 11
-    PICO_D9_BNC_100V = 12
-    PICO_D9_BNC_200V = 13
-    PICO_MAX_D9_BNC_RANGES = (PICO_D9_BNC_200V + 1) - PICO_D9_BNC_10MV
+    pico_d9_bnc_10mv = 0
+    pico_d9_bnc_20mv = 1
+    pico_d9_bnc_50mv = 2
+    pico_d9_bnc_100mv = 3
+    pico_d9_bnc_200mv = 4
+    pico_d9_bnc_500mv = 5
+    pico_d9_bnc_1v = 6
+    pico_d9_bnc_2v = 7
+    pico_d9_bnc_5v = 8
+    pico_d9_bnc_10v = 9
+    pico_d9_bnc_20v = 10
+    pico_d9_bnc_50v = 11
+    pico_d9_bnc_100v = 12
+    pico_d9_bnc_200v = 13
+    pico_max_d9_bnc_ranges = (pico_d9_bnc_200v + 1) - pico_d9_bnc_10mv
 
-    PICO_D9_2X_BNC_10MV = PICO_D9_BNC_10MV
-    PICO_D9_2X_BNC_20MV = PICO_D9_BNC_20MV
-    PICO_D9_2X_BNC_50MV = PICO_D9_BNC_50MV
-    PICO_D9_2X_BNC_100MV = PICO_D9_BNC_100MV
-    PICO_D9_2X_BNC_200MV = PICO_D9_BNC_200MV
-    PICO_D9_2X_BNC_500MV = PICO_D9_BNC_500MV
-    PICO_D9_2X_BNC_1V = PICO_D9_BNC_1V
-    PICO_D9_2X_BNC_2V = PICO_D9_BNC_2V
-    PICO_D9_2X_BNC_5V = PICO_D9_BNC_5V
-    PICO_D9_2X_BNC_10V = PICO_D9_BNC_10V
-    PICO_D9_2X_BNC_20V = PICO_D9_BNC_20V
-    PICO_D9_2X_BNC_50V = PICO_D9_BNC_50V
-    PICO_D9_2X_BNC_100V = PICO_D9_BNC_100V
-    PICO_D9_2X_BNC_200V = PICO_D9_BNC_200V
-    PICO_MAX_D9_2X_BNC_RANGES = (PICO_D9_2X_BNC_200V + 1) - PICO_D9_2X_BNC_10MV
+    pico_d9_2x_bnc_10mv = pico_d9_bnc_10mv
+    pico_d9_2x_bnc_20mv = pico_d9_bnc_20mv
+    pico_d9_2x_bnc_50mv = pico_d9_bnc_50mv
+    pico_d9_2x_bnc_100mv = pico_d9_bnc_100mv
+    pico_d9_2x_bnc_200mv = pico_d9_bnc_200mv
+    pico_d9_2x_bnc_500mv = pico_d9_bnc_500mv
+    pico_d9_2x_bnc_1v = pico_d9_bnc_1v
+    pico_d9_2x_bnc_2v = pico_d9_bnc_2v
+    pico_d9_2x_bnc_5v = pico_d9_bnc_5v
+    pico_d9_2x_bnc_10v = pico_d9_bnc_10v
+    pico_d9_2x_bnc_20v = pico_d9_bnc_20v
+    pico_d9_2x_bnc_50v = pico_d9_bnc_50v
+    pico_d9_2x_bnc_100v = pico_d9_bnc_100v
+    pico_d9_2x_bnc_200v = pico_d9_bnc_200v
+    pico_max_d9_2x_bnc_ranges = (pico_d9_2x_bnc_200v + 1) - pico_d9_2x_bnc_10mv
 
-    PICO_DIFFERENTIAL_10MV = PICO_D9_BNC_10MV
-    PICO_DIFFERENTIAL_20MV = PICO_D9_BNC_20MV
-    PICO_DIFFERENTIAL_50MV = PICO_D9_BNC_50MV
-    PICO_DIFFERENTIAL_100MV = PICO_D9_BNC_100MV
-    PICO_DIFFERENTIAL_200MV = PICO_D9_BNC_200MV
-    PICO_DIFFERENTIAL_500MV = PICO_D9_BNC_500MV
-    PICO_DIFFERENTIAL_1V = PICO_D9_BNC_1V
-    PICO_DIFFERENTIAL_2V = PICO_D9_BNC_2V
-    PICO_DIFFERENTIAL_5V = PICO_D9_BNC_5V
-    PICO_DIFFERENTIAL_10V = PICO_D9_BNC_10V
-    PICO_DIFFERENTIAL_20V = PICO_D9_BNC_20V
-    PICO_DIFFERENTIAL_50V = PICO_D9_BNC_50V
-    PICO_DIFFERENTIAL_100V = PICO_D9_BNC_100V
-    PICO_DIFFERENTIAL_200V = PICO_D9_BNC_200V
-    PICO_MAX_DIFFERENTIAL_RANGES = (PICO_DIFFERENTIAL_200V + 1) - PICO_DIFFERENTIAL_10MV,
+    pico_differential_10mv = pico_d9_bnc_10mv
+    pico_differential_20mv = pico_d9_bnc_20mv
+    pico_differential_50mv = pico_d9_bnc_50mv
+    pico_differential_100mv = pico_d9_bnc_100mv
+    pico_differential_200mv = pico_d9_bnc_200mv
+    pico_differential_500mv = pico_d9_bnc_500mv
+    pico_differential_1v = pico_d9_bnc_1v
+    pico_differential_2v = pico_d9_bnc_2v
+    pico_differential_5v = pico_d9_bnc_5v
+    pico_differential_10v = pico_d9_bnc_10v
+    pico_differential_20v = pico_d9_bnc_20v
+    pico_differential_50v = pico_d9_bnc_50v
+    pico_differential_100v = pico_d9_bnc_100v
+    pico_differential_200v = pico_d9_bnc_200v
+    pico_max_differential_ranges = (pico_differential_200v + 1) - pico_differential_10mv,
 
-    PICO_CURRENT_CLAMP_200A_2kA_1A = 4000
-    PICO_CURRENT_CLAMP_200A_2kA_2A = PICO_CURRENT_CLAMP_200A_2kA_1A + 1
-    PICO_CURRENT_CLAMP_200A_2kA_5A = PICO_CURRENT_CLAMP_200A_2kA_1A + 2
-    PICO_CURRENT_CLAMP_200A_2kA_10A = PICO_CURRENT_CLAMP_200A_2kA_1A + 3
-    PICO_CURRENT_CLAMP_200A_2kA_20A = PICO_CURRENT_CLAMP_200A_2kA_1A + 4
-    PICO_CURRENT_CLAMP_200A_2kA_50A = PICO_CURRENT_CLAMP_200A_2kA_1A + 5
-    PICO_CURRENT_CLAMP_200A_2kA_100A = PICO_CURRENT_CLAMP_200A_2kA_1A + 6
-    PICO_CURRENT_CLAMP_200A_2kA_200A = PICO_CURRENT_CLAMP_200A_2kA_1A + 7
-    PICO_CURRENT_CLAMP_200A_2kA_500A = PICO_CURRENT_CLAMP_200A_2kA_1A + 8
-    PICO_CURRENT_CLAMP_200A_2kA_1000A = PICO_CURRENT_CLAMP_200A_2kA_1A + 9
-    PICO_CURRENT_CLAMP_200A_2kA_2000A = PICO_CURRENT_CLAMP_200A_2kA_1A + 10
-    PICO_MAX_CURRENT_CLAMP_200A_2kA_RANGES = (PICO_CURRENT_CLAMP_200A_2kA_2000A + 1) - PICO_CURRENT_CLAMP_200A_2kA_1A
+    pico_current_clamp_200a_2ka_1a = 4000
+    pico_current_clamp_200a_2ka_2a = pico_current_clamp_200a_2ka_1a + 1
+    pico_current_clamp_200a_2ka_5a = pico_current_clamp_200a_2ka_1a + 2
+    pico_current_clamp_200a_2ka_10a = pico_current_clamp_200a_2ka_1a + 3
+    pico_current_clamp_200a_2ka_20a = pico_current_clamp_200a_2ka_1a + 4
+    pico_current_clamp_200a_2ka_50a = pico_current_clamp_200a_2ka_1a + 5
+    pico_current_clamp_200a_2ka_100a = pico_current_clamp_200a_2ka_1a + 6
+    pico_current_clamp_200a_2ka_200a = pico_current_clamp_200a_2ka_1a + 7
+    pico_current_clamp_200a_2ka_500a = pico_current_clamp_200a_2ka_1a + 8
+    pico_current_clamp_200a_2ka_1000a = pico_current_clamp_200a_2ka_1a + 9
+    pico_current_clamp_200a_2ka_2000a = pico_current_clamp_200a_2ka_1a + 10
+    pico_max_current_clamp_200a_2ka_ranges = (pico_current_clamp_200a_2ka_2000a + 1) - pico_current_clamp_200a_2ka_1a
 
-    PICO_CURRENT_CLAMP_40A_100mA = 5000
-    PICO_CURRENT_CLAMP_40A_200mA = PICO_CURRENT_CLAMP_40A_100mA + 1
-    PICO_CURRENT_CLAMP_40A_500mA = PICO_CURRENT_CLAMP_40A_100mA + 2
-    PICO_CURRENT_CLAMP_40A_1A = PICO_CURRENT_CLAMP_40A_100mA + 3
-    PICO_CURRENT_CLAMP_40A_2A = PICO_CURRENT_CLAMP_40A_100mA + 4
-    PICO_CURRENT_CLAMP_40A_5A = PICO_CURRENT_CLAMP_40A_100mA + 5
-    PICO_CURRENT_CLAMP_40A_10A = PICO_CURRENT_CLAMP_40A_100mA + 6
-    PICO_CURRENT_CLAMP_40A_20A = PICO_CURRENT_CLAMP_40A_100mA + 7
-    PICO_CURRENT_CLAMP_40A_40A = PICO_CURRENT_CLAMP_40A_100mA + 8
-    PICO_MAX_CURRENT_CLAMP_40A_RANGES = (PICO_CURRENT_CLAMP_40A_40A + 1) - PICO_CURRENT_CLAMP_40A_100mA
+    pico_current_clamp_40a_100ma = 5000
+    pico_current_clamp_40a_200ma = pico_current_clamp_40a_100ma + 1
+    pico_current_clamp_40a_500ma = pico_current_clamp_40a_100ma + 2
+    pico_current_clamp_40a_1a = pico_current_clamp_40a_100ma + 3
+    pico_current_clamp_40a_2a = pico_current_clamp_40a_100ma + 4
+    pico_current_clamp_40a_5a = pico_current_clamp_40a_100ma + 5
+    pico_current_clamp_40a_10a = pico_current_clamp_40a_100ma + 6
+    pico_current_clamp_40a_20a = pico_current_clamp_40a_100ma + 7
+    pico_current_clamp_40a_40a = pico_current_clamp_40a_100ma + 8
+    pico_max_current_clamp_40a_ranges = (pico_current_clamp_40a_40a + 1) - pico_current_clamp_40a_100ma
 
-    PICO_1KV_2_5V = 6003
-    PICO_1KV_5V = PICO_1KV_2_5V + 1
-    PICO_1KV_12_5V = PICO_1KV_2_5V + 2
-    PICO_1KV_25V = PICO_1KV_2_5V + 3
-    PICO_1KV_50V = PICO_1KV_2_5V + 4
-    PICO_1KV_125V = PICO_1KV_2_5V + 5
-    PICO_1KV_250V = PICO_1KV_2_5V + 6
-    PICO_1KV_500V = PICO_1KV_2_5V + 7
-    PICO_1KV_1000V = PICO_1KV_2_5V + 8
-    PICO_MAX_1KV_RANGES = (PICO_1KV_1000V + 1) - PICO_1KV_2_5V
+    pico_1kv_2_5v = 6003
+    pico_1kv_5v = pico_1kv_2_5v + 1
+    pico_1kv_12_5v = pico_1kv_2_5v + 2
+    pico_1kv_25v = pico_1kv_2_5v + 3
+    pico_1kv_50v = pico_1kv_2_5v + 4
+    pico_1kv_125v = pico_1kv_2_5v + 5
+    pico_1kv_250v = pico_1kv_2_5v + 6
+    pico_1kv_500v = pico_1kv_2_5v + 7
+    pico_1kv_1000v = pico_1kv_2_5v + 8
+    pico_max_1kv_ranges = (pico_1kv_1000v + 1) - pico_1kv_2_5v
 
-    return {k:v for k, v in locals().items() if k.startswith("PICO")}
+    return {k.upper(): v for k, v in locals().items() if k.startswith("pico")}
+
 
 ps4000a.PICO_CONNECT_PROBE_RANGE = _define_ranges()
+
 
 def process_enum(enum):
     """The PS4000a range enum is complicated enough that we need some clearer logic:"""

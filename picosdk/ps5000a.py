@@ -12,12 +12,12 @@ from picosdk.library import Library
 from picosdk.constants import make_enum
 
 
-class ps5000alib(Library):
+class Ps5000alib(Library):
     def __init__(self):
-        super(ps5000alib, self).__init__("ps5000a")
+        super(Ps5000alib, self).__init__("ps5000a")
 
 
-ps5000a = ps5000alib()
+ps5000a = Ps5000alib()
 
 ps5000a.PS5000A_DEVICE_RESOLUTION = make_enum([
     "PS5000A_DR_8BIT",
@@ -693,4 +693,3 @@ doc = """ PICO_STATUS ps5000aGetDeviceResolution
         PS5000A_DEVICE_RESOLUTION *resolution
     ); """
 ps5000a.make_symbol("_GetDeviceResolution", "ps5000aGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
-

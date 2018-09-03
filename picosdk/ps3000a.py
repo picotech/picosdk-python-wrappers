@@ -12,12 +12,12 @@ from picosdk.library import Library
 from picosdk.constants import make_enum
 
 
-class ps3000alib(Library):
+class Ps3000alib(Library):
     def __init__(self):
-        super(ps3000alib, self).__init__("ps3000a")
+        super(Ps3000alib, self).__init__("ps3000a")
 
 
-ps3000a = ps3000alib()
+ps3000a = Ps3000alib()
 
 ps3000a.PS3000A_COUPLING = make_enum([
     'PS3000A_AC',

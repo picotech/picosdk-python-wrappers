@@ -11,12 +11,12 @@ from picosdk.library import Library, ArgumentOutOfRangeError
 from picosdk.constants import make_enum
 
 
-class ps2000lib(Library):
+class Ps2000lib(Library):
     def __init__(self):
-        super(ps2000lib, self).__init__("ps2000")
+        super(Ps2000lib, self).__init__("ps2000")
 
 
-ps2000 = ps2000lib()
+ps2000 = Ps2000lib()
 
 ps2000.PS2000_CHANNEL = make_enum([
     "PS2000_CHANNEL_A",
@@ -388,6 +388,6 @@ ps2000.make_symbol("_PingUnit", "ps2000PingUnit", c_int16, [c_int16, ], doc)
 
 ps2000.variants = ("2104", "2105", "2202", "2203", "2204", "2205", "2204A", "2205A")
 
-ps2000.PICO_INFO = { k: v for k, v in ps2000.PICO_INFO.items() if v <= 0x00000005 }
+ps2000.PICO_INFO = {k: v for k, v in ps2000.PICO_INFO.items() if v <= 0x00000005}
 ps2000.PICO_INFO["PICO_ERROR_CODE"] = 0x00000006
 ps2000.PICO_INFO["PICO_KERNEL_DRIVER_VERSION"] = 0x00000007

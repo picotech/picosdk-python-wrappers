@@ -12,12 +12,12 @@ from picosdk.library import Library
 from picosdk.constants import make_enum
 
 
-class ps4000lib(Library):
+class Ps4000lib(Library):
     def __init__(self):
-        super(ps4000lib, self).__init__("ps4000")
+        super(Ps4000lib, self).__init__("ps4000")
 
 
-ps4000 = ps4000lib()
+ps4000 = Ps4000lib()
 
 # This field is passed to the driver as a boolean, not an enum.
 ps4000.PICO_COUPLING = {
@@ -80,6 +80,7 @@ ps4000.PS4000_RANGE = make_enum([
     "PS4000_RESISTANCE_50K",
     "PS4000_MAX_EXTRA_RESISTANCES",
 ])
+
 
 def process_enum(enum):
     """The PS4000 range enum is complicated enough that we need some clearer logic:"""

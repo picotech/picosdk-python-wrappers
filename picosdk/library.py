@@ -56,16 +56,14 @@ def requires_device(error_message):
     return check_device_decorator
 
 
-
 class Library(object):
     def load(self):
-        result = None
         library_path = find_library(self.name)
 
         if library_path is None:
             env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
             raise CannotFindPicoSDKError("PicoSDK (%s) not found, check %s" % (self.name, env_var_name))
-        
+
         try:
             if sys.platform == 'win32':
                 result = ctypes.WinDLL(library_path)
@@ -134,7 +132,8 @@ class Library(object):
         serial: If no serial number is provided, this function opens the first device discovered.
         resolution: for some devices, you may specify a resolution as you open the device. You should retrieve this
             numeric constant from the relevant driver module.
-        returns: a Device instance, which has functions on it for collecting data and using the waveform generator (if present).
+        returns: a Device instance, which has functions on it for collecting data and using the waveform generator (if
+            present).
         Note: Either use this object in a context manager, or manually call .close() on it when you are finished."""
         return Device(self, self._python_open_unit(serial=serial, resolution=resolution))
 
@@ -225,39 +224,41 @@ class Library(object):
             return create_string_buffer("\0".encode('utf8'), 255)
 
     def _python_get_unit_info(self, handle, info_type):
-        STRING_SIZE = 255
+        string_size = 255
         info = self._create_empty_string_buffer()
         if len(self._get_unit_info.argtypes) == 4:
-            info_len = self._get_unit_info(c_int16(handle), info, c_int16(STRING_SIZE), c_int16(info_type))
+            info_len = self._get_unit_info(c_int16(handle), info, c_int16(string_size), c_int16(info_type))
             if info_len > 0:
                 return info.value[:info_len]
         elif len(self._get_unit_info.argtypes) == 5:
             required_size = c_int16(0)
             status = self._get_unit_info(c_int16(handle),
                                          info,
-                                         c_int16(STRING_SIZE),
+                                         c_int16(string_size),
                                          ctypes.byref(required_size),
                                          c_uint32(info_type))
             if status == self.PICO_STATUS['PICO_OK']:
-                if required_size.value < STRING_SIZE:
+                if required_size.value < string_size:
                     return info.value[:required_size.value]
         return ""
 
     def _python_get_unit_info_wrapper(self, handle):
         return UnitInfo(
-            driver= self,
-            variant= self._python_get_unit_info(handle, self.PICO_INFO["PICO_VARIANT_INFO"]),
-            serial= self._python_get_unit_info(handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
+            driver=self,
+            variant=self._python_get_unit_info(handle, self.PICO_INFO["PICO_VARIANT_INFO"]),
+            serial=self._python_get_unit_info(handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
         )
 
     @requires_device("set_channel requires a picosdk.device.Device instance, passed to the correct owning driver.")
-    def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf'), analog_offset=None):
+    def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf'),
+                    analog_offset=None):
         """optional arguments:
         channel_name: a single channel (e.g. 'A')
         enabled: whether to enable the channel (boolean)
         coupling: string of the relevant enum member for your driver less the driver name prefix. e.g. 'DC' or 'AC'.
-        range: float which is the largest value you expect in the input signal. We will throw an exception if no
-               range on the device is large enough for that value.
+        range_peak: float which is the largest value you expect in the input signal. We will throw an exception if no
+                    range on the device is large enough for that value.
+        analog_offset: the meaning of 0 for this channel.
         return value: Max voltage of new range. Raises an exception in error cases."""
 
         return self._python_set_channel(device.handle,
@@ -279,26 +280,27 @@ class Library(object):
                                             c_int16(coupling_id),
                                             c_int16(range_id))
             if return_code == 0:
-                raise ArgumentOutOfRangeError("%sV is out of range for this device." % self.PICO_VOLTAGE_RANGE[range_id])
+                raise ArgumentOutOfRangeError("%sV is out of range for this device." % (
+                                              self.PICO_VOLTAGE_RANGE[range_id]))
         elif len(self._set_channel.argtypes) == 6:
             if analog_offset is None:
                 analog_offset = 0.0
-            status =  self._set_channel(c_int16(handle),
-                                        c_int32(channel_id),
-                                        c_int16(enabled),
-                                        c_int32(coupling_id),
-                                        c_int32(range_id),
-                                        c_float(analog_offset))
+            status = self._set_channel(c_int16(handle),
+                                       c_int32(channel_id),
+                                       c_int16(enabled),
+                                       c_int32(coupling_id),
+                                       c_int32(range_id),
+                                       c_float(analog_offset))
             if status != self.PICO_STATUS['PICO_OK']:
                 raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
         elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32:
             if analog_offset is not None:
                 raise ArgumentOutOfRangeError("This device doesn't support analog offset")
-            status =  self._set_channel(c_int16(handle),
-                                        c_int32(channel_id),
-                                        c_int16(enabled),
-                                        c_int16(coupling_id),
-                                        c_int32(range_id))
+            status = self._set_channel(c_int16(handle),
+                                       c_int32(channel_id),
+                                       c_int16(enabled),
+                                       c_int16(coupling_id),
+                                       c_int32(range_id))
             if status != self.PICO_STATUS['PICO_OK']:
                 raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
         else:
@@ -312,11 +314,3 @@ class Library(object):
         if not possibilities:
             raise ArgumentOutOfRangeError("%s device doesn't support a range as wide as %sV" % (self.name, signal_peak))
         return min(possibilities, key=lambda i: i[1])
-
-
-
-
-
-
-
-

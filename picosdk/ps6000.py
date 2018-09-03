@@ -10,13 +10,13 @@ functions.
 from ctypes import *
 from picosdk.library import Library
 
-class ps6000lib(Library):
+
+class Ps6000lib(Library):
     def __init__(self):
-        super(ps6000lib, self).__init__("ps6000")
+        super(Ps6000lib, self).__init__("ps6000")
 
 
-ps6000 = ps6000lib()
-
+ps6000 = Ps6000lib()
 
 doc = """ PICO_STATUS ps6000OpenUnit
     (
@@ -82,7 +82,7 @@ doc = """ PICO_STATUS ps6000SetChannel
         PS6000_BANDWIDTH_LIMITER  bandwidth
     ); """
 ps6000.make_symbol("_SetChannel", "ps6000SetChannel", c_uint32,
-            [c_int16, c_int32, c_int16, c_int32, c_int32, c_float, c_int32], doc)
+                   [c_int16, c_int32, c_int16, c_int32, c_int32, c_float, c_int32], doc)
 
 doc = """ PICO_STATUS ps6000GetTimebase
     (
@@ -95,7 +95,7 @@ doc = """ PICO_STATUS ps6000GetTimebase
         uint32_t  segmentIndex
     ); """
 ps6000.make_symbol("_GetTimebase", "ps6000GetTimebase", c_uint32,
-            [c_int16, c_uint32, c_uint32, c_void_p, c_int16, c_void_p, c_uint32], doc)
+                   [c_int16, c_uint32, c_uint32, c_void_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000GetTimebase2
     (
@@ -108,7 +108,7 @@ doc = """ PICO_STATUS ps6000GetTimebase2
         uint32_t  segmentIndex
     ); """
 ps6000.make_symbol("_GetTimebase2", "ps6000GetTimebase2", c_uint32,
-            [c_int16, c_uint32, c_uint32, c_void_p, c_int16, c_void_p, c_uint32], doc)
+                   [c_int16, c_uint32, c_uint32, c_void_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000SetSigGenArbitrary
     (
@@ -131,8 +131,8 @@ doc = """ PICO_STATUS ps6000SetSigGenArbitrary
         int16_t                    extInThreshold
     ); """
 ps6000.make_symbol("_SetSigGenArbitrary", "ps6000SetSigGenArbitrary", c_uint32,
-            [c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p,
-             c_int32, c_int32, c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
+                   [c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p,
+                    c_int32, c_int32, c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps6000SetSigGenBuiltIn
     (
@@ -153,8 +153,8 @@ doc = """ PICO_STATUS ps6000SetSigGenBuiltIn
         int16_t                    extInThreshold
     ); """
 ps6000.make_symbol("_SetSigGenBuiltIn", "ps6000SetSigGenBuiltIn", c_uint32,
-            [c_int16, c_int32, c_uint32, c_int16, c_float, c_float, c_float, c_float,
-             c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
+                   [c_int16, c_int32, c_uint32, c_int16, c_float, c_float, c_float, c_float,
+                    c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps6000SetSigGenBuiltInV2
     (
@@ -175,8 +175,8 @@ doc = """ PICO_STATUS ps6000SetSigGenBuiltInV2
         int16_t                    extInThreshold
     ); """
 ps6000.make_symbol("_SetSigGenBuiltInV2", "ps6000SetSigGenBuiltInV2", c_uint32,
-            [c_int16, c_int32, c_uint32, c_int16, c_double, c_double, c_double, c_double,
-             c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
+                   [c_int16, c_int32, c_uint32, c_int16, c_double, c_double, c_double, c_double,
+                    c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps6000SetSigGenPropertiesArbitrary
     (
@@ -195,8 +195,8 @@ doc = """ PICO_STATUS ps6000SetSigGenPropertiesArbitrary
         int16_t                    extInThreshold
     ); """
 ps6000.make_symbol("_SigGenPropertiesArbitrary", "ps6000SetSigGenPropertiesArbitrary", c_uint32,
-            [c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32,
-             c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
+                   [c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32,
+                    c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps6000SetSigGenPropertiesBuiltIn
     (
@@ -215,8 +215,8 @@ doc = """ PICO_STATUS ps6000SetSigGenPropertiesBuiltIn
         int16_t                    extInThreshold
     ); """
 ps6000.make_symbol("_SetSigGenPropertiesBuiltIn", "ps6000SetSigGenPropertiesBuiltIn", c_uint32,
-            [c_int16, c_int32, c_uint32, c_double, c_double, c_double, c_double,
-             c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
+                   [c_int16, c_int32, c_uint32, c_double, c_double, c_double, c_double,
+                    c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps6000SigGenFrequencyToPhase
     (
@@ -227,7 +227,7 @@ doc = """ PICO_STATUS ps6000SigGenFrequencyToPhase
         uint32_t          *phase
     ); """
 ps6000.make_symbol("_SigGenFrequencyToPhase", "ps6000SigGenFrequencyToPhase", c_uint32,
-            [c_int16, c_double, c_int32, c_uint32, c_void_p], doc)
+                   [c_int16, c_double, c_int32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000SigGenArbitraryMinMaxValues
     (
@@ -238,7 +238,7 @@ doc = """ PICO_STATUS ps6000SigGenArbitraryMinMaxValues
         uint32_t *maxArbitraryWaveformSize
     ); """
 ps6000.make_symbol("_SigGenArbitraryMinMaxValues", "ps6000SigGenArbitraryMinMaxValues", c_uint32,
-            [c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
+                   [c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000SigGenSoftwareControl
     (
@@ -258,7 +258,7 @@ doc = """ PICO_STATUS ps6000SetSimpleTrigger
         int16_t                     autoTrigger_ms
     ); """
 ps6000.make_symbol("_SetSimpleTrigger", "ps6000SetSimpleTrigger", c_uint32,
-            [c_int16, c_int16, c_int32, c_int16, c_int32, c_uint32, c_int16], doc)
+                   [c_int16, c_int16, c_int32, c_int16, c_int32, c_uint32, c_int16], doc)
 
 doc = """ PICO_STATUS ps6000SetEts
     (
@@ -279,7 +279,7 @@ doc = """ PICO_STATUS ps6000SetTriggerChannelProperties
         int32_t                            autoTriggerMilliseconds
     ); """
 ps6000.make_symbol("_SetTriggerChannelProperties", "ps6000SetTriggerChannelProperties", c_uint32,
-            [c_int16, c_void_p, c_int16, c_int16, c_int32], doc)
+                   [c_int16, c_void_p, c_int16, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps6000SetTriggerChannelConditions
     (
@@ -288,7 +288,7 @@ doc = """ PICO_STATUS ps6000SetTriggerChannelConditions
         int16_t                    nConditions
     ); """
 ps6000.make_symbol("_SetTriggerChannelConditions", "ps6000SetTriggerChannelConditions", c_uint32,
-            [c_int16, c_void_p, c_int16], doc)
+                   [c_int16, c_void_p, c_int16], doc)
 
 doc = """ PICO_STATUS ps6000SetTriggerChannelDirections
     (
@@ -301,7 +301,7 @@ doc = """ PICO_STATUS ps6000SetTriggerChannelDirections
         PS6000_THRESHOLD_DIRECTION  aux
     ); """
 ps6000.make_symbol("_SetTriggerChannelDirections", "ps6000SetTriggerChannelDirections", c_uint32,
-            [c_int16, c_int32, c_int32, c_int32, c_int32, c_int32, c_int32], doc)
+                   [c_int16, c_int32, c_int32, c_int32, c_int32, c_int32, c_int32], doc)
 
 doc = """ PICO_STATUS ps6000SetTriggerDelay
     (
@@ -321,7 +321,7 @@ doc = """ PICO_STATUS ps6000SetPulseWidthQualifier
         PS6000_PULSE_WIDTH_TYPE     type
     ); """
 ps6000.make_symbol("_SetPulseWidthQualifier", "ps6000SetPulseWidthQualifier", c_uint32,
-            [c_int16, c_void_p, c_int16, c_int32, c_uint32, c_uint32, c_int32], doc)
+                   [c_int16, c_void_p, c_int16, c_int32, c_uint32, c_uint32, c_int32], doc)
 
 doc = """ PICO_STATUS ps6000IsTriggerOrPulseWidthQualifierEnabled
     (
@@ -330,7 +330,7 @@ doc = """ PICO_STATUS ps6000IsTriggerOrPulseWidthQualifierEnabled
         int16_t *pulseWidthQualifierEnabled
     ); """
 ps6000.make_symbol("_IsTriggerOrPulseWidthQualifierEnabled", "ps6000IsTriggerOrPulseWidthQualifierEnabled", c_uint32,
-            [c_int16, c_void_p, c_void_p], doc)
+                   [c_int16, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetTriggerTimeOffset
     (
@@ -341,7 +341,7 @@ doc = """ PICO_STATUS ps6000GetTriggerTimeOffset
         uint32_t           segmentIndex
     ); """
 ps6000.make_symbol("_GetTriggerTimeOffset", "ps6000GetTriggerTimeOffset", c_uint32,
-            [c_int16, c_void_p, c_void_p, c_void_p, c_uint32], doc)
+                   [c_int16, c_void_p, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000GetTriggerTimeOffset64
     (
@@ -351,7 +351,7 @@ doc = """ PICO_STATUS ps6000GetTriggerTimeOffset64
         uint32_t      segmentIndex
     ); """
 ps6000.make_symbol("_GetTriggerTimeOffset64", "ps6000GetTriggerTimeOffset64", c_uint32,
-            [c_int16, c_void_p, c_void_p, c_uint32], doc)
+                   [c_int16, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesTriggerTimeOffsetBulk
     (
@@ -363,7 +363,7 @@ doc = """ PICO_STATUS ps6000GetValuesTriggerTimeOffsetBulk
         uint32_t           toSegmentIndex
     ); """
 ps6000.make_symbol("_ps6000GetValuesTriggerTimeOffsetBulk", "ps6000GetValuesTriggerTimeOffsetBulk", c_uint32,
-            [c_int16, c_void_p, c_void_p, c_void_p, c_uint32, c_uint32], doc)
+                   [c_int16, c_void_p, c_void_p, c_void_p, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesTriggerTimeOffsetBulk64
     (
@@ -374,7 +374,7 @@ doc = """ PICO_STATUS ps6000GetValuesTriggerTimeOffsetBulk64
         uint32_t           toSegmentIndex
     ); """
 ps6000.make_symbol("_GetValuesTriggerTimeOffsetBulk64", "ps6000GetValuesTriggerTimeOffsetBulk64", c_uint32,
-            [c_int16, c_void_p, c_void_p, c_uint32, c_uint32], doc)
+                   [c_int16, c_void_p, c_void_p, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000SetDataBuffers
     (
@@ -386,7 +386,7 @@ doc = """ PICO_STATUS ps6000SetDataBuffers
         PS6000_RATIO_MODE  downSampleRatioMode
     ); """
 ps6000.make_symbol("_SetDataBuffers", "ps6000SetDataBuffers", c_uint32,
-            [c_int16, c_int32, c_void_p, c_void_p, c_uint32, c_int32], doc)
+                   [c_int16, c_int32, c_void_p, c_void_p, c_uint32, c_int32], doc)
 
 doc = """ PICO_STATUS ps6000SetDataBuffer
     (
@@ -396,7 +396,8 @@ doc = """ PICO_STATUS ps6000SetDataBuffer
         uint32_t           bufferLth,
         PS6000_RATIO_MODE  downSampleRatioMode
     ); """
-ps6000.make_symbol("_SetDataBuffer", "ps6000SetDataBuffer", c_uint32, [c_int16, c_int32, c_void_p, c_uint32, c_int32], doc)
+ps6000.make_symbol("_SetDataBuffer", "ps6000SetDataBuffer", c_uint32, [c_int16, c_int32, c_void_p, c_uint32, c_int32],
+                   doc)
 
 doc = """ PICO_STATUS (ps6000SetDataBufferBulk)
     (
@@ -408,7 +409,7 @@ doc = """ PICO_STATUS (ps6000SetDataBufferBulk)
         PS6000_RATIO_MODE  downSampleRatioMode
     ); """
 ps6000.make_symbol("_SetDataBufferBulk", "ps6000SetDataBufferBulk", c_uint32,
-            [c_int16, c_int32, c_void_p, c_uint32, c_uint32, c_int32], doc)
+                   [c_int16, c_int32, c_void_p, c_uint32, c_uint32, c_int32], doc)
 
 doc = """ PICO_STATUS ps6000SetDataBuffersBulk
     (
@@ -421,7 +422,7 @@ doc = """ PICO_STATUS ps6000SetDataBuffersBulk
         PS6000_RATIO_MODE  downSampleRatioMode
     ); """
 ps6000.make_symbol("_SetDataBuffersBulk", "ps6000SetDataBuffersBulk", c_uint32,
-            [c_int16, c_int32, c_void_p, c_void_p, c_uint32, c_uint32, c_int32], doc)
+                   [c_int16, c_int32, c_void_p, c_void_p, c_uint32, c_uint32, c_int32], doc)
 
 doc = """ PICO_STATUS ps6000SetEtsTimeBuffer
     (
@@ -438,7 +439,8 @@ doc = """ PICO_STATUS ps6000SetEtsTimeBuffers
         uint32_t *timeLower,
         uint32_t  bufferLth
     ); """
-ps6000.make_symbol("_SetEtsTimeBuffers", "ps6000SetEtsTimeBuffers", c_uint32, [c_int16, c_void_p, c_void_p, c_uint32], doc)
+ps6000.make_symbol("_SetEtsTimeBuffers", "ps6000SetEtsTimeBuffers", c_uint32, [c_int16, c_void_p, c_void_p, c_uint32],
+                   doc)
 
 doc = """ PICO_STATUS ps6000RunBlock
     (
@@ -453,7 +455,7 @@ doc = """ PICO_STATUS ps6000RunBlock
         void             *pParameter
     ); """
 ps6000.make_symbol("_RunBlock", "ps6000RunBlock", c_uint32,
-            [c_int16, c_uint32, c_uint32, c_uint32, c_int16, c_void_p, c_uint32, c_void_p, c_void_p], doc)
+                   [c_int16, c_uint32, c_uint32, c_uint32, c_int16, c_void_p, c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000IsReady
     (
@@ -475,7 +477,7 @@ doc = """ PICO_STATUS ps6000RunStreaming
         uint32_t           overviewBufferSize
     ); """
 ps6000.make_symbol("_RunStreaming", "ps6000RunStreaming", c_uint32,
-            [c_int16, c_void_p, c_int32, c_uint32, c_uint32, c_int16, c_uint32, c_int32, c_uint32], doc)
+                   [c_int16, c_void_p, c_int32, c_uint32, c_uint32, c_int16, c_uint32, c_int32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000GetStreamingLatestValues
     (
@@ -484,7 +486,7 @@ doc = """ PICO_STATUS ps6000GetStreamingLatestValues
         void                 *pParameter
     ); """
 ps6000.make_symbol("_GetStreamingLatestValues", "ps6000GetStreamingLatestValues", c_uint32,
-            [c_int16, c_void_p, c_void_p], doc)
+                   [c_int16, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000NoOfStreamingValues
     (
@@ -502,7 +504,7 @@ doc = """ PICO_STATUS ps6000GetMaxDownSampleRatio
         uint32_t           segmentIndex
     ); """
 ps6000.make_symbol("_GetMaxDownSampleRatio", "ps6000GetMaxDownSampleRatio", c_uint32,
-            [c_int16, c_uint32, c_void_p, c_int32, c_uint32], doc)
+                   [c_int16, c_uint32, c_void_p, c_int32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000GetValues
     (
@@ -515,7 +517,7 @@ doc = """ PICO_STATUS ps6000GetValues
         int16_t           *overflow
     ); """
 ps6000.make_symbol("_GetValues", "ps6000GetValues", c_uint32,
-            [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_void_p], doc)
+                   [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesBulk
     (
@@ -528,7 +530,7 @@ doc = """ PICO_STATUS ps6000GetValuesBulk
         int16_t           *overflow
     ); """
 ps6000.make_symbol("_GetValuesBulk", "ps6000GetValuesBulk", c_uint32,
-            [c_int16, c_void_p, c_uint32, c_uint32, c_uint32, c_int32, c_void_p], doc)
+                   [c_int16, c_void_p, c_uint32, c_uint32, c_uint32, c_int32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesAsync
     (
@@ -542,7 +544,7 @@ doc = """ PICO_STATUS ps6000GetValuesAsync
         void              *pParameter
     ); """
 ps6000.make_symbol("_GetValuesAsync", "ps6000GetValuesAsync", c_uint32,
-            [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_void_p, c_void_p], doc)
+                   [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesOverlapped
     (
@@ -555,7 +557,7 @@ doc = """ PICO_STATUS ps6000GetValuesOverlapped
         int16_t           *overflow
     ); """
 ps6000.make_symbol("_GetValuesOverlapped", "ps6000GetValuesOverlapped", c_uint32,
-            [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_void_p], doc)
+                   [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesOverlappedBulk
     (
@@ -569,7 +571,7 @@ doc = """ PICO_STATUS ps6000GetValuesOverlappedBulk
         int16_t           *overflow
     ); """
 ps6000.make_symbol("_GetValuesOverlappedBulk", "ps6000GetValuesOverlappedBulk", c_uint32,
-            [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
+                   [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetValuesBulkAsyc
     (
@@ -583,7 +585,7 @@ doc = """ PICO_STATUS ps6000GetValuesBulkAsyc
         int16_t           *overflow
     ); """
 ps6000.make_symbol("_GetValuesAsync", "ps6000GetValuesAsync", c_uint32,
-            [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
+                   [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetNoOfCaptures
     (
@@ -650,4 +652,4 @@ doc = """ PICO_STATUS ps6000GetAnalogueOffset
         float           *minimumVoltage
     ); """
 ps6000.make_symbol("_GetAnalogueOffset", "ps6000GetAnalogueOffset", c_uint32,
-            [c_int16, c_int32, c_int32, c_void_p, c_void_p], doc)
+                   [c_int16, c_int32, c_int32, c_void_p, c_void_p], doc)

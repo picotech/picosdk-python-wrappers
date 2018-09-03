@@ -11,12 +11,12 @@ from picosdk.library import Library
 from picosdk.constants import make_enum
 
 
-class ps2000alib(Library):
+class Ps2000alib(Library):
     def __init__(self):
-        super(ps2000alib, self).__init__("ps2000a")
+        super(Ps2000alib, self).__init__("ps2000a")
 
 
-ps2000a = ps2000alib()
+ps2000a = Ps2000alib()
 
 # A tuple in an enum like this is 2 names for the same value.
 ps2000a.PS2000A_CHANNEL = make_enum([
