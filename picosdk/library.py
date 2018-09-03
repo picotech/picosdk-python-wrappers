@@ -319,29 +319,34 @@ class Library(object):
             if return_code == 0:
                 raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
                     self.PICO_VOLTAGE_RANGE[range_id]))
-        elif len(self._set_channel.argtypes) == 6:
-            if analog_offset is None:
-                analog_offset = 0.0
-            status = self._set_channel(c_int16(handle),
-                                       c_int32(channel_id),
-                                       c_int16(enabled),
-                                       c_int32(coupling_id),
-                                       c_int32(range_id),
-                                       c_float(analog_offset))
+        elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32 or (
+             len(self._set_channel.argtypes) == 6):
+            status = self.PICO_STATUS['PICO_OK']
+            if len(self._set_channel.argtypes) == 6:
+                if analog_offset is None:
+                    analog_offset = 0.0
+                status = self._set_channel(c_int16(handle),
+                                           c_int32(channel_id),
+                                           c_int16(enabled),
+                                           c_int32(coupling_id),
+                                           c_int32(range_id),
+                                           c_float(analog_offset))
+            elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32:
+                if analog_offset is not None:
+                    raise ArgumentOutOfRangeError("This device doesn't support analog offset")
+                status = self._set_channel(c_int16(handle),
+                                           c_int32(channel_id),
+                                           c_int16(enabled),
+                                           c_int16(coupling_id),
+                                           c_int32(range_id))
             if status != self.PICO_STATUS['PICO_OK']:
                 if status == self.PICO_STATUS['PICO_INVALID_VOLTAGE_RANGE']:
                     raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
                         self.PICO_VOLTAGE_RANGE[range_id]))
+                if status == self.PICO_STATUS['PICO_INVALID_CHANNEL'] and not enabled:
+                    # don't throw errors if the user tried to disable a missing channel.
+                    return
                 raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
-        elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32:
-            if analog_offset is not None:
-                raise ArgumentOutOfRangeError("This device doesn't support analog offset")
-            status = self._set_channel(c_int16(handle),
-                                       c_int32(channel_id),
-                                       c_int16(enabled),
-                                       c_int16(coupling_id),
-                                       c_int32(range_id))
-            if status != self.PICO_STATUS['PICO_OK']:
-                raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
+
         else:
             raise NotImplementedError("not done other driver types yet")

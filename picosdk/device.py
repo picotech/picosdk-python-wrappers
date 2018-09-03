@@ -33,6 +33,10 @@ class ClosedDeviceError(Exception):
     pass
 
 
+class NoChannelsEnabledError(Exception):
+    pass
+
+
 def requires_open(error_message="This operation requires a device to be connected."):
     def check_open_decorator(method):
         def check_open_impl(self, *args, **kwargs):
@@ -54,6 +58,10 @@ ChannelConfig.__new__.__defaults__ = (None, None, None)
 
 
 class Device(object):
+    """This object caches some information about the device state which cannot be queried from the driver. Please don't
+    mix and match calls to this object with calls directly to the driver (or the ctypes wrapper), as this may cause
+    unwanted behaviour (e.g. throwing an exception because no channels are enabled, when you enabled them yourself
+    on the driver object.)"""
     def __init__(self, driver, handle):
         self.driver = driver
         self.handle = handle
@@ -107,25 +115,34 @@ class Device(object):
         return self._channel_ranges[name]
 
     @requires_open()
-    def capture_block(self, channel_configs):
+    def set_channels(self, *channel_configs):
+        """ set_channels(self, *channel_configs)
+        An alternative to calling set_channel for each one, you can call this method with some channel configs.
+        This method will also disable any missing channels from the passed configs, and disable ALL channels if the
+        collection is empty. """
+        # Add channels which are missing as "disabled".
+        if len(channel_configs) < len(self.driver.PICO_CHANNEL):
+            channel_configs = list(channel_configs)
+            present_channels = set(c.name for c in channel_configs)
+            missing_channels = [cn for cn in self.driver.PICO_CHANNEL.keys() if cn not in present_channels]
+            for channel_name in missing_channels:
+                channel_configs.append(ChannelConfig(channel_name, False))
+
+        for channel_config in channel_configs:
+            self.set_channel(channel_config)
+
+    @requires_open()
+    def capture_block(self, channel_configs=()):
         """device.capture_block(channel_configs)
-        channel_configs: a collection of ChannelConfig objects, specifying channel settings. Can be empty if you've
-        already called set_channel. If not empty, any channels which are missing from this collection will be disabled.
+        channel_configs: a collection of ChannelConfig objects. If present, will be passed to set_channels.
         """
         times = []
         voltages = []
 
         if channel_configs:
-            # Add channels which are missing as "disabled".
-            if len(channel_configs) < len(self.driver.PICO_CHANNEL):
-                present_channels = set(c.name for c in channel_configs)
-                missing_channels = [cn for cn in self.driver.PICO_CHANNEL.keys() if cn not in present_channels]
-                for channel_name in missing_channels:
-                    channel_configs.append(ChannelConfig(channel_name, False))
+            self.set_channels(*channel_configs)
 
-        for channel_config in channel_configs:
-            self.set_channel(channel_config)
-
-        # throw error if no channels enabled?
+        if len(self._channel_ranges) == 0:
+            raise NoChannelsEnabledError("We cannot capture any data if no channels are enabled.")
 
         return times, voltages
