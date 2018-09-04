@@ -27,9 +27,9 @@ chandle = ctypes.c_int16(status["openUnit"])
 # channel = PS2000_CHANNEL_A = 0
 # enabled = 1
 # coupling type = PS2000_DC = 1
-# range = PS2000_5V = 8
+# range = PS2000_2V = 7
 # analogue offset = 0 V
-chARange = 8
+chARange = 7
 status["setChA"] = ps.ps2000_set_channel(chandle, 0, 1, 1, chARange)
 assert_pico2000_ok(status["setChA"])
 
