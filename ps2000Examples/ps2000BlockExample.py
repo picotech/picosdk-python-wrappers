@@ -17,7 +17,7 @@ status = {}
 # Open 2000 series PicoScope
 # Returns handle to chandle for use in future API functions
 status["openUnit"] = ps.ps2000_open_unit()
-assert_pico2000_ok(status["openunit"])
+assert_pico2000_ok(status["openUnit"])
 
 # Create chandle for use
 chandle = ctypes.c_int16(status["openUnit"])
