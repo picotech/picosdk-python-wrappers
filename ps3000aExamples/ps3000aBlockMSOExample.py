@@ -7,13 +7,13 @@
 
 import ctypes
 from picosdk.ps3000a import ps3000a as ps
-from picosdk.functions import splitMSODataPort0
+from picosdk.functions import splitMSODataPort0, assert_pico_ok
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 from array import *
 
-# Gives the device a handle 
+# Gives the device a handle
 status = {}
 chandle = ctypes.c_int16()
 
@@ -33,10 +33,10 @@ except:
     # If the powerstate is the same as 286 then it will run this if statement
     elif powerstate == 286:
         # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
-        status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286) 
+        status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286)
     else:
         raise
-    
+
     assert_pico_ok(status["ChangePowerSource"])
 
 # set up digital port
@@ -58,7 +58,7 @@ maxsamples = preTriggerSamples + postTriggerSamples
 # Nosample = maxsamples
 # TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
 # MaxSamples = ctypes.byref(returnedMaxSamples)
-# Segement index = 0 
+# Segement index = 0
 timebase = 8
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
@@ -80,7 +80,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)()
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 0 
+# Segment index = 0
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0x80, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
 assert_pico_ok(status["SetDataBuffers"])
@@ -91,7 +91,7 @@ assert_pico_ok(status["SetDataBuffers"])
 # Number of postTriggerSamples
 # Timebase = 2 = 4ns (see Programmer's guide for more information on timebases)
 # time indisposed ms = None (This is not needed within the example)
-# Segment index = 0 
+# Segment index = 0
 # LpRead = None
 # pParameter = None
 status["runblock"] = ps.ps3000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, 1, None, 0, None, None)
@@ -106,7 +106,7 @@ cmaxSamples = ctypes.c_int32(maxsamples)
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
 while ready.value == check.value:
-	status["isReady"] = ps.ps3000aIsReady(chandle, ctypes.byref(ready))
+    status["isReady"] = ps.ps3000aIsReady(chandle, ctypes.byref(ready))
 
 # Handle = chandle
 # start index = 0
@@ -121,7 +121,7 @@ assert_pico_ok(status["GetValues"])
 
 bufferAMaxBinaryD0, bufferAMaxBinaryD1, bufferAMaxBinaryD2, bufferAMaxBinaryD3, bufferAMaxBinaryD4, bufferAMaxBinaryD5, bufferAMaxBinaryD6, bufferAMaxBinaryD7 = splitMSODataPort0(cmaxSamples, bufferAMax)
 
-# Creates the time data 
+# Creates the time data
 time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from digital channel onto a graph
@@ -138,13 +138,13 @@ plt.ylabel('Binary')
 plt.show()
 
 
-# Stops the scope 
+# Stops the scope
 # Handle = chandle
 status["stop"] = ps.ps3000aStop(chandle)
 assert_pico_ok(status["stop"])
 
-# Closes the unit 
-# Handle = chandle 
+# Closes the unit
+# Handle = chandle
 status["stop"] = ps.ps3000aCloseUnit(chandle)
 assert_pico_ok(status["stop"])
 

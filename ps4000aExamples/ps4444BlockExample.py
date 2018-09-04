@@ -9,7 +9,7 @@ import ctypes
 import numpy as np
 from picosdk.ps4000a import ps4000a as ps
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV
+from picosdk.functions import adc2mV, assert_pico_ok
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -32,7 +32,7 @@ except: # PicoNotOkError:
         raise
 
     assert_pico_ok(status["changePowerSource"])
-        
+
 
 
 # Set up channel A

@@ -33,7 +33,7 @@ except: # PicoNotOkError:
 
     assert_pico_ok(status["changePowerSource"])
 
-# Displays the serial number and handle 
+# Displays the serial number and handle
 print(chandle.value)
 
 # Set up channel A
@@ -47,7 +47,7 @@ status["setChA"] = ps.ps5000aSetChannel(chandle, channel, 1, coupling_type, chAR
 assert_pico_ok(status["setChA"])
 
 
-# Finds the max ADC count 
+# Finds the max ADC count
 # Handle = chandle
 # Value = ctype.byref(maxADC)
 maxADC = ctypes.c_int16()
@@ -76,7 +76,7 @@ timebase = 2
 # Nosample = maxsamples
 # TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
 # MaxSamples = ctypes.byref(returnedMaxSamples)
-# Segement index = 0 
+# Segement index = 0
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
 status["GetTimebase"] = ps.ps5000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
@@ -103,7 +103,7 @@ assert_pico_ok(status["SetNoOfCaptures"])
 # Number of postTriggerSamples
 # Timebase = 2 = 4ns (see Programmer's guide for more information on timebases)
 # time indisposed ms = None (This is not needed within the example)
-# Segment index = 0 
+# Segment index = 0
 # LpRead = None
 # pParameter = None
 status["runblock"] = ps.ps5000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, None, 0, None, None)
@@ -119,7 +119,7 @@ source = ps.PS5000A_CHANNEL["ps5000a_channel_A"]
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 0 
+# Segment index = 0
 # Ratio mode = ps5000a_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps5000aSetDataBuffers(chandle, source, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
 assert_pico_ok(status["SetDataBuffers"])
@@ -239,7 +239,7 @@ bufferAMin8 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 8 
+# Segment index = 8
 # Ratio mode = ps5000a_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps5000aSetDataBuffers(chandle, source, ctypes.byref(bufferAMax8), ctypes.byref(bufferAMin8), maxsamples, 8, 0)
 assert_pico_ok(status["SetDataBuffers"])
@@ -268,7 +268,7 @@ cmaxSamples = ctypes.c_int32(maxsamples)
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
 while ready.value == check.value:
-	status["isReady"] = ps.ps5000aIsReady(chandle, ctypes.byref(ready))
+    status["isReady"] = ps.ps5000aIsReady(chandle, ctypes.byref(ready))
 
 # Handle = chandle
 # noOfSamples = ctypes.byref(cmaxSamples)
@@ -282,7 +282,7 @@ status["GetValuesBulk"] = ps.ps5000aGetValuesBulk(chandle, ctypes.byref(cmaxSamp
 assert_pico_ok(status["GetValuesBulk"])
 
 # Handle = chandle
-# Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times) 
+# Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times)
 # Timeunits = TimeUnits = ctypes.c_char() = ctypes.byref(TimeUnits)
 # Fromsegmentindex = 0
 # Tosegementindex = 9
@@ -303,7 +303,7 @@ adc2mVChAMax7 =  adc2mV(bufferAMax7, chARange, maxADC)
 adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
 adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
 
-# Creates the time data 
+# Creates the time data
 time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
@@ -321,13 +321,13 @@ plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
 
-# Stops the scope 
+# Stops the scope
 # Handle = chandle
 status["stop"] = ps.ps5000aStop(chandle)
 assert_pico_ok(status["stop"])
 
-# Closes the unit 
-# Handle = chandle 
+# Closes the unit
+# Handle = chandle
 status["close"] = ps.ps5000aCloseUnit(chandle)
 assert_pico_ok(status["close"])
 

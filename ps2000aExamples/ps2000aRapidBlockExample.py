@@ -9,7 +9,7 @@ import ctypes
 from picosdk.ps2000a import ps2000a as ps
 import numpy as np
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV
+from picosdk.functions import adc2mV, assert_pico_ok
 
 # Create chandle and status ready for use
 status = {}
@@ -52,7 +52,7 @@ maxsamples = preTriggerSamples + postTriggerSamples
 # Nosample = maxsamples
 # TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
 # MaxSamples = ctypes.byref(returnedMaxSamples)
-# Segement index = 0 
+# Segement index = 0
 timebase = 2
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
@@ -81,7 +81,7 @@ assert_pico_ok(status["SetNoOfCaptures"])
 # Number of postTriggerSamples
 # Timebase = 2 = 4ns (see Programmer's guide for more information on timebases)
 # time indisposed ms = None (This is not needed within the example)
-# Segment index = 0 
+# Segment index = 0
 # LpRead = None
 # pParameter = None
 status["runblock"] = ps.ps2000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, 1, None, 0, None, None)
@@ -97,7 +97,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 0 
+# Segment index = 0
 # Ratio mode = ps2000a_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps2000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
 assert_pico_ok(status["SetDataBuffers"])
@@ -217,7 +217,7 @@ bufferAMin8 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 8 
+# Segment index = 8
 # Ratio mode = ps2000a_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps2000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax8), ctypes.byref(bufferAMin8), maxsamples, 8, 0)
 assert_pico_ok(status["SetDataBuffers"])
@@ -246,7 +246,7 @@ cmaxSamples = ctypes.c_int32(maxsamples)
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
 while ready.value == check.value:
-	status["isReady"] = ps.ps2000aIsReady(chandle, ctypes.byref(ready))
+    status["isReady"] = ps.ps2000aIsReady(chandle, ctypes.byref(ready))
 
 # Handle = chandle
 # noOfSamples = ctypes.byref(cmaxSamples)
@@ -260,7 +260,7 @@ status["GetValuesBulk"] = ps.ps2000aGetValuesBulk(chandle, ctypes.byref(cmaxSamp
 assert_pico_ok(status["GetValuesBulk"])
 
 # Handle = chandle
-# Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times) 
+# Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times)
 # Timeunits = TimeUnits = ctypes.c_char() = ctypes.byref(TimeUnits)
 # Fromsegmentindex = 0
 # Tosegementindex = 9
@@ -269,7 +269,7 @@ TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps2000aGetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
-# Finds the max ADC count 
+# Finds the max ADC count
 # Handle = chandle
 # Value = ctype.byref(maxADC)
 maxADC = ctypes.c_int16()
@@ -277,18 +277,18 @@ status["maximumValue"] = ps.ps2000aMaximumValue(chandle, ctypes.byref(maxADC))
 assert_pico_ok(status["maximumValue"])
 
 # Converts ADC from channel A to mV
-adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
-adc2mVChAMax1 =  adc2mV(bufferAMax1, chARange, maxADC)
-adc2mVChAMax2 =  adc2mV(bufferAMax2, chARange, maxADC)
-adc2mVChAMax3 =  adc2mV(bufferAMax3, chARange, maxADC)
-adc2mVChAMax4 =  adc2mV(bufferAMax4, chARange, maxADC)
-adc2mVChAMax5 =  adc2mV(bufferAMax5, chARange, maxADC)
-adc2mVChAMax6 =  adc2mV(bufferAMax6, chARange, maxADC)
-adc2mVChAMax7 =  adc2mV(bufferAMax7, chARange, maxADC)
-adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
-adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
+adc2mVChAMax = adc2mV(bufferAMax, chARange, maxADC)
+adc2mVChAMax1 = adc2mV(bufferAMax1, chARange, maxADC)
+adc2mVChAMax2 = adc2mV(bufferAMax2, chARange, maxADC)
+adc2mVChAMax3 = adc2mV(bufferAMax3, chARange, maxADC)
+adc2mVChAMax4 = adc2mV(bufferAMax4, chARange, maxADC)
+adc2mVChAMax5 = adc2mV(bufferAMax5, chARange, maxADC)
+adc2mVChAMax6 = adc2mV(bufferAMax6, chARange, maxADC)
+adc2mVChAMax7 = adc2mV(bufferAMax7, chARange, maxADC)
+adc2mVChAMax8 = adc2mV(bufferAMax8, chARange, maxADC)
+adc2mVChAMax9 = adc2mV(bufferAMax9, chARange, maxADC)
 
-# Creates the time data 
+# Creates the time data
 time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
@@ -306,13 +306,13 @@ plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
 
-# Stops the scope 
+# Stops the scope
 # Handle = chandle
 status["stop"] = ps.ps2000aStop(chandle)
 assert_pico_ok(status["stop"])
 
-# Closes the unit 
-# Handle = chandle 
+# Closes the unit
+# Handle = chandle
 status["close"] = ps.ps2000aCloseUnit(chandle)
 assert_pico_ok(status["close"])
 

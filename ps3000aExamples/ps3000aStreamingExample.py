@@ -9,7 +9,7 @@ import ctypes
 from picosdk.ps3000a import ps3000a as ps
 import numpy as np
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV
+from picosdk.functions import adc2mV, assert_pico_ok
 
 # Create chandle and status ready for use
 status = {}
@@ -31,7 +31,7 @@ if powerstate == 286:
     # Changes the power input to "PICO_USB3_0_DEVICE_NON_USB3_0_PORT"
     status["ChangePowerSource"] = ps.ps3000aChangePowerSource(chandle, 286)
 
-# Displays the serial number and handle 
+# Displays the serial number and handle
 print(chandle.value)
 
 # Set up channel A
@@ -69,7 +69,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)()
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 0 
+# Segment index = 0
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
 
@@ -80,14 +80,14 @@ timeUnits = 3 # PS3000A_US
 
 status['runStreaming'] = ps.ps3000aRunStreaming(chandle, ctypes.byref(sampleInterval), timeUnits, preTriggerSamples, postTriggerSamples, 1, 1, 0, maxsamples)
 
-# Stops the scope 
+# Stops the scope
 # Handle = chandle
 status["stop"] = ps.ps3000aStop(chandle)
 
 # Displays the staus returns
 print(status)
 
-# Closes the unit 
-# Handle = chandle 
+# Closes the unit
+# Handle = chandle
 ps.ps3000aCloseUnit(chandle)
 

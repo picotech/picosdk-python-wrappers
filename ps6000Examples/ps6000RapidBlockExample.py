@@ -9,7 +9,7 @@ import ctypes
 from picosdk.ps6000 import ps6000 as ps
 import numpy as np
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV
+from picosdk.functions import adc2mV, assert_pico_ok
 
 # Create chandle and status ready for use
 status = {}
@@ -19,7 +19,7 @@ chandle = ctypes.c_int16()
 status["openunit"] = ps.ps6000OpenUnit(ctypes.byref(chandle), None)
 assert_pico_ok(status[""])
 
-# Displays the serial number and handle 
+# Displays the serial number and handle
 print(chandle.value)
 
 # Set up channel A
@@ -55,7 +55,7 @@ maxsamples = preTriggerSamples + postTriggerSamples
 # Nosample = maxsamples
 # TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
 # MaxSamples = ctypes.byref(returnedMaxSamples)
-# Segement index = 0 
+# Segement index = 0
 timebase = 2
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
@@ -84,7 +84,7 @@ assert_pico_ok(status["SetNoOfCaptures"])
 # Number of postTriggerSamples
 # Timebase = 2 = 4ns (see Programmer's guide for more information on timebases)
 # time indisposed ms = None (This is not needed within the example)
-# Segment index = 0 
+# Segment index = 0
 # LpRead = None
 # pParameter = None
 status["runblock"] = ps.ps6000RunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, 1, None, 0, None, None)
@@ -100,7 +100,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 0 
+# Segment index = 0
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
 assert_pico_ok(status["SetDataBuffersBulk"])
@@ -221,7 +221,7 @@ bufferAMin8 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
-# Segment index = 8 
+# Segment index = 8
 # Ratio mode = ps6000_Ratio_Mode_None = 0
 status["SetDataBuffersBulk"] = ps.ps6000SetDataBuffersBulk(chandle, 0, ctypes.byref(bufferAMax8), ctypes.byref(bufferAMin8), maxsamples, 8, 0)
 assert_pico_ok(status["SetDataBuffersBulk"])
@@ -250,7 +250,7 @@ cmaxSamples = ctypes.c_int32(maxsamples)
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
 while ready.value == check.value:
-	status["isReady"] = ps.ps6000IsReady(chandle, ctypes.byref(ready))
+    status["isReady"] = ps.ps6000IsReady(chandle, ctypes.byref(ready))
 
 # Handle = chandle
 # noOfSamples = ctypes.byref(cmaxSamples)
@@ -264,7 +264,7 @@ status["GetValuesBulk"] = ps.ps6000GetValuesBulk(chandle, ctypes.byref(cmaxSampl
 assert_pico_ok(status["GetValuesBulk"])
 
 # Handle = chandle
-# Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times) 
+# Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times)
 # Timeunits = TimeUnits = ctypes.c_char() = ctypes.byref(TimeUnits)
 # Fromsegmentindex = 0
 # Tosegementindex = 9
@@ -273,7 +273,7 @@ TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps6000GetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
-# Finds the max ADC count 
+# Finds the max ADC count
 maxADC = ctypes.c_int16(32512)
 
 # Converts ADC from channel A to mV
@@ -288,7 +288,7 @@ adc2mVChAMax7 =  adc2mV(bufferAMax7, chARange, maxADC)
 adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
 adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
 
-# Creates the time data 
+# Creates the time data
 time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
@@ -306,13 +306,13 @@ plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
 
-# Stops the scope 
+# Stops the scope
 # Handle = chandle
 status["stop"] = ps.ps6000Stop(chandle)
 assert_pico_ok(status["stop"])
 
-# Closes the unit 
-# Handle = chandle 
+# Closes the unit
+# Handle = chandle
 status["close"] = ps.ps6000CloseUnit(chandle)
 assert_pico_ok(status["close"])
 
