@@ -17,7 +17,7 @@ chandle = ctypes.c_int16()
 
 # Opens the device/s
 status["openunit"] = ps.ps6000OpenUnit(ctypes.byref(chandle), None)
-assert_pico_ok(status[""])
+assert_pico_ok(status["openunit"])
 
 # Displays the serial number and handle
 print(chandle.value)

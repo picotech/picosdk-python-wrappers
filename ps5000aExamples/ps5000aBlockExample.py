@@ -22,7 +22,7 @@ resolution =ps.PS5000A_DEVICE_RESOLUTION["PS5000A_DR_12BIT"]
 status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, resolution)
 
 try:
-    assert_pico_ok(status["open_unit"])
+    assert_pico_ok(status["openunit"])
 except: # PicoNotOkError:
 
     powerStatus = status["openunit"]

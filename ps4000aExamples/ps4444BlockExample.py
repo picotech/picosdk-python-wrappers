@@ -20,7 +20,7 @@ status = {}
 status["openunit"] = ps.ps4000aOpenUnit(ctypes.byref(chandle), None)
 
 try:
-    assert_pico_ok(status["open_unit"])
+    assert_pico_ok(status["openunit"])
 except: # PicoNotOkError:
     powerStatus = status["openunit"]
 

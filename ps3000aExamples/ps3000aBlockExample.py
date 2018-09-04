@@ -19,7 +19,7 @@ chandle = ctypes.c_int16()
 status["openunit"] = ps.ps3000aOpenUnit(ctypes.byref(chandle), None)
 
 try:
-    assert_pico_ok(status["opneunit"])
+    assert_pico_ok(status["openunit"])
 except:
 
     # powerstate becomes the status number of openunit
