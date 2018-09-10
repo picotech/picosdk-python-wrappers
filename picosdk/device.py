@@ -7,26 +7,7 @@ capturing data and configuring the AWG.
 """
 from __future__ import print_function
 import collections
-
-
-def make_array(obj, dtype=None, copy=True, order='K', subok=False, ndmin=0):
-    """this function emulates the numpy array constructor in an environment without numpy.
-    In the case where numpy isn't available, the return type is a normal Python list."""
-    try:
-        import numpy
-        return numpy.array(obj, dtype, copy, order, subok, ndmin)
-    except ImportError:
-        if not copy and dtype is None:
-            return obj
-        if dtype is None:
-            # PEP-8 requires me to write this out with a def, rather than just use a lambda.
-            def dtype(v):
-                return v
-
-        # we ignore the other arguments, since Python doesn't natively support them, or (ndmin) the feature is not
-        # required by the picosdk.
-
-        return [dtype(i) for i in iter(obj)]
+import numpy
 
 
 class ClosedDeviceError(Exception):
@@ -136,6 +117,7 @@ class Device(object):
         """device.capture_block(channel_configs)
         channel_configs: a collection of ChannelConfig objects. If present, will be passed to set_channels.
         """
+        # TODO make these into numpy arrays (when we know the size)
         times = []
         voltages = []
 
