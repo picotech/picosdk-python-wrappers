@@ -1,3 +1,6 @@
+# .gitignore file for picosdk-python-wrappers repository
+# Untracked files/folders to ignore.
+
 # python bytecode cache files
 **/*.pyc
 
