@@ -320,11 +320,8 @@ class Library(object):
         # we allow exclude so that if the smallest range in the header file isn't available on this device (or in this
         # configuration) we can exclude it from the collection. It should be the numerical enum constant (the key in
         # PICO_VOLTAGE_RANGE).
-
-        def predicate((key, value)):
-            return value >= signal_peak and key not in exclude
-
-        possibilities = list(filter(predicate, self.PICO_VOLTAGE_RANGE.items()))
+        possibilities = list(filter(lambda tup: tup[1] >= signal_peak and tup[0] not in exclude,
+                                    self.PICO_VOLTAGE_RANGE.items()))
 
         if not possibilities:
             raise ArgumentOutOfRangeError("%s device doesn't support a range as wide as %sV" % (self.name, signal_peak))
