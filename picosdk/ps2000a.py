@@ -145,6 +145,19 @@ doc = """ PICO_STATUS ps2000aSetNoOfCaptures
     ); """
 ps2000a.make_symbol("_SetNoOfCaptures", "ps2000aSetNoOfCaptures", c_uint32, [c_int16, c_uint32], doc)
 
+doc = """ PICO_STATUS ps2000aGetTimebase
+    (
+        int16_t  handle,
+        uint32_t timebase,
+        int32_t  noSamples,
+        int32_t *timeIntervalNanoseconds,
+        int16_t  oversample,
+        int32_t *maxSamples,
+        uint32_t segmentIndex
+    ); """
+ps2000a.make_symbol("_GetTimebase", "ps2000aGetTimebase", c_uint32,
+                    [c_int16, c_uint32, c_int32, c_void_p, c_int16, c_void_p, c_uint32], doc)
+
 doc = """ PICO_STATUS ps2000aGetTimebase2
     (
         int16_t  handle,

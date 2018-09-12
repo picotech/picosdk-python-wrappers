@@ -1,3 +1,4 @@
+# coding=utf-8
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
@@ -8,6 +9,8 @@ capturing data and configuring the AWG.
 from __future__ import print_function
 import collections
 import numpy
+import math
+from picosdk.library import DeviceCannotSegmentMemoryError, InvalidTimebaseError
 
 
 class ClosedDeviceError(Exception):
@@ -36,6 +39,24 @@ range_peak (optional) = +/- max volts, the highest precision range which include
 analog_offset (optional) = the meaning of 0 for this channel."""
 ChannelConfig = collections.namedtuple('ChannelConfig', ['name', 'enabled', 'coupling', 'range_peak', 'analog_offset'])
 ChannelConfig.__new__.__defaults__ = (None, None, None)
+
+
+"""TimebaseOptions: A type for specifying timebase constraints (pass to Device.find_timebase or Device.capture_*)
+All are optional. Please specify the options which matter to you: 
+  - the maximum time interval (if you want the fastest/most precise timebase you can get),
+  - the number of samples in one buffer,
+  - the minimum total collection time (if you want at least x.y seconds of uninterrupted capture data)
+  - the oversample (if you want to sacrifice time precision for amplitude precision - see the programming guides.)"""
+TimebaseOptions = collections.namedtuple('TimebaseOptions', ['max_time_interval',
+                                                             'no_of_samples',
+                                                             'min_collection_time',
+                                                             'oversample'])
+_TIMEBASE_OPTIONS_DEFAULTS = (None, None, None, 1)
+TimebaseOptions.__new__.__defaults__ = _TIMEBASE_OPTIONS_DEFAULTS
+
+
+class NoValidTimebaseForOptionsError(Exception):
+    pass
 
 
 class Device(object):
@@ -112,19 +133,71 @@ class Device(object):
         for channel_config in channel_configs:
             self.set_channel(channel_config)
 
+    @staticmethod
+    def _validate_timebase(timebase_options, timebase_info):
+        """validate whether a timebase result matches the options requested."""
+        if timebase_options.max_time_interval is not None:
+            if timebase_info.time_interval > timebase_options.max_time_interval:
+                return False
+        if timebase_options.no_of_samples is not None:
+            if timebase_options.no_of_samples > timebase_info.max_samples:
+                return False
+        if timebase_options.min_collection_time is not None:
+            if timebase_options.min_collection_time > timebase_info.max_samples * timebase_info.time_interval:
+                return False
+        return True
+
     @requires_open()
-    def capture_block(self, channel_configs=()):
-        """device.capture_block(channel_configs)
+    def find_timebase(self, timebase_options):
+        timebase_id = 0
+        # TODO binary search?
+        while True:
+            try:
+                timebase_info = self.driver.get_timebase(self, timebase_id, 0, timebase_options.oversample)
+                if self._validate_timebase(timebase_options, timebase_info):
+                    return timebase_info
+            except InvalidTimebaseError:
+                if timebase_id > 0:
+                    # we won't find a valid timebase.
+                    break
+            timebase_id += 1
+        raise NoValidTimebaseForOptionsError()
+
+    @requires_open()
+    def capture_block(self, timebase_options, channel_configs=()):
+        """device.capture_block(timebase_options, channel_configs)
+        timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
         channel_configs: a collection of ChannelConfig objects. If present, will be passed to set_channels.
         """
-        # TODO make these into numpy arrays (when we know the size)
-        times = []
-        voltages = []
+        # set_channel:
 
         if channel_configs:
             self.set_channels(*channel_configs)
 
         if len(self._channel_ranges) == 0:
             raise NoChannelsEnabledError("We cannot capture any data if no channels are enabled.")
+
+        # memory_segments:
+        try:
+            # always force the number of memory segments on the device to 1 before computing timebases for a one-off
+            # block capture.
+            max_samples_possible = self.driver.memory_segments(self, 1)
+            if timebase_options.no_of_samples is not None and timebase_options.no_of_samples > max_samples_possible:
+                raise NoValidTimebaseForOptionsError()
+        except DeviceCannotSegmentMemoryError:
+            pass
+
+        # get_timebase
+        timebase_info = self.find_timebase(timebase_options)
+
+        num_samples = timebase_options.no_of_samples
+
+        if num_samples is None:
+            num_samples = int(math.ceil(timebase_options.min_collection_time / timebase_info.time_interval))
+
+        times = numpy.array(num_samples)
+        voltages = numpy.array(num_samples)
+
+        # run_block
 
         return times, voltages

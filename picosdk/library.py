@@ -10,12 +10,9 @@ this type and attach the missing methods.
 from __future__ import print_function
 
 import sys
-import ctypes
-from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer
+from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer, byref, cdll, WinDLL
 from ctypes.util import find_library
 import collections
-
-from picosdk.device import Device
 import picosdk.constants as constants
 
 
@@ -43,11 +40,32 @@ class ValidRangeEnumValueNotValidForThisDevice(Exception):
     pass
 
 
+class DeviceCannotSegmentMemoryError(Exception):
+    pass
+
+
+class InvalidMemorySegmentsError(Exception):
+    pass
+
+
+class InvalidTimebaseError(Exception):
+    pass
+
+
+# !! TODO put all exception types into one file, and have all other files import what they need.
+from picosdk.device import Device
+
+
 """UnitInfo: A type for holding the particulars of a connected device.
 driver = a Library subclass
 variant = model name as a string
 serial = batch and serial number as a string (for use with Library.open_unit)"""
 UnitInfo = collections.namedtuple('UnitInfo', ['driver', 'variant', 'serial'])
+
+
+"""TimebaseInfo: A type for holding the particulars of a timebase configuration.
+"""
+TimebaseInfo = collections.namedtuple('UnitInfo', ['timebase_id', 'time_interval', 'time_units', 'max_samples', 'segment_id'])
 
 
 def requires_device(error_message):
@@ -61,25 +79,9 @@ def requires_device(error_message):
 
 
 class Library(object):
-    def load(self):
-        library_path = find_library(self.name)
-
-        if library_path is None:
-            env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
-            raise CannotFindPicoSDKError("PicoSDK (%s) not found, check %s" % (self.name, env_var_name))
-
-        try:
-            if sys.platform == 'win32':
-                result = ctypes.WinDLL(library_path)
-            else:
-                result = ctypes.cdll.LoadLibrary(library_path)
-        except OSError as e:
-            raise CannotOpenPicoSDKError("PicoSDK (%s) not compatible (check 32 vs 64-bit): %s" % (self.name, e))
-        return result
-
     def __init__(self, name):
         self.name = name
-        self._clib = self.load()
+        self._clib = self._load()
         # ! some drivers will replace these dicts at import time, where they have different constants (notably ps2000).
         self.PICO_INFO = constants.PICO_INFO
         self.PICO_STATUS = constants.PICO_STATUS
@@ -88,6 +90,22 @@ class Library(object):
         self.PICO_CHANNEL = {}
         self.PICO_COUPLING = {}
         self.PICO_VOLTAGE_RANGE = {}
+
+    def _load(self):
+        library_path = find_library(self.name)
+
+        if library_path is None:
+            env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
+            raise CannotFindPicoSDKError("PicoSDK (%s) not found, check %s" % (self.name, env_var_name))
+
+        try:
+            if sys.platform == 'win32':
+                result = WinDLL(library_path)
+            else:
+                result = cdll.LoadLibrary(library_path)
+        except OSError as e:
+            raise CannotOpenPicoSDKError("PicoSDK (%s) not compatible (check 32 vs 64-bit): %s" % (self.name, e))
+        return result
 
     def __str__(self):
         return "picosdk %s library" % self.name
@@ -172,11 +190,11 @@ class Library(object):
             chandle = c_int16()
             cresolution = c_int32()
             cresolution.value = resolution
-            status = self._open_unit(ctypes.byref(chandle), None, cresolution)
+            status = self._open_unit(byref(chandle), None, cresolution)
             handle = chandle.value
         elif len(self._open_unit.argtypes) == 2:
             chandle = c_int16()
-            status = self._open_unit(ctypes.byref(chandle), None)
+            status = self._open_unit(byref(chandle), None)
             handle = chandle.value
         else:
             handle = self._open_unit()
@@ -193,12 +211,12 @@ class Library(object):
             cresolution = c_int32()
             cresolution.value = resolution
             cserial = create_string_buffer(serial)
-            status = self._open_unit(ctypes.byref(chandle), cserial, cresolution)
+            status = self._open_unit(byref(chandle), cserial, cresolution)
             handle = chandle.value
         elif len(self._open_unit.argtypes) == 2:
             chandle = c_int16()
             cserial = create_string_buffer(serial)
-            status = self._open_unit(ctypes.byref(chandle), cserial)
+            status = self._open_unit(byref(chandle), cserial)
             handle = chandle.value
         else:
             open_handles = []
@@ -239,7 +257,7 @@ class Library(object):
             status = self._get_unit_info(c_int16(handle),
                                          info,
                                          c_int16(string_size),
-                                         ctypes.byref(required_size),
+                                         byref(required_size),
                                          c_uint32(info_type))
             if status == self.PICO_STATUS['PICO_OK']:
                 if required_size.value < string_size:
@@ -350,3 +368,64 @@ class Library(object):
 
         else:
             raise NotImplementedError("not done other driver types yet")
+
+    @requires_device("memory_segments requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def memory_segments(self, device, number_segments):
+        if not hasattr(self, '_memory_segments'):
+            raise DeviceCannotSegmentMemoryError()
+        max_samples = c_int32(0)
+        status = self._memory_segments(c_int16(device.handle), c_uint32(number_segments), byref(max_samples))
+        if status != self.PICO_STATUS['PICO_OK']:
+            raise InvalidMemorySegmentsError("could not segment the device memory into (%s) segments (%s)" % (
+                                              number_segments, constants.pico_tag(status)))
+        return max_samples
+
+    @requires_device("get_timebase requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def get_timebase(self, device, timebase_id, no_of_samples, oversample=1, segment_index=0):
+        """query the device about what time precision modes it can handle.
+        note: the driver returns the timebase in nanoseconds, this function converts that into SI units (seconds)"""
+        nanoseconds_result = self._python_get_timebase(device.handle,
+                                                       timebase_id,
+                                                       no_of_samples,
+                                                       oversample,
+                                                       segment_index)
+
+        return TimebaseInfo(nanoseconds_result.timebase_id,
+                            nanoseconds_result.time_interval * 1.e-9,
+                            nanoseconds_result.time_units,
+                            nanoseconds_result.max_samples,
+                            nanoseconds_result.segment_id)
+
+    def _python_get_timebase(self, handle, timebase_id, no_of_samples, oversample, segment_index):
+        # We use get_timebase on ps2000 and ps3000 and parse the nanoseconds-int into a float.
+        # on other drivers, we use get_timebase2, which gives us a float in the first place.
+        if len(self._get_timebase.argtypes) == 7 and self._get_timebase.argtypes[1] == c_int16:
+            time_interval = c_int32(0)
+            time_units = c_int16(0)
+            max_samples = c_int32(0)
+            return_code = self._get_timebase(c_int16(handle),
+                                             c_int16(timebase_id),
+                                             c_int32(no_of_samples),
+                                             byref(time_interval),
+                                             byref(time_units),
+                                             c_int16(oversample),
+                                             byref(max_samples))
+            if return_code == 0:
+                raise InvalidTimebaseError()
+
+            return TimebaseInfo(timebase_id, float(time_interval.value), time_units.value, max_samples.value, None)
+        elif hasattr(self, '_get_timebase2') and (
+                     len(self._get_timebase2.argtypes) == 7 and self._get_timebase2.argtypes[1] == c_uint32):
+            time_interval = c_float(0.0)
+            max_samples = c_int32(0)
+            status = self._get_timebase2(c_int16(handle),
+                                              c_uint32(timebase_id),
+                                              c_int32(no_of_samples),
+                                              byref(time_interval),
+                                              c_int16(oversample),
+                                              byref(max_samples),
+                                              c_uint32(segment_index))
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidTimebaseError("get_timebase2 failed (%s)" % constants.pico_tag(status))
+
+            return TimebaseInfo(timebase_id, time_interval.value, None, max_samples.value, segment_index)
