@@ -65,7 +65,11 @@ UnitInfo = collections.namedtuple('UnitInfo', ['driver', 'variant', 'serial'])
 
 """TimebaseInfo: A type for holding the particulars of a timebase configuration.
 """
-TimebaseInfo = collections.namedtuple('UnitInfo', ['timebase_id', 'time_interval', 'time_units', 'max_samples', 'segment_id'])
+TimebaseInfo = collections.namedtuple('UnitInfo', ['timebase_id',
+                                                   'time_interval',
+                                                   'time_units',
+                                                   'max_samples',
+                                                   'segment_id'])
 
 
 def requires_device(error_message):
@@ -90,6 +94,8 @@ class Library(object):
         self.PICO_CHANNEL = {}
         self.PICO_COUPLING = {}
         self.PICO_VOLTAGE_RANGE = {}
+
+        self.MAX_MEMORY = float('inf')
 
     def _load(self):
         library_path = find_library(self.name)

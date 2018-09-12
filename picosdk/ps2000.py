@@ -51,6 +51,8 @@ ps2000.PICO_VOLTAGE_RANGE = {
     for k, v in ps2000.PS2000_VOLTAGE_RANGE.items()
 }
 
+ps2000.MAX_MEMORY = 32e3
+
 doc = """ int16_t ps2000_open_unit
     (
         void

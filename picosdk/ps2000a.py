@@ -62,6 +62,8 @@ ps2000a.PICO_VOLTAGE_RANGE = {
     for k, v in ps2000a.PS2000A_RANGE.items() if k != "PS2000A_MAX_RANGES"
 }
 
+ps2000a.MAX_MEMORY = 128e6
+
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (

@@ -69,7 +69,7 @@ class Device(object):
         self.handle = handle
         self.is_open = handle > 0
 
-        # if a channel is missing from here, its range is not yet defined.
+        # if a channel is missing from here, it is disabled (or in an undefined state).
         self._channel_ranges = {}
         self._channel_offsets = {}
 
@@ -133,6 +133,24 @@ class Device(object):
         for channel_config in channel_configs:
             self.set_channel(channel_config)
 
+    def _timebase_options_are_impossible(self, options):
+        device_max_samples_possible = self.driver.MAX_MEMORY
+        if options.no_of_samples is not None:
+            if options.no_of_samples > device_max_samples_possible:
+                return True
+        elif options.max_time_interval is not None and options.min_collection_time is not None:
+            effective_min_no_samples = math.ceil(options.min_collection_time / options.max_time_interval)
+            if effective_min_no_samples > device_max_samples_possible:
+                return True
+        if None not in (options.no_of_samples, options.max_time_interval, options.min_collection_time):
+            # if all 3 are requested, the result can be impossible.
+            effective_min_no_samples = int(math.ceil(options.min_collection_time / options.max_time_interval))
+            if effective_min_no_samples > options.no_of_samples:
+                return True
+        # Is it still possible that this device cannot handle this request, but we don't know without making calls to
+        # get_timebase.
+        return False
+
     @staticmethod
     def _validate_timebase(timebase_options, timebase_info):
         """validate whether a timebase result matches the options requested."""
@@ -150,6 +168,9 @@ class Device(object):
     @requires_open()
     def find_timebase(self, timebase_options):
         timebase_id = 0
+        # quickly validate that the request is not impossible.
+        if self._timebase_options_are_impossible(timebase_options):
+            raise NoValidTimebaseForOptionsError()
         # TODO binary search?
         while True:
             try:
