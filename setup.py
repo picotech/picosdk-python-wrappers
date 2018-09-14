@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 Pico Technology Ltd.
+# Copyright (C) 2017-2018 Pico Technology Ltd.
 #
 from __future__ import print_function
 from distutils.core import setup

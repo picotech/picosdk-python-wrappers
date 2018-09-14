@@ -61,7 +61,7 @@ relevant drivers for connected-device tests. (most tests use this).
 
 To check which driver your device uses, you can use `picosdk.discover`:
 
-    from picosdk.discover import find_all_devices
+    from picosdk.discover import find_all_units
     
     scopes = find_all_units()
     

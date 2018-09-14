@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2017 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2014-2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
 Defines python-visible versions of preprocessor-macros from Pico SDK C header files.
