@@ -14,6 +14,7 @@ from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer, by
 from ctypes.util import find_library
 import collections
 import picosdk.constants as constants
+import numpy
 
 
 class CannotFindPicoSDKError(Exception):
@@ -52,6 +53,14 @@ class InvalidTimebaseError(Exception):
     pass
 
 
+class InvalidTriggerParameters(Exception):
+    pass
+
+
+class InvalidCaptureParameters(Exception):
+    pass
+
+
 # !! TODO put all exception types into one file, and have all other files import what they need.
 from picosdk.device import Device
 
@@ -72,7 +81,7 @@ TimebaseInfo = collections.namedtuple('UnitInfo', ['timebase_id',
                                                    'segment_id'])
 
 
-def requires_device(error_message):
+def requires_device(error_message="This method requires a Device instance registered to this Library instance."):
     def check_device_decorator(method):
         def check_device_impl(self, device, *args, **kwargs):
             if not isinstance(device, Device) or device.driver != self:
@@ -96,6 +105,10 @@ class Library(object):
         self.PICO_VOLTAGE_RANGE = {}
 
         self.MAX_MEMORY = float('inf')
+
+        # These are set in some driver files, but not all.
+        self.PICO_RATIO_MODE = {}
+        self.PICO_THRESHOLD_DIRECTION = {}
 
     def _load(self):
         library_path = find_library(self.name)
@@ -422,13 +435,169 @@ class Library(object):
             time_interval = c_float(0.0)
             max_samples = c_int32(0)
             status = self._get_timebase2(c_int16(handle),
-                                              c_uint32(timebase_id),
-                                              c_int32(no_of_samples),
-                                              byref(time_interval),
-                                              c_int16(oversample),
-                                              byref(max_samples),
-                                              c_uint32(segment_index))
+                                         c_uint32(timebase_id),
+                                         c_int32(no_of_samples),
+                                         byref(time_interval),
+                                         c_int16(oversample),
+                                         byref(max_samples),
+                                         c_uint32(segment_index))
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidTimebaseError("get_timebase2 failed (%s)" % constants.pico_tag(status))
 
             return TimebaseInfo(timebase_id, time_interval.value, None, max_samples.value, segment_index)
+        else:
+            raise NotImplementedError("not done other driver types yet")
+
+    @requires_device()
+    def set_null_trigger(self, device):
+        auto_trigger_after_millis = 1
+        if hasattr(self, '_set_trigger') and len(self._set_trigger.argtypes) == 6:
+            PS2000_NONE = 5
+            return_code = self._set_trigger(c_int16(device.handle),
+                                            c_int16(PS2000_NONE),
+                                            c_int16(0),
+                                            c_int16(0),
+                                            c_int16(0),
+                                            c_int16(auto_trigger_after_millis))
+            if return_code == 0:
+                raise InvalidTriggerParameters()
+        elif hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
+            enabled = False
+            status = self._set_simple_trigger(c_int16(device.handle),
+                                              c_int16(int(enabled)),
+                                              c_int32(self.PICO_CHANNEL['A']),
+                                              c_int16(0),
+                                              c_int32(self.PICO_THRESHOLD_DIRECTION['NONE']),
+                                              c_uint32(0),
+                                              c_int16(auto_trigger_after_millis))
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidTriggerParameters("set_simple_trigger failed (%s)" % constants.pico_tag(status))
+        else:
+            raise NotImplementedError("not done other driver types yet")
+
+
+    @requires_device()
+    def run_block(self, device, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
+        """tell the device to arm any triggers and start capturing in block mode now.
+        returns: the approximate time (in seconds) which the device will take to capture with these settings."""
+        return self._python_run_block(device.handle,
+                                      pre_trigger_samples,
+                                      post_trigger_samples,
+                                      timebase_id,
+                                      oversample,
+                                      segment_index)
+
+    def _python_run_block(self, handle, pre_samples, post_samples, timebase_id, oversample, segment_index):
+        time_indisposed = c_int32(0)
+        if len(self._run_block.argtypes) == 5:
+            return_code = self._run_block(c_int16(handle),
+                                          c_int32(pre_samples + post_samples),
+                                          c_int16(timebase_id),
+                                          c_int16(oversample),
+                                          byref(time_indisposed))
+            if return_code == 0:
+                raise InvalidCaptureParameters()
+        elif len(self._run_block.argtypes) == 9:
+            status = self._run_block(c_int16(handle),
+                                     c_int32(pre_samples),
+                                     c_int32(post_samples),
+                                     c_uint32(timebase_id),
+                                     c_int16(oversample),
+                                     byref(time_indisposed),
+                                     c_uint32(segment_index),
+                                     None,
+                                     None)
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidCaptureParameters("run_block failed (%s)" % constants.pico_tag(status))
+        else:
+            raise NotImplementedError("not done other driver types yet")
+
+        return float(time_indisposed.value) * 0.001
+
+    @requires_device()
+    def is_ready(self, device):
+        """poll this function to find out when block mode is ready or has triggered.
+        returns: True if data is ready, False otherwise."""
+        if hasattr(self, '_ready') and len(self._ready.argtypes) == 1:
+            return_code = self._ready(c_int16(device.handle))
+            return bool(return_code)
+        elif hasattr(self, '_is_ready') and len(self._is_ready.argtypes) == 2:
+            is_ready = c_int16(0)
+            status = self._is_ready(c_int16(device.handle), byref(is_ready))
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidCaptureParameters("is_ready failed (%s)" % constants.pico_tag(status))
+            return bool(is_ready.value)
+        else:
+            raise NotImplementedError("not done other driver types yet")
+
+    @requires_device()
+    def maximum_value(self, device):
+        if not hasattr(self, '_maximum_value'):
+            return (2**15)-1
+        max_adc = c_int16(0)
+        self._maximum_value(c_int16(device.handle), byref(max_adc))
+        return max_adc.value
+
+    @requires_device()
+    def get_values(self, device, active_channels, num_samples, segment_index=0):
+        # Initialise buffers to hold the data:
+        results = {channel: numpy.empty(num_samples, numpy.dtype('int16')) for channel in active_channels}
+
+        overflow = c_int16(0)
+
+        if len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_int16:
+            inputs = {k: None for k in 'ABCD'}
+            for k, arr in results.items():
+                inputs[k] = arr.ctypes.data
+            return_code = self._get_values(c_int16(device.handle),
+                                           inputs['A'],
+                                           inputs['B'],
+                                           inputs['C'],
+                                           inputs['D'],
+                                           byref(overflow),
+                                           c_int32(num_samples))
+            if return_code == 0:
+                raise InvalidCaptureParameters()
+        elif len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_uint32:
+            # For this function pattern, we first call a function (self._set_data_buffer) to register each buffer. Then,
+            # we can call self._get_values to actually populate them.
+            for channel, array in results.items():
+                status = self._set_data_buffer(c_int16(device.handle),
+                                               c_int32(self.PICO_CHANNEL[channel]),
+                                               array.ctypes.data,
+                                               c_int32(num_samples),
+                                               c_uint32(segment_index),
+                                               c_int32(self.PICO_RATIO_MODE['NONE']))
+                if status != self.PICO_STATUS['PICO_OK']:
+                    raise InvalidCaptureParameters("set_data_buffer failed (%s)" % constants.pico_tag(status))
+
+            samples_collected = c_uint32(num_samples)
+            status = self._get_values(c_int16(device.handle),
+                                      c_uint32(0),
+                                      byref(samples_collected),
+                                      c_uint32(1),
+                                      c_int32(self.PICO_RATIO_MODE['NONE']),
+                                      c_uint32(segment_index),
+                                      byref(overflow))
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidCaptureParameters("get_values failed (%s)" % constants.pico_tag(status))
+
+        overflow_warning = {}
+        if overflow.value:
+            for channel in results.keys():
+                if overflow.value & (1 >> self.PICO_CHANNEL[channel]):
+                    overflow_warning[channel] = True
+
+        return results, overflow_warning
+
+    @requires_device()
+    def stop(self, device):
+        if self._stop.restype == c_int16:
+            return_code = self._stop(c_int16(device.handle))
+            if isinstance(return_code, c_int16):
+                if return_code == 0:
+                    raise InvalidCaptureParameters()
+        else:
+            status = self._stop(c_int16(device.handle))
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidCaptureParameters("stop failed (%s)" % constants.pico_tag(status))

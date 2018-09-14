@@ -10,6 +10,7 @@ from __future__ import print_function
 import collections
 import numpy
 import math
+import time
 from picosdk.library import DeviceCannotSegmentMemoryError, InvalidTimebaseError
 
 
@@ -199,10 +200,11 @@ class Device(object):
             raise NoChannelsEnabledError("We cannot capture any data if no channels are enabled.")
 
         # memory_segments:
+        USE_SEGMENT_ID=0
         try:
             # always force the number of memory segments on the device to 1 before computing timebases for a one-off
             # block capture.
-            max_samples_possible = self.driver.memory_segments(self, 1)
+            max_samples_possible = self.driver.memory_segments(self, USE_SEGMENT_ID+1)
             if timebase_options.no_of_samples is not None and timebase_options.no_of_samples > max_samples_possible:
                 raise NoValidTimebaseForOptionsError()
         except DeviceCannotSegmentMemoryError:
@@ -211,14 +213,46 @@ class Device(object):
         # get_timebase
         timebase_info = self.find_timebase(timebase_options)
 
-        num_samples = timebase_options.no_of_samples
+        post_trigger_samples = timebase_options.no_of_samples
+        pre_trigger_samples = 0
 
-        if num_samples is None:
-            num_samples = int(math.ceil(timebase_options.min_collection_time / timebase_info.time_interval))
+        if post_trigger_samples is None:
+            post_trigger_samples = int(math.ceil(timebase_options.min_collection_time / timebase_info.time_interval))
 
-        times = numpy.array(num_samples)
-        voltages = numpy.array(num_samples)
+        self.driver.set_null_trigger(self)
 
-        # run_block
+        # tell the device to capture something:
+        approx_time_busy = self.driver.run_block(self,
+                                                 pre_trigger_samples,
+                                                 post_trigger_samples,
+                                                 timebase_info.timebase_id,
+                                                 timebase_options.oversample,
+                                                 USE_SEGMENT_ID)
 
-        return times, voltages
+        is_ready = self.driver.is_ready(self)
+        while not is_ready:
+            time.sleep(approx_time_busy / 5)
+            is_ready = self.driver.is_ready(self)
+
+        raw_data, overflow_warnings = self.driver.get_values(self,
+                                                             self._channel_ranges.keys(),
+                                                             post_trigger_samples,
+                                                             USE_SEGMENT_ID)
+
+        self.driver.stop(self)
+
+        times = numpy.linspace(0.,
+                               post_trigger_samples * timebase_info.time_interval,
+                               post_trigger_samples,
+                               dtype=numpy.dtype('float32'))
+
+        voltages = {}
+
+        max_adc = self.driver.maximum_value(self)
+        for channel, raw_array in raw_data.items():
+            array = raw_array.astype(numpy.dtype('float32'), casting='safe')
+            factor = self._channel_ranges[channel] / max_adc
+            array = array * factor
+            voltages[channel] = array
+
+        return times, voltages, overflow_warnings
