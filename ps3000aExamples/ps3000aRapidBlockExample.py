@@ -255,7 +255,7 @@ bufferAMin9 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Segment index = 9
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
 status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax9), ctypes.byref(bufferAMin9), maxsamples, 9, 0)
-assert_pico_ok(status["SetDatBuffers"])
+assert_pico_ok(status["SetDataBuffers"])
 
 # Creates a overlow location for data
 overflow = (ctypes.c_int16 * 10)()

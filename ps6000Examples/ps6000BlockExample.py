@@ -151,7 +151,7 @@ plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
 
-status["stop"] = ps.ps6000aStop(chandle)
+status["stop"] = ps.ps6000Stop(chandle)
 assert_pico_ok(status["stop"])
 
 # Close unitDisconnect the scope
