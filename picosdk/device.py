@@ -1,3 +1,4 @@
+# coding=utf-8
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
@@ -7,26 +8,10 @@ capturing data and configuring the AWG.
 """
 from __future__ import print_function
 import collections
-
-
-def make_array(obj, dtype=None, copy=True, order='K', subok=False, ndmin=0):
-    """this function emulates the numpy array constructor in an environment without numpy.
-    In the case where numpy isn't available, the return type is a normal Python list."""
-    try:
-        import numpy
-        return numpy.array(obj, dtype, copy, order, subok, ndmin)
-    except ImportError:
-        if not copy and dtype is None:
-            return obj
-        if dtype is None:
-            # PEP-8 requires me to write this out with a def, rather than just use a lambda.
-            def dtype(v):
-                return v
-
-        # we ignore the other arguments, since Python doesn't natively support them, or (ndmin) the feature is not
-        # required by the picosdk.
-
-        return [dtype(i) for i in iter(obj)]
+import numpy
+import math
+import time
+from picosdk.library import DeviceCannotSegmentMemoryError, InvalidTimebaseError
 
 
 class ClosedDeviceError(Exception):
@@ -57,6 +42,24 @@ ChannelConfig = collections.namedtuple('ChannelConfig', ['name', 'enabled', 'cou
 ChannelConfig.__new__.__defaults__ = (None, None, None)
 
 
+"""TimebaseOptions: A type for specifying timebase constraints (pass to Device.find_timebase or Device.capture_*)
+All are optional. Please specify the options which matter to you: 
+  - the maximum time interval (if you want the fastest/most precise timebase you can get),
+  - the number of samples in one buffer,
+  - the minimum total collection time (if you want at least x.y seconds of uninterrupted capture data)
+  - the oversample (if you want to sacrifice time precision for amplitude precision - see the programming guides.)"""
+TimebaseOptions = collections.namedtuple('TimebaseOptions', ['max_time_interval',
+                                                             'no_of_samples',
+                                                             'min_collection_time',
+                                                             'oversample'])
+_TIMEBASE_OPTIONS_DEFAULTS = (None, None, None, 1)
+TimebaseOptions.__new__.__defaults__ = _TIMEBASE_OPTIONS_DEFAULTS
+
+
+class NoValidTimebaseForOptionsError(Exception):
+    pass
+
+
 class Device(object):
     """This object caches some information about the device state which cannot be queried from the driver. Please don't
     mix and match calls to this object with calls directly to the driver (or the ctypes wrapper), as this may cause
@@ -67,7 +70,7 @@ class Device(object):
         self.handle = handle
         self.is_open = handle > 0
 
-        # if a channel is missing from here, its range is not yet defined.
+        # if a channel is missing from here, it is disabled (or in an undefined state).
         self._channel_ranges = {}
         self._channel_offsets = {}
 
@@ -131,13 +134,64 @@ class Device(object):
         for channel_config in channel_configs:
             self.set_channel(channel_config)
 
+    def _timebase_options_are_impossible(self, options):
+        device_max_samples_possible = self.driver.MAX_MEMORY
+        if options.no_of_samples is not None:
+            if options.no_of_samples > device_max_samples_possible:
+                return True
+        elif options.max_time_interval is not None and options.min_collection_time is not None:
+            effective_min_no_samples = math.ceil(options.min_collection_time / options.max_time_interval)
+            if effective_min_no_samples > device_max_samples_possible:
+                return True
+        if None not in (options.no_of_samples, options.max_time_interval, options.min_collection_time):
+            # if all 3 are requested, the result can be impossible.
+            effective_min_no_samples = int(math.ceil(options.min_collection_time / options.max_time_interval))
+            if effective_min_no_samples > options.no_of_samples:
+                return True
+        # Is it still possible that this device cannot handle this request, but we don't know without making calls to
+        # get_timebase.
+        return False
+
+    @staticmethod
+    def _validate_timebase(timebase_options, timebase_info):
+        """validate whether a timebase result matches the options requested."""
+        if timebase_options.max_time_interval is not None:
+            if timebase_info.time_interval > timebase_options.max_time_interval:
+                return False
+        if timebase_options.no_of_samples is not None:
+            if timebase_options.no_of_samples > timebase_info.max_samples:
+                return False
+        if timebase_options.min_collection_time is not None:
+            if timebase_options.min_collection_time > timebase_info.max_samples * timebase_info.time_interval:
+                return False
+        return True
+
     @requires_open()
-    def capture_block(self, channel_configs=()):
-        """device.capture_block(channel_configs)
+    def find_timebase(self, timebase_options):
+        timebase_id = 0
+        # quickly validate that the request is not impossible.
+        if self._timebase_options_are_impossible(timebase_options):
+            raise NoValidTimebaseForOptionsError()
+        # TODO binary search?
+        while True:
+            try:
+                timebase_info = self.driver.get_timebase(self, timebase_id, 0, timebase_options.oversample)
+                if self._validate_timebase(timebase_options, timebase_info):
+                    return timebase_info
+            except InvalidTimebaseError:
+                if timebase_id > 0:
+                    # we won't find a valid timebase.
+                    break
+            timebase_id += 1
+        raise NoValidTimebaseForOptionsError()
+
+    @requires_open()
+    def capture_block(self, timebase_options, channel_configs=()):
+        """device.capture_block(timebase_options, channel_configs)
+        timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
         channel_configs: a collection of ChannelConfig objects. If present, will be passed to set_channels.
         """
-        times = []
-        voltages = []
+        # set_channel:
 
         if channel_configs:
             self.set_channels(*channel_configs)
@@ -145,4 +199,60 @@ class Device(object):
         if len(self._channel_ranges) == 0:
             raise NoChannelsEnabledError("We cannot capture any data if no channels are enabled.")
 
-        return times, voltages
+        # memory_segments:
+        USE_SEGMENT_ID=0
+        try:
+            # always force the number of memory segments on the device to 1 before computing timebases for a one-off
+            # block capture.
+            max_samples_possible = self.driver.memory_segments(self, USE_SEGMENT_ID+1)
+            if timebase_options.no_of_samples is not None and timebase_options.no_of_samples > max_samples_possible:
+                raise NoValidTimebaseForOptionsError()
+        except DeviceCannotSegmentMemoryError:
+            pass
+
+        # get_timebase
+        timebase_info = self.find_timebase(timebase_options)
+
+        post_trigger_samples = timebase_options.no_of_samples
+        pre_trigger_samples = 0
+
+        if post_trigger_samples is None:
+            post_trigger_samples = int(math.ceil(timebase_options.min_collection_time / timebase_info.time_interval))
+
+        self.driver.set_null_trigger(self)
+
+        # tell the device to capture something:
+        approx_time_busy = self.driver.run_block(self,
+                                                 pre_trigger_samples,
+                                                 post_trigger_samples,
+                                                 timebase_info.timebase_id,
+                                                 timebase_options.oversample,
+                                                 USE_SEGMENT_ID)
+
+        is_ready = self.driver.is_ready(self)
+        while not is_ready:
+            time.sleep(approx_time_busy / 5)
+            is_ready = self.driver.is_ready(self)
+
+        raw_data, overflow_warnings = self.driver.get_values(self,
+                                                             self._channel_ranges.keys(),
+                                                             post_trigger_samples,
+                                                             USE_SEGMENT_ID)
+
+        self.driver.stop(self)
+
+        times = numpy.linspace(0.,
+                               post_trigger_samples * timebase_info.time_interval,
+                               post_trigger_samples,
+                               dtype=numpy.dtype('float32'))
+
+        voltages = {}
+
+        max_adc = self.driver.maximum_value(self)
+        for channel, raw_array in raw_data.items():
+            array = raw_array.astype(numpy.dtype('float32'), casting='safe')
+            factor = self._channel_ranges[channel] / max_adc
+            array = array * factor
+            voltages[channel] = array
+
+        return times, voltages, overflow_warnings

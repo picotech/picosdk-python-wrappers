@@ -62,6 +62,48 @@ ps2000a.PICO_VOLTAGE_RANGE = {
     for k, v in ps2000a.PS2000A_RANGE.items() if k != "PS2000A_MAX_RANGES"
 }
 
+ps2000a.MAX_MEMORY = 128e6
+
+ps2000a.PS2000A_RATIO_MODE = {
+    'PS2000A_RATIO_MODE_NONE': 0,
+    'PS2000A_RATIO_MODE_AGGREGATE': 1,
+    'PS2000A_RATIO_MODE_DECIMATE': 2,
+    'PS2000A_RATIO_MODE_AVERAGE': 4,
+}
+
+ps2000a.PICO_RATIO_MODE = {k[19:]: v for k, v in ps2000a.PS2000A_RATIO_MODE.items()}
+
+
+def _define_threshold_direction():
+    ps2000a_above = 0
+    ps2000a_below = 1
+    ps2000a_rising = 2
+    ps2000a_falling = 3
+    ps2000a_rising_or_falling = 4
+    ps2000a_above_lower = 5
+    ps2000a_below_lower = 6
+    ps2000a_rising_lower = 7
+    ps2000a_falling_lower = 8
+
+    ps2000a_inside = ps2000a_above
+    ps2000a_outside = ps2000a_below
+    ps2000a_enter = ps2000a_rising
+    ps2000a_exit = ps2000a_falling
+    ps2000a_enter_or_exit = ps2000a_rising_or_falling
+    ps2000a_positive_runt = 9
+    ps2000a_negative_runt = 10
+
+    ps2000a_none = ps2000a_rising
+
+    return {k.upper(): v for k, v in locals().items() if k.startswith("ps2000a")}
+
+
+ps2000a.PS2000A_THRESHOLD_DIRECTION = _define_threshold_direction()
+
+ps2000a.PICO_THRESHOLD_DIRECTION = {
+    k[8:]: v for k, v in ps2000a.PS2000A_THRESHOLD_DIRECTION.items()
+}
+
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (
@@ -144,6 +186,19 @@ doc = """ PICO_STATUS ps2000aSetNoOfCaptures
         uint32_t nCaptures
     ); """
 ps2000a.make_symbol("_SetNoOfCaptures", "ps2000aSetNoOfCaptures", c_uint32, [c_int16, c_uint32], doc)
+
+doc = """ PICO_STATUS ps2000aGetTimebase
+    (
+        int16_t  handle,
+        uint32_t timebase,
+        int32_t  noSamples,
+        int32_t *timeIntervalNanoseconds,
+        int16_t  oversample,
+        int32_t *maxSamples,
+        uint32_t segmentIndex
+    ); """
+ps2000a.make_symbol("_GetTimebase", "ps2000aGetTimebase", c_uint32,
+                    [c_int16, c_uint32, c_int32, c_void_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps2000aGetTimebase2
     (
