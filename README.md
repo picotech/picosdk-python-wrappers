@@ -2,8 +2,10 @@
 
 Welcome to the PicoSDK for Python. It allows you to control PicoScope devices in your own Python programs.
 
-To use this code you will need to install the PicoSDK C libraries, please visit https://www.picotech.com/downloads
+To use this code you will need to install the PicoSDK C libraries. Please visit https://www.picotech.com/downloads
 to do this.
+
+macOS users may find this forum post helpful for installing the C libraries: https://www.picotech.com/support/topic22221.html
 
 ## Compatibility
 
@@ -21,6 +23,14 @@ guides exactly. Examples are provided in the folders like `psX000[a]Examples/`.
 
 We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature/device yet,
 let us know that you're waiting in an Issue (good) or a Pull Request (better!)
+
+### Dependencies
+
+As well as depending on the C libraries, the Pythonic wrappers use some python libraries like `numpy`. Many of the
+examples scripts also use the `matplotlib` plotting library. You can install these dependencies with pip as follows:
+
+    pip install -r requirements.txt
+    pip install -r requirements-for-examples.txt
 
 ### Driver-agnostic examples
 
