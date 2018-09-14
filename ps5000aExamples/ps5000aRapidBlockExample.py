@@ -58,7 +58,7 @@ status["maximumValue"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
 # handle = chandle
 # enabled = 1
 source = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
-threshold = mV2adc(500,chARange, maxADC)
+threshold = int(mV2adc(500,chARange, maxADC))
 # direction = PS5000A_RISING = 2
 # delay = 0 s
 # auto Trigger = 1000 ms
@@ -80,7 +80,7 @@ timebase = 2
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
 status["GetTimebase"] = ps.ps5000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
-assert_pico_ok(status["getTimebase2"])
+assert_pico_ok(status["GetTimebase"])
 
 # Creates a overlow location for data
 overflow = ctypes.c_int16()
@@ -107,7 +107,7 @@ assert_pico_ok(status["SetNoOfCaptures"])
 # LpRead = None
 # pParameter = None
 status["runblock"] = ps.ps5000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, None, 0, None, None)
-assert_pico_ok(status["runBlock"])
+assert_pico_ok(status["runblock"])
 
 # Create buffers ready for assigning pointers for data collection
 bufferAMax = (ctypes.c_int16 * maxsamples)()
@@ -115,7 +115,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
-source = ps.PS5000A_CHANNEL["ps5000a_channel_A"]
+source = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
 # Buffer length = maxsamples
@@ -332,6 +332,6 @@ status["close"] = ps.ps5000aCloseUnit(chandle)
 assert_pico_ok(status["close"])
 
 # Displays the staus returns
-print(status)
+#print(status)
 
 

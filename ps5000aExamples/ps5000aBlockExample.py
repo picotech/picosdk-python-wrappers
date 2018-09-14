@@ -67,7 +67,7 @@ assert_pico_ok(status["maximumValue"])
 # handle = chandle
 # enabled = 1
 source = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
-threshold = mV2adc(500,chARange, maxADC)
+threshold = int(mV2adc(500,chARange, maxADC))
 # direction = PS5000A_RISING = 2
 # delay = 0 s
 # auto Trigger = 1000 ms
