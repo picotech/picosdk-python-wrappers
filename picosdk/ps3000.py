@@ -377,7 +377,5 @@ doc = """ int16_t ps3000PingUnit
     ); """
 ps3000.make_symbol("_PingUnit", "ps3000PingUnit", c_int16, [c_int16, ], doc)
 
-ps3000.variants = ("3204", "3205", "3206", "3224", "3424", "3425")
-
 ps3000.PICO_INFO = {k: v for k, v in ps3000.PICO_INFO.items() if v <= 0x00000005}
 ps3000.PICO_INFO["PICO_ERROR_CODE"] = 0x00000006
