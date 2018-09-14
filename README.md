@@ -1,11 +1,25 @@
-# Pico Technology PicoSDK Python Wrappers
+# picosdk-python-wrappers
 
 Welcome to the PicoSDK for Python. It allows you to control PicoScope devices in your own Python programs.
 
-To use this code you will need to install the PicoSDK C libraries. Please visit https://www.picotech.com/downloads
-to do this.
+## Getting started
 
-macOS users may find this forum post helpful for installing the C libraries: https://www.picotech.com/support/topic22221.html
+To use this code you will need to install the PicoSDK C libraries.
+
+### Microsoft Windows
+
+Please visit (https://www.picotech.com/downloads) to download the 32-bit or 64-bit PicoSDK C Libraries for Windows. 
+Please take care to match the "bitness" of your python to the PicoSDK.
+
+### Linux
+
+Follow the instructions from our [Linux Software & Drivers for Oscilloscopes and Data Loggers page](https://www.picotech.com/downloads/linux) 
+to install the required driver packages for your product.
+
+### Mac OS X
+
+macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C 
+libraries.
 
 ## Compatibility
 
@@ -16,13 +30,19 @@ picosdk commit hash, etc.) and your error message(s).
 
 ## C interface
 
-You can access C driver functions directly (ctypes calls) by their original C name, following the Pico programming
-guides exactly. Examples are provided in the folders like `psX000[a]Examples/`.
+You can access C driver functions directly (ctypes calls) by their original C name, following the Programmer's
+Guides exactly. Examples are provided in the folders like `psX000[a]Examples/`.
+
+### Programmer's Guides
+
+You can download Programmer's Guides providing a description of the API functions for the relevant PicoScope or 
+PicoLog driver from our [Documentation page](https://www.picotech.com/library/documentation).
 
 ## Python interface
 
 We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature/device yet,
-let us know that you're waiting in an Issue (good) or a Pull Request (better!)
+let us know that you're waiting in an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues) (good) 
+or a [Pull Request](https://github.com/picotech/picosdk-python-wrappers/pulls) (better!)
 
 ### Dependencies
 
@@ -74,3 +94,25 @@ on your device.
 
 To run the unit tests, you will need to install nose (e.g. `pip install nose`.) Then, run `nosetests` in the root of 
 the repo. 
+
+## Obtaining support
+
+Please visit our [Support page](https://www.picotech.com/tech-support) to contact us directly or visit our [Test and Measurement Forum](https://www.picotech.com/support/forum17.html) to post questions.
+
+## Contributing
+
+Contributions are welcome. Please refer to our [guidelines for contributing](.github/CONTRIBUTING.md) for further information.
+
+## Copyright and licensing
+
+See [LICENSE.md](LICENSE.md) for license terms. 
+
+*PicoScope* and *PicoLog* are registered trademarks of Pico Technology Ltd. 
+
+*Windows* is a registered trademark of Microsoft Corporation. 
+
+*Mac* and *macOS* are registered trademarks of Apple, Inc. 
+
+*Linux* is the registered trademark of Linus Torvalds in the U.S. and other countries.
+
+Copyright © 2018 Pico Technology Ltd. All rights reserved. 
