@@ -332,6 +332,6 @@ status["close"] = ps.ps5000aCloseUnit(chandle)
 assert_pico_ok(status["close"])
 
 # Displays the staus returns
-print(status)
+#print(status)
 
 
