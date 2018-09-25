@@ -108,8 +108,11 @@ status["runblock"] = ps.ps3000aRunBlock(chandle, preTriggerSamples, postTriggerS
 assert_pico_ok(status["runblock"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax = (ctypes.c_int16 * maxsamples)()
-bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+#bufferAMax = (ctypes.c_int16 * maxsamples)()
+#bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+
+bufferAMax = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -119,27 +122,27 @@ bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't
 # Buffer length = maxsamples
 # Segment index = 0
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax.ctypes.data, bufferAMin.ctypes.data, maxsamples, 0, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax1 = (ctypes.c_int16 * maxsamples)()
-bufferAMin1 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax1 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin1 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
 # source = ps3000A_channel_A = 0
-# Buffer max = ctypes.byref(bufferAMax)
-# Buffer min = ctypes.byref(bufferAMin)
+# Buffer max = ctypes.byref(bufferAMax1)
+# Buffer min = ctypes.byref(bufferAMin1)
 # Buffer length = maxsamples
 # Segment index = 1
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax1), ctypes.byref(bufferAMin1), maxsamples, 1, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax1.ctypes.data, bufferAMin1.ctypes.data, maxsamples, 1, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax2 = (ctypes.c_int16 * maxsamples)()
-bufferAMin2 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax2 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin2 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -149,12 +152,12 @@ bufferAMin2 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 2
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax2), ctypes.byref(bufferAMin2), maxsamples, 2, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax2.ctypes.data, bufferAMin2.ctypes.data, maxsamples, 2, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax3 = (ctypes.c_int16 * maxsamples)()
-bufferAMin3 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax3 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin3 =np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -164,12 +167,12 @@ bufferAMin3 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 3
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax3), ctypes.byref(bufferAMin3), maxsamples, 3, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax3.ctypes.data, bufferAMin3.ctypes.data, maxsamples, 3, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax4 = (ctypes.c_int16 * maxsamples)()
-bufferAMin4 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax4 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin4 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -179,12 +182,12 @@ bufferAMin4 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 4
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax4), ctypes.byref(bufferAMin4), maxsamples, 4, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax4.ctypes.data, bufferAMin4.ctypes.data, maxsamples, 4, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax5 = (ctypes.c_int16 * maxsamples)()
-bufferAMin5 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax5 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin5 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -194,12 +197,12 @@ bufferAMin5 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 5
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax5), ctypes.byref(bufferAMin5), maxsamples, 5, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax5.ctypes.data, bufferAMin5.ctypes.data, maxsamples, 5, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax6 = (ctypes.c_int16 * maxsamples)()
-bufferAMin6 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax6 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin6 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -209,12 +212,12 @@ bufferAMin6 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 6
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax6), ctypes.byref(bufferAMin6), maxsamples, 6, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax6.ctypes.data, bufferAMin6.ctypes.data, maxsamples, 6, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax7 = (ctypes.c_int16 * maxsamples)()
-bufferAMin7 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax7 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin7 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -224,12 +227,12 @@ bufferAMin7 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 7
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax7), ctypes.byref(bufferAMin7), maxsamples, 7, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax7.ctypes.data, bufferAMin7.ctypes.data, maxsamples, 7, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax8 = (ctypes.c_int16 * maxsamples)()
-bufferAMin8 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax8 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin8 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -239,12 +242,12 @@ bufferAMin8 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 8
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax8), ctypes.byref(bufferAMin8), maxsamples, 8, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax8.ctypes.data, bufferAMin8.ctypes.data, maxsamples, 8, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Create buffers ready for assigning pointers for data collection
-bufferAMax9 = (ctypes.c_int16 * maxsamples)()
-bufferAMin9 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
+bufferAMax9 = np.empty(maxsamples, dtype=np.dtype('int16'))
+bufferAMin9 = np.empty(maxsamples, dtype=np.dtype('int16')) # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
 # Handle = Chandle
@@ -254,7 +257,7 @@ bufferAMin9 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 # Buffer length = maxsamples
 # Segment index = 9
 # Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax9), ctypes.byref(bufferAMin9), maxsamples, 9, 0)
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, bufferAMax9.ctypes.data, bufferAMin9.ctypes.data, maxsamples, 9, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
 # Creates a overlow location for data
@@ -276,7 +279,7 @@ while ready.value == check.value:
 # DownSampleRatioMode = 0
 # Overflow = ctypes.byref(overflow)
 
-status["GetValuesBulk"] = ps.ps3000aGetValuesBulk(chandle, ctypes.byref(cmaxSamples), 0, 9, 0, 0, ctypes.byref(overflow))
+status["GetValuesBulk"] = ps.ps3000aGetValuesBulk(chandle, ctypes.byref(cmaxSamples), 0, 9, 1, 0, ctypes.byref(overflow))
 assert_pico_ok(status["GetValuesBulk"])
 
 # Handle = chandle

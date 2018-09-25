@@ -142,7 +142,7 @@ bufferBMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't
 # segementIndex = 0
 # mode = PS4000A_RATIO_MODE_NONE = 0
 status["setDataBuffersA"] = ps.ps4000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxSamples, 0 , 0)
-assert_pico_ok(status["SetDataBuffersA"])
+assert_pico_ok(status["setDataBuffersA"])
 
 # Set data buffer location for data collection from channel B
 # handle = chandle
