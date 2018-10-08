@@ -16,7 +16,7 @@ Please take care to match the "bitness" of your python to the PicoSDK.
 Follow the instructions from our [Linux Software & Drivers for Oscilloscopes and Data Loggers page](https://www.picotech.com/downloads/linux) 
 to install the required driver packages for your product.
 
-### Mac OS X
+### macOS
 
 macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C 
 libraries.
@@ -111,7 +111,7 @@ See [LICENSE.md](LICENSE.md) for license terms.
 
 *Windows* is a registered trademark of Microsoft Corporation. 
 
-*Mac* and *macOS* are registered trademarks of Apple, Inc. 
+*macOS* is a registered trademark of Apple Inc. 
 
 *Linux* is the registered trademark of Linus Torvalds in the U.S. and other countries.
 
