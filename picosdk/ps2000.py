@@ -388,8 +388,6 @@ doc = """ int16_t ps2000PingUnit
     ); """
 ps2000.make_symbol("_PingUnit", "ps2000PingUnit", c_int16, [c_int16, ], doc)
 
-ps2000.variants = ("2104", "2105", "2202", "2203", "2204", "2205", "2204A", "2205A")
-
 ps2000.PICO_INFO = {k: v for k, v in ps2000.PICO_INFO.items() if v <= 0x00000005}
 ps2000.PICO_INFO["PICO_ERROR_CODE"] = 0x00000006
 ps2000.PICO_INFO["PICO_KERNEL_DRIVER_VERSION"] = 0x00000007

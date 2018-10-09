@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015-2017 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2015-2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
 This is a Python module defining the functions from the ps4000Api.h C header
