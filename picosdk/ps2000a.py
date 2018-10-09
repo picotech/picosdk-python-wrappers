@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2017 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2014-2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
 This is a Python module defining the functions from the ps2000aApi.h C header
@@ -715,4 +715,3 @@ doc = """ PICO_STATUS ps2000aGetMaxSegments
 ps2000a.make_symbol("_GetMaxSegments", "ps2000aGetMaxSegments", c_uint32, [c_int16, c_void_p], doc)
 
 ps2000a.INI_LOGIC_VOLTS = 1.5
-ps2000a.variants = ("2205MSO", "2206", "2206A", "2207", "2207A", "2208", "2208A")
