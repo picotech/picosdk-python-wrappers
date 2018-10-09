@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2017 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2014-2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
 This is a Python module defining the functions from the ps3000aApi.h C header
@@ -722,10 +722,3 @@ doc = """ PICO_STATUS ps3000aCurrentPowerSource
 ps3000a.make_symbol("_CurrentPowerSource", "ps3000aCurrentPowerSource", c_uint32, [c_int16, c_uint32], doc)
 
 ps3000a.INI_LOGIC_VOLTS = 1.5
-
-ps3000a.variants = ("3204A", "3204B", "3204MSO", "3205A", "3205B", "3205MSO",
-                    "3206A", "3206B", "3206MSO", "3207A", "3207B",
-                    "3404A", "3404B", "3405A", "3405B", "3406A", "3406B",
-                    "3204DMSO", "3205DMSO", "3206DMSO", "3404DMSO", "3405DMSO", "3406DMSO",
-                    "3203C", "3204C", "3205C", "3206C", "3203D", "3204D", "3205D", "3206D",
-                    "3403C", "3404C", "3405C", "3406C", "3403D", "3404D", "3405D", "3406D",)
