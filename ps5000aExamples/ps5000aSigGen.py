@@ -1,8 +1,9 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS5000 (A API) SIGNAL GENERATOR EXAMPLE
-# This example opens a 5000a driver device, sets up the signal generator to produce a sine wave, then a square wave,
+# PicoScope 5000 (A API) SIGNAL GENERATOR EXAMPLE
+# This example demonstrates how to use the PicoScope 5000 Series (ps5000a) driver API functions to set up the signal generator to do the following:
+# Opens a 5000a driver device, sets up the signal generator to produce a sine wave, then a square wave,
 # then perform a sweep of a square wave signal
 
 import ctypes
@@ -34,7 +35,7 @@ except: # PicoNotOkError:
 
     assert_pico_ok(status["changePowerSource"])
 
-# Generates Sine signal with a 2V peak-to-peak with a 10KHz frequency
+# Output a sine wave with a 2V peak-to-peak with a 10KHz frequency
 # handle = chandle
 # offsetVoltage = 0
 # pkToPk = 2000000
@@ -47,7 +48,7 @@ except: # PicoNotOkError:
 # operation = 0
 # shots = 0
 # sweeps = 0
-# triggerType = ctypes.c_int16(0) = PS5000a_SIGGEN_NONE
+# triggerType = ctypes.c_int16(0) = PS5000a_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = P5000a_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int32(0)
@@ -62,7 +63,7 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # Pauses the script to show signal
 time.sleep(10)
 
-# Generates Square signal with a 2V peak-to-peak
+# Output a square signal with a 2V peak-to-peak
 # handle = chandle
 # offsetVoltage = -1000000
 # pkToPk = 1500000
@@ -75,7 +76,7 @@ time.sleep(10)
 # operation = 0
 # shots = 0
 # sweeps = 0
-# triggerType = ctypes.c_int16(0) = PS5000A_SIGGEN_NONE
+# triggerType = ctypes.c_int16(0) = PS5000A_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = P5000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int32(1)
@@ -89,7 +90,7 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # Pauses the script to show signal
 time.sleep(10)
 
-# Generates square signal with an up down sweep, starting at 10-100 in 5 kHz increments every 1 second.
+# Outputs a sweep of a square wave with an up down sweep, 10-100 kHz in 5 kHz increments every 1 second.
 # handle = chandle
 # offsetVoltage = -1000000
 # pkToPk = 1500000
@@ -102,7 +103,7 @@ time.sleep(10)
 # operation = 0
 # shots = 0
 # sweeps = 0
-# triggerType = ctypes.c_int16(0) = PS5000a_SIGGEN_NONE
+# triggerType = ctypes.c_int16(0) = PS5000a_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = P5000a_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int32(1)
