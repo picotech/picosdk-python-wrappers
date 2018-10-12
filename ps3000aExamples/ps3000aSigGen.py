@@ -1,8 +1,9 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS3000A SIGNAL GENERATOR EXAMPLE
-# This example opens a 3000a driver device, sets up the singal generator to produce a sine wave, then a square wave
+# PicoScope 3000 (A API) SERIES SIGNAL GENERATOR EXAMPLE
+# This example demonstrates how to use the PicoScope 3000 Series (ps3000a) driver API functions to set up the signal generator to do the following:
+# Opens a 3000a driver device, sets up the singal generator to produce a sine wave, then a square wave
 # followed by a sweep of a square wave signal
 
 import ctypes
@@ -38,7 +39,7 @@ except:
 
     assert_pico_ok(status["ChangePowerSource"])
 
-# Generates Sine signal with a 2 V peak-to-peak with a 10 kHz frequency
+# Output a sine wave with a 2 V peak-to-peak with a 10 kHz frequency
 # handle = chandle
 # offsetVoltage = 0
 # pkToPk = 2000000
@@ -51,7 +52,7 @@ except:
 # operation = 0
 # shots = 0
 # sweeps = 0
-# triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_NONE
+# triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = P3000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(0)
@@ -65,7 +66,7 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # pauses the script to show signal
 time.sleep(10)
 
-# Generates Square signal with a 2 V peak-to-peak
+# Output a square wave with a 2 V peak-to-peak
 # handle = chandle
 # offsetVoltage = -1000000
 # pkToPk = 1500000
@@ -78,7 +79,7 @@ time.sleep(10)
 # operation = 0
 # shots = 0
 # sweeps = 0
-# triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_NONE
+# triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = P3000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(1)
@@ -92,7 +93,7 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # Pauses the script to show signal
 time.sleep(10)
 
-# Generates square signal with a up down sweep, starting at 10-100 in 5 kHz increments every 1 second.
+# OutpUt a sweep of a square wave with a up down sweep, 10-100 kHz in 5 kHz increments every 1 second.
 # handle = chandle
 # offsetVoltage = -1000000
 # pkToPk = 1500000
@@ -105,7 +106,7 @@ time.sleep(10)
 # operation = 0
 # shots = 0
 # sweeps = 0
-# triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_NONE
+# triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = P3000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(1)
