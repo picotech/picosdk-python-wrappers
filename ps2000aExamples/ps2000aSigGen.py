@@ -1,10 +1,12 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PicoScope 2000 (A API) SERIES SIGNAL GENERATOR EXAMPLE
+# PicoScope 2000 (A API) Series Signal Generator Example
 # This example demonstrates how to use the PicoScope 2000 Series (ps2000a) driver API functions to set up the signal generator to do the following:
-# Open a 2000a driver device, sets up the signal generator to produce a sine wave, then a square wave,
-# followed by a sweep of a square wave signal
+# 
+# 1. Output a sine wave 
+# 2. Output a square wave 
+# 3. Output a sweep of a square wave signal
 
 import ctypes
 from picosdk.ps2000a import ps2000a as ps
@@ -38,13 +40,13 @@ except:
 
     assert_pico_ok(status["ChangePowerSource"])
 
-# Output a sine wave with 2 V peak-to-peak and 10 kHz frequency
+# Output a sine wave with peak-to-peak voltage of 2 V and frequency of 10 kHz
 # handle = chandle
 # offsetVoltage = 0
 # pkToPk = 2000000
 # waveType = ctypes.c_int16(0) = PS2000A_SINE
-# startFrequency = 10000 Hz
-# stopFrequency = 10000 Hz
+# startFrequency = 10 kHz
+# stopFrequency = 10 kHz
 # increment = 0
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS2000A_UP
@@ -52,7 +54,7 @@ except:
 # shots = 0
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS2000A_SIGGEN_RISING
-# triggerSource = ctypes.c_int16(0) = P2000A_SIGGEN_NONE
+# triggerSource = ctypes.c_int16(0) = PS2000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(0)
 sweepType = ctypes.c_int32(0)
@@ -65,13 +67,13 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # Pauses the script to show signal
 time.sleep(10)
 
-# Output a sqaure wave with 2 V peak-to-peak and 10 kHz frequency
+# Output a square wave with peak-to-peak voltage of 2 V and frequency of 10 kHz
 # handle = chandle
 # offsetVoltage = -1000000
 # pkToPk = 1500000
 # waveType = ctypes.c_int16(1) = PS2000A_SQUARE
-# startFrequency = 10000 Hz
-# stopFrequency = 10000 Hz
+# startFrequency = 10 kHz
+# stopFrequency = 10 kHz
 # increment = 0
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS2000A_UP
@@ -79,7 +81,7 @@ time.sleep(10)
 # shots = 0
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS2000A_SIGGEN_RISING
-# triggerSource = ctypes.c_int16(0) = P2000A_SIGGEN_NONE
+# triggerSource = ctypes.c_int16(0) = PS2000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(1)
 sweepType = ctypes.c_int32(0)
@@ -92,13 +94,13 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # pauses the script to show signal
 time.sleep(10)
 
-# Output sweep of a square wave with a up down sweep, ranging from 10-100 kHz in 5 kHz increments every 1 second.
+# Output square wave with an up-down sweep, ranging from 10-100 kHz in 5 kHz increments every 1 second.
 # handle = chandle
 # offsetVoltage = -1000000
 # pkToPk = 1500000
 # waveType = ctypes.c_int16(1) = PS2000A_SQUARE
-# startFrequency = 10000 Hz
-# stopFrequency = 100000 Hz
+# startFrequency = 10 kHz
+# stopFrequency = 100 kHz
 # increment = 5
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS2000A_UP
@@ -106,7 +108,7 @@ time.sleep(10)
 # shots = 0
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS2000A_SIGGEN_RISING
-# triggerSource = ctypes.c_int16(0) = P2000A_SIGGEN_NONE
+# triggerSource = ctypes.c_int16(0) = PS2000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(1)
 sweepType = ctypes.c_int32(2)
