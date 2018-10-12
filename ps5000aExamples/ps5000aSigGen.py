@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PicoScope 5000 (A API) SIGNAL GENERATOR EXAMPLE
+# PicoScope 5000 (A API) SERIES SIGNAL GENERATOR EXAMPLE
 # This example demonstrates how to use the PicoScope 5000 Series (ps5000a) driver API functions to set up the signal generator to do the following:
 # Opens a 5000a driver device, sets up the signal generator to produce a sine wave, then a square wave,
 # then perform a sweep of a square wave signal
@@ -116,11 +116,6 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # Pauses the script to show signal
 time.sleep(36)
-
-# Stops the scope
-# Handle = chandle
-status["stop"] = ps.ps5000aStop(chandle)
-assert_pico_ok(status["stop"])
 
 # Closes the unit
 # Handle = chandle
