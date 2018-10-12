@@ -121,11 +121,6 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # Pauses the script to show signal
 time.sleep(36)
 
-# Stops the scope
-# Handle = chandle
-status["stop"] = ps.ps2000aStop(chandle)
-assert_pico_ok(status["stop"])
-
 # Closes the unit
 # Handle = chandle
 status["close"] = ps.ps2000aCloseUnit(chandle)
