@@ -139,11 +139,8 @@ def assert_pico_ok(status):
                        )
     """
     # checks for PICO_OK status return
-    if status == 0:
-        errorCheck = True
-    else:
-        errorCheck = False
-        raise BaseException("Pico_OK not returned")
+    if status != PICO_STATUS['PICO_OK']:
+        raise PicoSDKCtypesError("PicoSDK returned '{}'".format(PICO_STATUS_LOOKUP[status]))
 
 
 def assert_pico2000_ok(status):
@@ -157,4 +154,4 @@ def assert_pico2000_ok(status):
         errorCheck = True
     else:
         errorCheck = False
-        raise BaseException("Unsuccessful API call")
+        raise PicoSDKCtypesError("Unsuccessful API call")
