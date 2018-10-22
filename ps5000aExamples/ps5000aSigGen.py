@@ -14,19 +14,18 @@ import time
 from picosdk.functions import assert_pico_ok
 
 
-# Gives the device a handle
 status = {}
 chandle = ctypes.c_int16()
 
-# Opens the device/s
-status["openunit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, 1)
+# Open the device
+status["openUnit"] = ps.ps5000aOpenUnit(ctypes.byref(chandle), None, 1)
 
 
 try:
-    assert_pico_ok(status["openunit"])
+    assert_pico_ok(status["openUnit"])
 except: # PicoNotOkError:
 
-    powerStatus = status["openunit"]
+    powerStatus = status["openUnit"]
 
     if powerStatus == 286:
         status["changePowerSource"] = ps.ps5000aChangePowerSource(chandle, powerStatus)
@@ -52,13 +51,13 @@ except: # PicoNotOkError:
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS5000A_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = PS5000A_SIGGEN_NONE
-# extInThreshold = 1
+# extInThreshold = 0
 wavetype = ctypes.c_int32(0)
 sweepType = ctypes.c_int32(0)
 triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
-status["setSigGenBuiltInV2"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+status["setSigGenBuiltInV2"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 0)
 assert_pico_ok(status["setSigGenBuiltInV2"])
 
 
@@ -80,13 +79,13 @@ time.sleep(10)
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS5000A_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = PS5000A_SIGGEN_NONE
-# extInThreshold = 1
+# extInThreshold = 0
 wavetype = ctypes.c_int32(1)
 sweepType = ctypes.c_int32(0)
 triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
-status["setSigGenBuiltInV2"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+status["setSigGenBuiltInV2"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 0)
 assert_pico_ok(status["setSigGenBuiltInV2"])
 
 # Pauses the script to show signal
