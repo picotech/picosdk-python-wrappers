@@ -114,7 +114,7 @@ sweepType = ctypes.c_int32(2)
 triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
-status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 100000, 5, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+status["SetSigGenBuiltIn"] = ps.ps3000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 100000, 5000, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
 assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # Pauses the script to show signal
