@@ -4,6 +4,11 @@
 from __future__ import division
 import numpy as np
 import ctypes
+from picosdk.constants import PICO_STATUS, PICO_STATUS_LOOKUP
+
+
+class PicoSDKCtypesError(Exception):
+    pass
 
 
 def adc2mV(bufferADC, range, maxADC):
@@ -14,7 +19,7 @@ def adc2mV(bufferADC, range, maxADC):
                 c_int32                 maxADC
                 )
                
-        Takes a buffer of raw adc count values and converts it into milivolts 
+        Takes a buffer of raw adc count values and converts it into millivolts
     """
 
     channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
@@ -57,7 +62,7 @@ def splitMSODataPort0(cmaxSamples, bufferMax):
     bufferMaxBinaryD5 = np.chararray((cmaxSamples.value, 1))
     bufferMaxBinaryD6 = np.chararray((cmaxSamples.value, 1))
     
-    # Changes the data from int type to a binary type and then seperates the data for each digital channel
+    # Changes the data from int type to a binary type and then separates the data for each digital channel
     for i in range(0, cmaxSamples.value):
         MSOData = bufferMax[i]
         binaryMSOData = bin(MSOData)
@@ -91,7 +96,7 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
     bufferMaxBinaryD14 = np.chararray((cmaxSamples.value, 1))
     bufferMaxBinaryD15 = np.chararray((cmaxSamples.value, 1))
     
-    # Changes the data from int type to a binary type and then seperates the data for each digital channel
+    # Changes the data from int type to a binary type and then separates the data for each digital channel
     for i in range(0, cmaxSamples.value):
         MSOData = bufferMax[i]
         binaryMSOData = bin(MSOData)
@@ -106,31 +111,33 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
         bufferMaxBinaryD14[i] = binaryMSOData[1]
         bufferMaxBinaryD15[i] = binaryMSOData[0]
 
-    return bufferMaxBinaryD8, bufferAMaxBinaryD9, bufferAMaxBinaryD10, bufferAMaxBinaryD11, bufferAMaxBinaryD12, bufferAMaxBinaryD13, bufferAMaxBinaryD14, bufferAMaxBinaryD15
+    return bufferMaxBinaryD8, bufferMaxBinaryD9, bufferMaxBinaryD10, bufferMaxBinaryD11, bufferMaxBinaryD12, bufferMaxBinaryD13, bufferMaxBinaryD14, bufferMaxBinaryD15
 
 def splitMSOData(cmaxSamples, data):
     """
-        splitMSODataPort1(
+    # This implementation will work on either channel in the same way as the Port1 and Port2 methods above.
+        splitMSOData(
                         c_int32         cmaxSamples
                         c_int16 array   data
                         )
     """
     # Makes an array for each digital channel
-    bufferBinaryD0 = np.chararray((cmaxSamples.value, 1))
-    bufferBinaryD1 = np.chararray((cmaxSamples.value, 1))
-    bufferBinaryD2 = np.chararray((cmaxSamples.value, 1))
-    bufferBinaryD3 = np.chararray((cmaxSamples.value, 1))
-    bufferBinaryD4 = np.chararray((cmaxSamples.value, 1))
-    bufferBinaryD5 = np.chararray((cmaxSamples.value, 1))
-    bufferBinaryD6 = np.chararray((cmaxSamples.value, 1))
-    bufferBinaryD7 = np.chararray((cmaxSamples.value, 1))
-    # Changes the data from int type to a binary type and then seperates the data for each digital channel
+    bufferBinaryDj = (
+        np.chararray((cmaxSamples.value, 1)),
+        np.chararray((cmaxSamples.value, 1)),
+        np.chararray((cmaxSamples.value, 1)),
+        np.chararray((cmaxSamples.value, 1)),
+        np.chararray((cmaxSamples.value, 1)),
+        np.chararray((cmaxSamples.value, 1)),
+        np.chararray((cmaxSamples.value, 1)),
+        np.chararray((cmaxSamples.value, 1)),
+    )
+    # Splits out the individual bits from the port into the binary values for each channel/pin.
     for i in range(cmaxSamples.value):
         for j in range(7):
-            bufferBinaryDj[i] = 1 if (data[i] & 1 << (7-j)) else 0
+            bufferBinaryDj[j][i] = 1 if (data[i] & 1 << (7-j)) else 0
 
-
-    return bufferBinaryD0, bufferBinaryD1, bufferBinaryD2, bufferBinaryD3, bufferBinaryD4, bufferBinaryD5, bufferBinaryD6, bufferBinaryD7
+    return bufferBinaryDj
 
 def assert_pico_ok(status):
     """
@@ -139,11 +146,8 @@ def assert_pico_ok(status):
                        )
     """
     # checks for PICO_OK status return
-    if status == 0:
-        errorCheck = True
-    else:
-        errorCheck = False
-        raise BaseException("Pico_OK not returned")
+    if status != PICO_STATUS['PICO_OK']:
+        raise PicoSDKCtypesError("PicoSDK returned '{}'".format(PICO_STATUS_LOOKUP[status]))
 
 
 def assert_pico2000_ok(status):
@@ -157,4 +161,4 @@ def assert_pico2000_ok(status):
         errorCheck = True
     else:
         errorCheck = False
-        raise BaseException("Unsuccessful API call")
+        raise PicoSDKCtypesError("Unsuccessful API call")

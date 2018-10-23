@@ -10,7 +10,7 @@ this type and attach the missing methods.
 from __future__ import print_function
 
 import sys
-from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer, byref, cdll, WinDLL
+from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer, byref
 from ctypes.util import find_library
 import collections
 import picosdk.constants as constants
@@ -119,8 +119,10 @@ class Library(object):
 
         try:
             if sys.platform == 'win32':
+                from ctypes import WinDLL
                 result = WinDLL(library_path)
             else:
+                from ctypes import cdll
                 result = cdll.LoadLibrary(library_path)
         except OSError as e:
             raise CannotOpenPicoSDKError("PicoSDK (%s) not compatible (check 32 vs 64-bit): %s" % (self.name, e))
