@@ -65,20 +65,13 @@ class InvalidCaptureParameters(Exception):
 from picosdk.device import Device
 
 
-"""UnitInfo: A type for holding the particulars of a connected device.
-driver = a Library subclass
-variant = model name as a string
-serial = batch and serial number as a string (for use with Library.open_unit)"""
-UnitInfo = collections.namedtuple('UnitInfo', ['driver', 'variant', 'serial'])
-
-
 """TimebaseInfo: A type for holding the particulars of a timebase configuration.
 """
-TimebaseInfo = collections.namedtuple('UnitInfo', ['timebase_id',
-                                                   'time_interval',
-                                                   'time_units',
-                                                   'max_samples',
-                                                   'segment_id'])
+TimebaseInfo = collections.namedtuple('TimebaseInfo', ['timebase_id',
+                                                       'time_interval',
+                                                       'time_units',
+                                                       'max_samples',
+                                                       'segment_id'])
 
 
 def requires_device(error_message="This method requires a Device instance registered to this Library instance."):
@@ -160,7 +153,7 @@ class Library(object):
         try:
             while True:
                 handle = self._python_open_unit()
-                device_infos.append(self._python_get_unit_info_wrapper(handle))
+                device_infos.append(self._python_get_unit_info_wrapper(handle, []))
                 handles.append(handle)
         except DeviceNotFoundError:
             pass
@@ -185,8 +178,8 @@ class Library(object):
         self._python_close_unit(device.handle)
 
     @requires_device("get_unit_info requires a picosdk.device.Device instance, passed to the correct owning driver.")
-    def get_unit_info(self, device):
-        return self._python_get_unit_info_wrapper(device.handle)
+    def get_unit_info(self, device, *args):
+        return self._python_get_unit_info_wrapper(device.handle, args)
 
     def _python_open_unit(self, serial=None, resolution=None):
         if serial is None:
@@ -285,12 +278,30 @@ class Library(object):
                     return info.value[:required_size.value]
         return ""
 
-    def _python_get_unit_info_wrapper(self, handle):
-        return UnitInfo(
-            driver=self,
-            variant=self._python_get_unit_info(handle, self.PICO_INFO["PICO_VARIANT_INFO"]),
-            serial=self._python_get_unit_info(handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
-        )
+    def _python_get_unit_info_wrapper(self, handle, keys):
+        # verify that the requested keys are valid for this driver:
+        invalid_info_lines = list(set(keys) - set(self.PICO_INFO.keys()))
+        if invalid_info_lines:
+            raise ArgumentOutOfRangeError("%s not available for %s devices" % (",".join(invalid_info_lines), self.name))
+
+        if not keys:
+            # backwards compatible behaviour from first release of this wrapper, which works on all drivers.
+            UnitInfo = collections.namedtuple('UnitInfo', ['driver', 'variant', 'serial'])
+            return UnitInfo(
+                driver=self,
+                variant=self._python_get_unit_info(handle, self.PICO_INFO["PICO_VARIANT_INFO"]),
+                serial=self._python_get_unit_info(handle, self.PICO_INFO["PICO_BATCH_AND_SERIAL"])
+            )
+
+        # make a new type here, with the relevant keys.
+        UnitInfo = collections.namedtuple('UnitInfo', list(keys))
+
+        info_lines = {}
+
+        for line in keys:
+            info_lines[line] = self._python_get_unit_info(handle, self.PICO_INFO[line])
+
+        return UnitInfo(**info_lines)
 
     @requires_device("set_channel requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf'),

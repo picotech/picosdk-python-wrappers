@@ -27,12 +27,12 @@ for _d in drivers_to_load:
 # PLEASE MODIFY this list before running, to indicate which drivers should
 # expect to find a device.
 drivers_with_device_connected = [
-    # 'ps2000',
+    'ps2000',
     # 'ps2000a',
     # 'ps3000',
     # 'ps3000a',
     # 'ps4000',
-    # 'ps4000a',
+    'ps4000a',
     # 'ps5000a',
     # 'ps6000',
 ]
