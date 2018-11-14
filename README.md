@@ -40,13 +40,13 @@ Within python, the library for `import` is called `picosdk`.
 
 This code is written to be compatible with both python 2.7 and python 3 (any version).
 
-If you find a compatibility problem please raise an Issue, listing all the versions you can find (python, numpy, 
+If you find a compatibility problem please raise an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues), listing all the versions you can find (python, numpy, 
 picosdk commit hash, etc.) and your error message(s).
 
 ## C interface
 
 You can access C driver functions directly (ctypes calls) by their original C name, following the [Programmer's
-Guides](https://www.picotech.com/downloads) exactly. Examples are provided in the folders like `psX000[a]Examples/`.
+Guides](https://github.com/picotech/picosdk-python-wrappers#programmers-guides) exactly. Examples are provided in the folders like `psX000[a]Examples/`.
 
 ### Programmer's Guides
 
@@ -58,6 +58,19 @@ PicoLog driver from our [Documentation page](https://www.picotech.com/library/do
 We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature/device yet,
 let us know that you're waiting in an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues) (good) 
 or a [Pull Request](https://github.com/picotech/picosdk-python-wrappers/pulls) (better!)
+
+### Unsupported models
+
+The following drivers and devices are not yet supported:
+
+* `picohrdl` - ADC-20 & ADC-24 High Resolution Data Loggers
+* `pl1000` - PicoLog 1012 & 1216 Data Loggers
+* `plcm3` - PicoLog CM3 Current Data Logger
+* `ps3000` - PicoScope 3204, 3205, 3206, 3223, 3224, 3423 & 3423
+* `ps5000` - PicoScope 5203 & 5204
+* `usbdrdaq` - DrDAQ Data Logger
+* `usbpt104` - PT-104 Platinum Resistance Data Logger
+* `usbtc08` - TC-08 Thermocouple Data Logger
 
 ### Dependencies
 
