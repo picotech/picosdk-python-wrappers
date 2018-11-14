@@ -8,7 +8,7 @@ To use this code you will need to install the PicoSDK C libraries.
 
 ### Microsoft Windows
 
-Please visit (https://www.picotech.com/downloads) to download the 32-bit or 64-bit PicoSDK C Libraries for Windows. 
+Please visit [our Downloads page](https://www.picotech.com/downloads) to download the 32-bit or 64-bit PicoSDK C Libraries for Windows. 
 Please take care to match the "bitness" of your python to the PicoSDK.
 
 ### Linux
@@ -45,8 +45,8 @@ picosdk commit hash, etc.) and your error message(s).
 
 ## C interface
 
-You can access C driver functions directly (ctypes calls) by their original C name, following the Programmer's
-Guides exactly. Examples are provided in the folders like `psX000[a]Examples/`.
+You can access C driver functions directly (ctypes calls) by their original C name, following the [Programmer's
+Guides](https://www.picotech.com/downloads) exactly. Examples are provided in the folders like `psX000[a]Examples/`.
 
 ### Programmer's Guides
 
