@@ -55,7 +55,7 @@ PicoLog driver from our [Documentation page](https://www.picotech.com/library/do
 
 ## Python interface
 
-We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature/device yet,
+We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature yet or your device is listed as one of the [unsupported models](https://github.com/picotech/picosdk-python-wrappers#unsupported-models),
 let us know that you're waiting in an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues) (good) 
 or a [Pull Request](https://github.com/picotech/picosdk-python-wrappers/pulls) (better!)
 
@@ -135,7 +135,7 @@ Contributions are welcome. Please refer to our [guidelines for contributing](.gi
 
 See [LICENSE.md](LICENSE.md) for license terms. 
 
-*PicoScope* and *PicoLog* are registered trademarks of Pico Technology Ltd. 
+*PicoScope*, *PicoLog* and *PicoSDK* are registered trademarks of Pico Technology Ltd. 
 
 *Windows* is a registered trademark of Microsoft Corporation. 
 
