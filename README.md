@@ -21,6 +21,21 @@ to install the required driver packages for your product.
 macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C 
 libraries.
 
+## Installing the python driver bindings
+
+A `distutils` installer is provided. After you have installed the PicoSDK
+driver package (see above), the Python installer can be used as follows:
+
+    python setup.py install
+
+On macOS and Linux you will either need to use `sudo` with this command, to
+install into the system folders, or to install for the current user only you
+can use:
+
+    python setup.py install --user
+
+Within python, the library for `import` is called `picosdk`.
+
 ## Compatibility
 
 This code is written to be compatible with both python 2.7 and python 3 (any version).
