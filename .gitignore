@@ -9,3 +9,6 @@
 
 # SDK download warning file
 .sdkwarning
+
+# distutils build directory
+build/
