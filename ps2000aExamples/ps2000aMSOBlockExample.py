@@ -31,10 +31,21 @@ assert_pico_ok(status["openUnit"])
 # channel = PS2000A_CHANNEL_A = 0
 # enabled = 1
 # coupling type = PS2000A_DC = 1
-# range = PS2000A_2V = 9
+# range = PS2000A_2V = 7
 # analogue offset = 0 V
-chARange = 9
-status["setChA"] = ps.ps2000aSetChannel(chandle, 0, 1, 1, chARange, 0)
+
+channelA = ps.PS2000A_CHANNEL['PS2000A_CHANNEL_A']
+chAEnabled = 1
+chACoupling = ps.PS2000A_COUPLING['PS2000A_DC']
+chARange = ps.PICO_VOLTAGE_RANGE['PICO_2V']
+chAAnalogOffset = 0
+
+status["setChA"] = ps.ps2000aSetChannel(chandle,
+                                        channelA,
+                                        chAEnabled,
+                                        chACoupling,
+                                        chARange,
+                                        chAAnalogOffset)
 assert_pico_ok(status["setChA"])
 
 # Set up channel B
@@ -42,10 +53,21 @@ assert_pico_ok(status["setChA"])
 # channel = PS2000A_CHANNEL_B = 1
 # enabled = 1
 # coupling type = PS2000A_DC = 1
-# range = PS2000A_2V = 9
+# range = PS2000A_2V = 7
 # analogue offset = 0 V
-chBRange = 9
-status["setChB"] = ps.ps2000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
+
+channelB = ps.PS2000A_CHANNEL['PS2000A_CHANNEL_A']
+chBEnabled = 1
+chBCoupling = ps.PS2000A_COUPLING['PS2000A_DC']
+chBRange = ps.PS2000A_VOLTAGE_RANGE['PS2000A_2V']
+chBAnalogOffset = 0
+
+status["setChB"] = ps.ps2000aSetChannel(chandle,
+                                        channelB,
+                                        chBEnabled,
+                                        chBCoupling,
+                                        chBRange,
+                                        chBAnalogOffset)
 assert_pico_ok(status["setChB"])
 
 # Set Digital Port 0
@@ -53,7 +75,9 @@ assert_pico_ok(status["setChB"])
 # port = PS2000A_DIGITAL_PORT0 = 0x80
 # enabled = 1
 # logicLevel = 9754 (1.5 V)
-status["setDigitalPort0"] = ps.ps2000aSetDigitalPort(chandle, 0x80, 1, 9754)
+
+dPort0 = ps.PS2000A_DIGITAL_PORT['ps2000a_digital_port0']
+status["setDigitalPort0"] = ps.ps2000aSetDigitalPort(chandle, dPort0, 1, 9754)
 assert_pico_ok(status["setDigitalPort0"])
 
 # Set up trigger on digital channel
@@ -72,10 +96,20 @@ assert_pico_ok(status["setDigitalPort0"])
 # digital             = PS2000A_CONDITION_TRUE = 1
 # nConditions = 1
 
-triggerConditionsList = [PS2000A_TRIGGER_CONDITIONS(0, 0, 0, 0, 0, 0, 0, 1)]
+dont_care = ps.PS2000A_TRIGGER_STATE['PS2000A_CONDITION_DONT_CARE']
+trigger_true = ps.PS2000A_TRIGGER_STATE['PS2000A_CONDITION_TRUE']
+nConditions = 1
 
-status["setTriggerChannelConditions"] = ps.ps2000aSetTriggerChannelConditions(chandle, triggerConditionsList,
-                                                                                len(triggerConditionsList))
+triggerConditions = PS2000A_TRIGGER_CONDITIONS(dont_care,
+                                               dont_care,
+                                               dont_care,
+                                               dont_care,
+                                               dont_care,
+                                               dont_care,
+                                               dont_care,
+                                               trigger_true)
+
+status["setTriggerChannelConditions"] = ps.ps2000aSetTriggerChannelConditions(chandle, ctypes.byref(triggerConditions), nConditions)
 assert_pico_ok(status["setTriggerChannelConditions"])
 
 # Set digital trigger directions
@@ -85,10 +119,13 @@ assert_pico_ok(status["setTriggerChannelConditions"])
 # channel = PS2000A_DIGITAL_CHANNEL_0 = 0
 # direction = PS2000A_DIGITAL_DIRECTION_RISING = 3
 # nDirections = 1
-digitalDirectionList = [PS2000A_DIGITAL_CHANNEL_DIRECTIONS(0, 3)]
 
-status["setTriggerDigitalPortProperties"] = ps.ps2000aSetTriggerDigitalPortProperties(chandle, digitalDirectionList,
-                                                                       len(digitalDirectionList))
+digitalDirections = PS2000A_DIGITAL_CHANNEL_DIRECTIONS(0, 3)
+nDigitalDirections = 1
+
+status["setTriggerDigitalPortProperties"] = ps.ps2000aSetTriggerDigitalPortProperties(chandle,
+                                                                                      ctypes.byref(digitalDirections),
+                                                                                      nDigitalDirections)
 assert_pico_ok(status["setTriggerDigitalPortProperties"])
 
 # Set number of pre- and post-trigger samples to be collected
@@ -119,15 +156,16 @@ assert_pico_ok(status["getTimebase2"])
 # oversample = 0 = oversample
 # time indisposed ms = None (not needed in the example)
 # segment index = 0
-# lpReady = None (using ps2000aIsReady rather than ps2000aBlockReady)
+# lpReady = None (using ps2000aIsReady() rather than ps2000aBlockReady())
 # pParameter = None
 status["runBlock"] = ps.ps2000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, oversample, None, 0,
                                         None, None)
 assert_pico_ok(status["runBlock"])
 
-# Check for data collection to finish using ps2000aIsReady
+# Check for data collection to finish using ps2000aIsReady()
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
+
 while ready.value == check.value:
     status["isReady"] = ps.ps2000aIsReady(chandle, ctypes.byref(ready))
 
@@ -136,6 +174,8 @@ bufferA = (ctypes.c_int16 * maxSamples)()
 bufferB = (ctypes.c_int16 * maxSamples)()
 bufferDPort0 = (ctypes.c_int16 * maxSamples)()
 
+ratio_mode_none = ps.PS2000A_RATIO_MODE['PS2000A_RATIO_MODE_NONE']
+
 # Set data buffer location for data collection from channel A
 # handle = chandle
 # source = PS2000A_CHANNEL_A = 0
@@ -143,7 +183,12 @@ bufferDPort0 = (ctypes.c_int16 * maxSamples)()
 # buffer length = maxSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
-status["setDataBufferA"] = ps.ps2000aSetDataBuffer(chandle, 0, ctypes.byref(bufferA), maxSamples, 0, 0)
+status["setDataBufferA"] = ps.ps2000aSetDataBuffer(chandle,
+                                                   channelA,
+                                                   ctypes.byref(bufferA),
+                                                   maxSamples,
+                                                   0,
+                                                   ratio_mode_none)
 assert_pico_ok(status["setDataBufferA"])
 
 # Set data buffer location for data collection from channel B
@@ -153,7 +198,12 @@ assert_pico_ok(status["setDataBufferA"])
 # buffer length = maxSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
-status["setDataBufferB"] = ps.ps2000aSetDataBuffers(chandle, 1, ctypes.byref(bufferB), maxSamples, 0, 0)
+status["setDataBufferB"] = ps.ps2000aSetDataBuffers(chandle,
+                                                    channelB,
+                                                    ctypes.byref(bufferB),
+                                                    maxSamples,
+                                                    0,
+                                                    ratio_mode_none)
 assert_pico_ok(status["setDataBufferB"])
 
 # Set data buffer location for data collection from digital port 0
@@ -163,7 +213,12 @@ assert_pico_ok(status["setDataBufferB"])
 # buffer length = maxSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
-status["setDataBufferDPort0"] = ps.ps2000aSetDataBuffers(chandle, 1, ctypes.byref(bufferDPort0), maxSamples, 0, 0)
+status["setDataBufferDPort0"] = ps.ps2000aSetDataBuffers(chandle,
+                                                         dPort0,
+                                                         ctypes.byref(bufferDPort0),
+                                                         maxSamples,
+                                                         0,
+                                                         ratio_mode_none)
 assert_pico_ok(status["setDataBufferDPort0"])
 
 # create overflow location
@@ -175,10 +230,16 @@ cMaxSamples = ctypes.c_int32(maxSamples)
 # handle = chandle
 # start index = 0
 # pointer to number of samples = ctypes.byref(cmaxSamples)
-# downsample ratio = 0
+# downsample ratio = 1
 # downsample ratio mode = PS2000A_RATIO_MODE_NONE
 # pointer to overflow = ctypes.byref(overflow))
-status["getValues"] = ps.ps2000aGetValues(chandle, 0, ctypes.byref(cMaxSamples), 0, 0, 0, ctypes.byref(overflow))
+status["getValues"] = ps.ps2000aGetValues(chandle,
+                                          0,
+                                          ctypes.byref(cMaxSamples),
+                                          0,
+                                          1,
+                                          ratio_mode_none,
+                                          ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
 
@@ -189,9 +250,9 @@ maxADC = ctypes.c_int16()
 status["maximumValue"] = ps.ps2000aMaximumValue(chandle, ctypes.byref(maxADC))
 assert_pico_ok(status["maximumValue"])
 
-# Convert ADC counts data to mV
-adc2mVChA =  adc2mV(bufferA, chARange, maxADC)
-adc2mVChB =  adc2mV(bufferB, chBRange, maxADC)
+# Convert ADC counts data to millivolts
+adc2mVChA = adc2mV(bufferA, chARange, maxADC)
+adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 
 # Obtain binary for digital channel D0
 [bufferD0] = splitMSODataPort0(cMaxSamples, bufferDPort0)
