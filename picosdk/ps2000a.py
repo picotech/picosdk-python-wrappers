@@ -104,6 +104,18 @@ ps2000a.PICO_THRESHOLD_DIRECTION = {
     k[8:]: v for k, v in ps2000a.PS2000A_THRESHOLD_DIRECTION.items()
 }
 
+ps2000a.PS2000A_THRESHOLD_MODE = make_enum([
+    "PS2000A_LEVEL",
+    "PS2000A_WINDOW",
+])
+
+ps2000a.PS2000A_TRIGGER_STATE = make_enum([
+    "PS2000A_CONDITION_DONT_CARE",
+    "PS2000A_CONDITION_TRUE",
+    "PS2000A_CONDITION_FALSE",
+    "PS2000A_CONDITION_MAX",
+])
+
 def _define_digital_port():
     ps2000a_digital_port0 = 0x80
     ps2000a_digital_port1 = ps2000a_digital_port0 + 1
@@ -160,6 +172,45 @@ ps2000a.PS2000A_DIGITAL_DIRECTION = make_enum([
     "PS2000A_DIGITAL_DIRECTION_RISING_OR_FALLING",
     "PS2000A_DIGITAL_MAX_DIRECTION",
 ])
+
+# Structure definitions
+
+class PS2000A_TRIGGER_CONDITIONS(Structure):
+    _pack_ = 1
+    _fields_ = [("channelA", c_int32),
+                ("channelB", c_int32),
+                ("channelC", c_int32),
+                ("channelD", c_int32),
+                ("external", c_int32),
+                ("aux", c_int32),
+                ("pulseWidthQualifier", c_int32),
+                ("digital", c_int32)]
+
+class PS2000A_PWQ_CONDITIONS(Structure):
+    _pack_ = 1
+    _fields_ = [("channelA", c_int32),
+                ("channelB", c_int32),
+                ("channelC", c_int32),
+                ("channelD", c_int32),
+                ("external", c_int32),
+                ("aux", c_int32),
+                ("digital", c_int32)]
+
+class PS2000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_int32),
+                ("direction", c_int32)]
+
+class PS2000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
+    _pack_ = 1
+    _fields_ = [("thresholdUpper", c_int16),
+                ("thresholdHysteresis", c_uint16),
+                ("thresholdLower", c_int16),
+                ("thresholdLowerHysteresis", c_uint16),
+                ("channel", c_int32),
+                ("thresholdMode", c_int32)]
+
+# Function definitions
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (

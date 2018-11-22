@@ -115,7 +115,7 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
 
 def splitMSOData(cmaxSamples, data):
     """
-    # This implementation will work on either channel in the same way as the Port1 and Port2 methods above.
+    # This implementation will work on either channel in the same way as the Port0 and Port1 methods above.
         splitMSOData(
                         c_int32         cmaxSamples
                         c_int16 array   data
