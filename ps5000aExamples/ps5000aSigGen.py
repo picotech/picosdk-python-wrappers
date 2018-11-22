@@ -115,12 +115,12 @@ triggerSource = ctypes.c_int32(0)
 status["setSigGenBuiltInV2"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 100000, 5000, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 0)
 assert_pico_ok(status["setSigGenBuiltInV2"])
 
-# Pause the script to show signal
+# Pauses the script to show signal
 time.sleep(36)
 
-# Close the unit
+# Closes the unit
 # Handle = chandle
-status["stop"] = ps.ps5000aCloseUnit(chandle)
+status["close"] = ps.ps5000aCloseUnit(chandle)
 assert_pico_ok(status["stop"])
 
 # Displays the status returns
