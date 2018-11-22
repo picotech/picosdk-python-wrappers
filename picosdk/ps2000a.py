@@ -104,6 +104,62 @@ ps2000a.PICO_THRESHOLD_DIRECTION = {
     k[8:]: v for k, v in ps2000a.PS2000A_THRESHOLD_DIRECTION.items()
 }
 
+def _define_digital_port():
+    ps2000a_digital_port0 = 0x80
+    ps2000a_digital_port1 = ps2000a_digital_port0 + 1
+    ps2000a_digital_port2 = ps2000a_digital_port0 + 2
+    ps2000a_digital_port3 = ps2000a_digital_port0 + 3
+    ps2000a_max_digital_ports = ps2000a_digital_port3 - ps2000a_digital_port0 + 1
+    
+    return {k.upper(): v for k, v in locals().items() if k.startswith("ps2000a")}
+    
+ps2000a.PS2000A_DIGITAL_PORT = _define_digital_port()
+
+ps2000a.PS2000A_DIGITAL_CHANNEL = make_enum([
+    "PS2000A_DIGITAL_CHANNEL_0",
+    "PS2000A_DIGITAL_CHANNEL_1",
+    "PS2000A_DIGITAL_CHANNEL_2",
+    "PS2000A_DIGITAL_CHANNEL_3",
+    "PS2000A_DIGITAL_CHANNEL_4",
+    "PS2000A_DIGITAL_CHANNEL_5",
+    "PS2000A_DIGITAL_CHANNEL_6",
+    "PS2000A_DIGITAL_CHANNEL_7",
+    "PS2000A_DIGITAL_CHANNEL_8",
+    "PS2000A_DIGITAL_CHANNEL_9",
+    "PS2000A_DIGITAL_CHANNEL_10",
+    "PS2000A_DIGITAL_CHANNEL_11",
+    "PS2000A_DIGITAL_CHANNEL_12",
+    "PS2000A_DIGITAL_CHANNEL_13",
+    "PS2000A_DIGITAL_CHANNEL_14",
+    "PS2000A_DIGITAL_CHANNEL_15",
+    "PS2000A_DIGITAL_CHANNEL_16",
+    "PS2000A_DIGITAL_CHANNEL_17",
+    "PS2000A_DIGITAL_CHANNEL_18",
+    "PS2000A_DIGITAL_CHANNEL_19",
+    "PS2000A_DIGITAL_CHANNEL_20",
+    "PS2000A_DIGITAL_CHANNEL_21",
+    "PS2000A_DIGITAL_CHANNEL_22",
+    "PS2000A_DIGITAL_CHANNEL_23",
+    "PS2000A_DIGITAL_CHANNEL_24",
+    "PS2000A_DIGITAL_CHANNEL_25",
+    "PS2000A_DIGITAL_CHANNEL_26",
+    "PS2000A_DIGITAL_CHANNEL_27",
+    "PS2000A_DIGITAL_CHANNEL_28",
+    "PS2000A_DIGITAL_CHANNEL_29",
+    "PS2000A_DIGITAL_CHANNEL_30",
+    "PS2000A_DIGITAL_CHANNEL_31",
+    "PS2000A_MAX_DIGITAL_CHANNELS",
+])
+
+ps2000a.PS2000A_DIGITAL_DIRECTION = make_enum([
+    "PS2000A_DIGITAL_DONT_CARE",
+    "PS2000A_DIGITAL_DIRECTION_LOW",
+    "PS2000A_DIGITAL_DIRECTION_HIGH",
+    "PS2000A_DIGITAL_DIRECTION_RISING",
+    "PS2000A_DIGITAL_DIRECTION_FALLING",
+    "PS2000A_DIGITAL_DIRECTION_RISING_OR_FALLING",
+    "PS2000A_DIGITAL_MAX_DIRECTION",
+])
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (
@@ -115,7 +171,7 @@ ps2000a.make_symbol("_OpenUnit", "ps2000aOpenUnit", c_uint32, [c_void_p, c_char_
 doc = """ PICO_STATUS ps2000aOpenUnitAsync
     (
         int16_t *status,
-        int8_t	*serial
+        int8_t    *serial
     ); """
 ps2000a.make_symbol("_OpenUnitAsync", "ps2000aOpenUnitAsync", c_uint32, [c_void_p, c_char_p], doc)
 
