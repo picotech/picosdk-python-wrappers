@@ -24,14 +24,14 @@ assert_pico_ok(status["openunit"])
 # channel = ps2000a_CHANNEL_A = 0
 # enabled = 1
 # coupling type = ps2000a_DC = 1
-# range = ps2000a_10V = 8
+# range = ps2000a_10V = 9
 # analogue offset = 0 V
 chARange = 8
 status["setChA"] = ps.ps2000aSetChannel(chandle, 0, 1, 1, chARange, 0)
 assert_pico_ok(status["setChA"])
 
 # Sets up single trigger
-# Handle = Chandle
+# andle = chandle
 # Enable = 1
 # Source = ps2000a_channel_A = 0
 # Threshold = 1024 ADC counts
@@ -47,7 +47,7 @@ postTriggerSamples = 400
 maxsamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase innfomation
-# Handle = chandle
+# handle = chandle
 # Timebase = 2 = timebase
 # Nosample = maxsamples
 # TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
@@ -76,7 +76,7 @@ status["SetNoOfCaptures"] = ps.ps2000aSetNoOfCaptures(chandle, 10)
 assert_pico_ok(status["SetNoOfCaptures"])
 
 # Starts the block capture
-# Handle = chandle
+# handle = chandle
 # Number of prTriggerSamples
 # Number of postTriggerSamples
 # Timebase = 2 = 4ns (see Programmer's guide for more information on timebases)
@@ -92,7 +92,7 @@ bufferAMax = (ctypes.c_int16 * maxsamples)()
 bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -107,7 +107,7 @@ bufferAMax1 = (ctypes.c_int16 * maxsamples)()
 bufferAMin1 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -122,7 +122,7 @@ bufferAMax2 = (ctypes.c_int16 * maxsamples)()
 bufferAMin2 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -137,7 +137,7 @@ bufferAMax3 = (ctypes.c_int16 * maxsamples)()
 bufferAMin3 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -152,7 +152,7 @@ bufferAMax4 = (ctypes.c_int16 * maxsamples)()
 bufferAMin4 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -167,7 +167,7 @@ bufferAMax5 = (ctypes.c_int16 * maxsamples)()
 bufferAMin5 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -182,7 +182,7 @@ bufferAMax6 = (ctypes.c_int16 * maxsamples)()
 bufferAMin6 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -197,7 +197,7 @@ bufferAMax7 = (ctypes.c_int16 * maxsamples)()
 bufferAMin7 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -212,7 +212,7 @@ bufferAMax8 = (ctypes.c_int16 * maxsamples)()
 bufferAMin8 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -227,7 +227,7 @@ bufferAMax9 = (ctypes.c_int16 * maxsamples)()
 bufferAMin9 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't in the scope of this example
 
 # Setting the data buffer location for data collection from channel A
-# Handle = Chandle
+# handle = chandle
 # source = ps2000a_channel_A = 0
 # Buffer max = ctypes.byref(bufferAMax)
 # Buffer min = ctypes.byref(bufferAMin)
@@ -248,7 +248,7 @@ check = ctypes.c_int16(0)
 while ready.value == check.value:
     status["isReady"] = ps.ps2000aIsReady(chandle, ctypes.byref(ready))
 
-# Handle = chandle
+# handle = chandle
 # noOfSamples = ctypes.byref(cmaxSamples)
 # fromSegmentIndex = 0
 # ToSegmentIndex = 9
@@ -259,7 +259,7 @@ while ready.value == check.value:
 status["GetValuesBulk"] = ps.ps2000aGetValuesBulk(chandle, ctypes.byref(cmaxSamples), 0, 9, 0, 0, ctypes.byref(overflow))
 assert_pico_ok(status["GetValuesBulk"])
 
-# Handle = chandle
+# handle = chandle
 # Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times)
 # Timeunits = TimeUnits = ctypes.c_char() = ctypes.byref(TimeUnits)
 # Fromsegmentindex = 0
@@ -270,7 +270,7 @@ status["GetValuesTriggerTimeOffsetBulk"] = ps.ps2000aGetValuesTriggerTimeOffsetB
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
 # Finds the max ADC count
-# Handle = chandle
+# handle = chandle
 # Value = ctype.byref(maxADC)
 maxADC = ctypes.c_int16()
 status["maximumValue"] = ps.ps2000aMaximumValue(chandle, ctypes.byref(maxADC))
