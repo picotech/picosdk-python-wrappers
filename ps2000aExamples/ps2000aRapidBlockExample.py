@@ -26,7 +26,7 @@ assert_pico_ok(status["openunit"])
 # coupling type = ps2000a_DC = 1
 # range = ps2000a_10V = 9
 # analogue offset = 0 V
-chARange = 8
+chARange = 9
 status["setChA"] = ps.ps2000aSetChannel(chandle, 0, 1, 1, chARange, 0)
 assert_pico_ok(status["setChA"])
 
