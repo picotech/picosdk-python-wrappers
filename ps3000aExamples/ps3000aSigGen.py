@@ -55,7 +55,7 @@ except:
 # shots = 0
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_RISING
-# triggerSource = ctypes.c_int16(0) = PS3000A_SIGGEN_NONE
+# triggerSource = ctypes.c_int16(0) = P3000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(0)
 sweepType = ctypes.c_int32(0)
@@ -82,7 +82,7 @@ time.sleep(10)
 # shots = 0
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_RISING
-# triggerSource = ctypes.c_int16(0) = PS3000A_SIGGEN_NONE
+# triggerSource = ctypes.c_int16(0) = P3000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(1)
 sweepType = ctypes.c_int32(0)
@@ -109,7 +109,7 @@ time.sleep(10)
 # shots = 0
 # sweeps = 0
 # triggerType = ctypes.c_int16(0) = PS3000A_SIGGEN_RISING
-# triggerSource = ctypes.c_int16(0) = PS3000A_SIGGEN_NONE
+# triggerSource = ctypes.c_int16(0) = P3000A_SIGGEN_NONE
 # extInThreshold = 1
 wavetype = ctypes.c_int16(1)
 sweepType = ctypes.c_int32(2)
