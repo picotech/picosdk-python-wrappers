@@ -15,7 +15,7 @@ import ctypes
 import numpy as np
 from picosdk.ps2000a import ps2000a as ps, PS2000A_TRIGGER_CONDITIONS, PS2000A_DIGITAL_CHANNEL_DIRECTIONS
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, splitMSODataPort0, assert_pico_ok
+from picosdk.functions import adc2mV, splitMSOData, assert_pico_ok
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -255,8 +255,8 @@ adc2mVChA = adc2mV(bufferA, chARange, maxADC)
 adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 
 # Obtain binary for digital channel D0
-bufferD0, bufferD1, bufferD2, bufferD3, bufferD4, bufferD5, bufferD6, bufferD7 = splitMSODataPort0(cTotalSamples,
-                                                                                                   bufferDPort0)
+bufferD0, bufferD1, bufferD2, bufferD3, bufferD4, bufferD5, bufferD6, bufferD7 = splitMSOData(cTotalSamples,
+                                                                                              bufferDPort0)
 
 # Create time data
 time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
@@ -268,9 +268,9 @@ axs[0].plot(time, adc2mVChA[:], time, adc2mVChB[:])
 axs[0].set_title('Analog data acquisition')
 axs[0].set_xlabel('Time (ns)')
 axs[0].set_ylabel('Voltage (mV)')
-fig.suptitle('PicoScope 2000 Series (A API) MSO Block Capture Example', fontsize=16)
+fig.suptitle('PicoScope 2000 Series (A API) MSO Block Capture Example', fontsize=12)
 
-axs[1].plot(time, bufferD0[:])
+axs[1].plot(time, bufferD0)
 axs[1].set_title('Digital data acquisition')
 axs[1].set_xlabel('Time (ns)')
 axs[1].set_ylabel('Logic Level')

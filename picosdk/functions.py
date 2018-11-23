@@ -113,6 +113,7 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
 
     return bufferMaxBinaryD8, bufferMaxBinaryD9, bufferMaxBinaryD10, bufferMaxBinaryD11, bufferMaxBinaryD12, bufferMaxBinaryD13, bufferMaxBinaryD14, bufferMaxBinaryD15
 
+
 def splitMSOData(cmaxSamples, data):
     """
     # This implementation will work on either channel in the same way as the Port0 and Port1 methods above.
@@ -123,14 +124,14 @@ def splitMSOData(cmaxSamples, data):
     """
     # Makes an array for each digital channel
     bufferBinaryDj = (
-        np.chararray((cmaxSamples.value, 1)),
-        np.chararray((cmaxSamples.value, 1)),
-        np.chararray((cmaxSamples.value, 1)),
-        np.chararray((cmaxSamples.value, 1)),
-        np.chararray((cmaxSamples.value, 1)),
-        np.chararray((cmaxSamples.value, 1)),
-        np.chararray((cmaxSamples.value, 1)),
-        np.chararray((cmaxSamples.value, 1)),
+        np.chararray(cmaxSamples.value),
+        np.chararray(cmaxSamples.value),
+        np.chararray(cmaxSamples.value),
+        np.chararray(cmaxSamples.value),
+        np.chararray(cmaxSamples.value),
+        np.chararray(cmaxSamples.value),
+        np.chararray(cmaxSamples.value),
+        np.chararray(cmaxSamples.value),
     )
     # Splits out the individual bits from the port into the binary values for each channel/pin.
     for i in range(cmaxSamples.value):
