@@ -116,6 +116,7 @@ ps2000a.PS2000A_TRIGGER_STATE = make_enum([
     "PS2000A_CONDITION_MAX",
 ])
 
+
 def _define_digital_port():
     ps2000a_digital_port0 = 0x80
     ps2000a_digital_port1 = ps2000a_digital_port0 + 1
@@ -124,7 +125,8 @@ def _define_digital_port():
     ps2000a_max_digital_ports = ps2000a_digital_port3 - ps2000a_digital_port0 + 1
     
     return {k.upper(): v for k, v in locals().items() if k.startswith("ps2000a")}
-    
+
+
 ps2000a.PS2000A_DIGITAL_PORT = _define_digital_port()
 
 ps2000a.PS2000A_DIGITAL_CHANNEL = make_enum([
@@ -175,6 +177,7 @@ ps2000a.PS2000A_DIGITAL_DIRECTION = make_enum([
 
 # Structure definitions
 
+
 class PS2000A_TRIGGER_CONDITIONS(Structure):
     _pack_ = 1
     _fields_ = [("channelA", c_int32),
@@ -186,6 +189,7 @@ class PS2000A_TRIGGER_CONDITIONS(Structure):
                 ("pulseWidthQualifier", c_int32),
                 ("digital", c_int32)]
 
+
 class PS2000A_PWQ_CONDITIONS(Structure):
     _pack_ = 1
     _fields_ = [("channelA", c_int32),
@@ -196,10 +200,12 @@ class PS2000A_PWQ_CONDITIONS(Structure):
                 ("aux", c_int32),
                 ("digital", c_int32)]
 
+
 class PS2000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32)]
+
 
 class PS2000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
     _pack_ = 1
@@ -209,6 +215,7 @@ class PS2000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
                 ("thresholdLowerHysteresis", c_uint16),
                 ("channel", c_int32),
                 ("thresholdMode", c_int32)]
+
 
 # Function definitions
 
@@ -301,7 +308,7 @@ doc = """ PICO_STATUS ps2000aGetTimebase
         int32_t  noSamples,
         int32_t *timeIntervalNanoseconds,
         int16_t  oversample,
-        int32_t *maxSamples,
+        int32_t *totalSamples,
         uint32_t segmentIndex
     ); """
 ps2000a.make_symbol("_GetTimebase", "ps2000aGetTimebase", c_uint32,
@@ -314,7 +321,7 @@ doc = """ PICO_STATUS ps2000aGetTimebase2
         int32_t  noSamples,
         float   *timeIntervalNanoseconds,
         int16_t  oversample,
-        int32_t *maxSamples,
+        int32_t *totalSamples,
         uint32_t segmentIndex
     ); """
 ps2000a.make_symbol("_GetTimebase2", "ps2000aGetTimebase2", c_uint32,
