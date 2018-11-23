@@ -37,7 +37,7 @@ assert_pico_ok(status["openUnit"])
 channelA = ps.PS2000A_CHANNEL['PS2000A_CHANNEL_A']
 chAEnabled = 1
 chACoupling = ps.PS2000A_COUPLING['PS2000A_DC']
-chARange = ps.PICO_VOLTAGE_RANGE['PICO_2V']
+chARange = ps.PS2000A_RANGE['PS2000A_2V']
 chAAnalogOffset = 0
 
 status["setChA"] = ps.ps2000aSetChannel(chandle,
@@ -59,7 +59,7 @@ assert_pico_ok(status["setChA"])
 channelB = ps.PS2000A_CHANNEL['PS2000A_CHANNEL_A']
 chBEnabled = 1
 chBCoupling = ps.PS2000A_COUPLING['PS2000A_DC']
-chBRange = ps.PS2000A_VOLTAGE_RANGE['PS2000A_2V']
+chBRange = ps.PS2000A_RANGE['PS2000A_2V']
 chBAnalogOffset = 0
 
 status["setChB"] = ps.ps2000aSetChannel(chandle,
@@ -76,7 +76,7 @@ assert_pico_ok(status["setChB"])
 # enabled = 1
 # logicLevel = 9754 (1.5 V)
 
-dPort0 = ps.PS2000A_DIGITAL_PORT['ps2000a_digital_port0']
+dPort0 = ps.PS2000A_DIGITAL_PORT.get("PS2000A_DIGITAL_PORT0")
 status["setDigitalPort0"] = ps.ps2000aSetDigitalPort(chandle, dPort0, 1, 9754)
 assert_pico_ok(status["setDigitalPort0"])
 
@@ -131,20 +131,20 @@ assert_pico_ok(status["setTriggerDigitalPortProperties"])
 # Set number of pre- and post-trigger samples to be collected
 preTriggerSamples = 2500
 postTriggerSamples = 2500
-maxSamples = preTriggerSamples + postTriggerSamples
+totalSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
 # handle = chandle
 # timebase = 8 = timebase
-# noSamples = maxSamples
+# noSamples = totalSamples
 # pointer to timeIntervalNanoseconds = ctypes.byref(timeIntervalNs)
-# pointer to maxSamples = ctypes.byref(returnedMaxSamples)
+# pointer to totalSamples = ctypes.byref(returnedMaxSamples)
 # segment index = 0
 timebase = 8
 timeIntervalNs = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int32()
 oversample = ctypes.c_int16(0)
-status["getTimebase2"] = ps.ps2000aGetTimebase2(chandle, timebase, maxSamples, ctypes.byref(timeIntervalNs), oversample,
+status["getTimebase2"] = ps.ps2000aGetTimebase2(chandle, timebase, totalSamples, ctypes.byref(timeIntervalNs), oversample,
                                                 ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["getTimebase2"])
 
@@ -170,9 +170,9 @@ while ready.value == check.value:
     status["isReady"] = ps.ps2000aIsReady(chandle, ctypes.byref(ready))
 
 # Create buffers ready for assigning pointers for data collection
-bufferA = (ctypes.c_int16 * maxSamples)()
-bufferB = (ctypes.c_int16 * maxSamples)()
-bufferDPort0 = (ctypes.c_int16 * maxSamples)()
+bufferA = (ctypes.c_int16 * totalSamples)()
+bufferB = (ctypes.c_int16 * totalSamples)()
+bufferDPort0 = (ctypes.c_int16 * totalSamples)()
 
 ratio_mode_none = ps.PS2000A_RATIO_MODE['PS2000A_RATIO_MODE_NONE']
 
@@ -180,13 +180,13 @@ ratio_mode_none = ps.PS2000A_RATIO_MODE['PS2000A_RATIO_MODE_NONE']
 # handle = chandle
 # source = PS2000A_CHANNEL_A = 0
 # pointer to buffer = ctypes.byref(bufferA)
-# buffer length = maxSamples
+# buffer length = totalSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
 status["setDataBufferA"] = ps.ps2000aSetDataBuffer(chandle,
                                                    channelA,
                                                    ctypes.byref(bufferA),
-                                                   maxSamples,
+                                                   totalSamples,
                                                    0,
                                                    ratio_mode_none)
 assert_pico_ok(status["setDataBufferA"])
@@ -195,36 +195,36 @@ assert_pico_ok(status["setDataBufferA"])
 # handle = chandle
 # source = PS2000A_CHANNEL_B = 1
 # pointer to buffer max = ctypes.byref(bufferB)
-# buffer length = maxSamples
+# buffer length = totalSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
-status["setDataBufferB"] = ps.ps2000aSetDataBuffers(chandle,
-                                                    channelB,
-                                                    ctypes.byref(bufferB),
-                                                    maxSamples,
-                                                    0,
-                                                    ratio_mode_none)
+status["setDataBufferB"] = ps.ps2000aSetDataBuffer(chandle,
+                                                   channelB,
+                                                   ctypes.byref(bufferB),
+                                                   totalSamples,
+                                                   0,
+                                                   ratio_mode_none)
 assert_pico_ok(status["setDataBufferB"])
 
 # Set data buffer location for data collection from digital port 0
 # handle = chandle
 # source = PS2000A_DIGITAL_PORT0 = 0x80
 # pointer to buffer max = ctypes.byref(bufferB)
-# buffer length = maxSamples
+# buffer length = totalSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
-status["setDataBufferDPort0"] = ps.ps2000aSetDataBuffers(chandle,
-                                                         dPort0,
-                                                         ctypes.byref(bufferDPort0),
-                                                         maxSamples,
-                                                         0,
-                                                         ratio_mode_none)
+status["setDataBufferDPort0"] = ps.ps2000aSetDataBuffer(chandle,
+                                                        dPort0,
+                                                        ctypes.byref(bufferDPort0),
+                                                        totalSamples,
+                                                        0,
+                                                        ratio_mode_none)
 assert_pico_ok(status["setDataBufferDPort0"])
 
 # create overflow location
 overflow = ctypes.c_int16()
-# create converted type maxSamples
-cMaxSamples = ctypes.c_int32(maxSamples)
+# create converted type totalSamples
+cTotalSamples = ctypes.c_int32(totalSamples)
 
 # Retried data from scope to buffers assigned above
 # handle = chandle
@@ -235,7 +235,7 @@ cMaxSamples = ctypes.c_int32(maxSamples)
 # pointer to overflow = ctypes.byref(overflow))
 status["getValues"] = ps.ps2000aGetValues(chandle,
                                           0,
-                                          ctypes.byref(cMaxSamples),
+                                          ctypes.byref(cTotalSamples),
                                           0,
                                           1,
                                           ratio_mode_none,
@@ -255,10 +255,10 @@ adc2mVChA = adc2mV(bufferA, chARange, maxADC)
 adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 
 # Obtain binary for digital channel D0
-[bufferD0] = splitMSODataPort0(cMaxSamples, bufferDPort0)
+[bufferD0] = splitMSODataPort0(cTotalSamples, bufferDPort0)
 
 # Create time data
-time = np.linspace(0, cMaxSamples.value * timeIntervalNs.value, cMaxSamples.value)
+time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
 
 # Plot data from channels A, B and D0
 
