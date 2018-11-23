@@ -255,7 +255,8 @@ adc2mVChA = adc2mV(bufferA, chARange, maxADC)
 adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 
 # Obtain binary for digital channel D0
-[bufferD0] = splitMSODataPort0(cTotalSamples, bufferDPort0)
+bufferD0, bufferD1, bufferD2, bufferD3, bufferD4, bufferD5, bufferD6, bufferD7 = splitMSODataPort0(cTotalSamples,
+                                                                                                   bufferDPort0)
 
 # Create time data
 time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
@@ -269,7 +270,7 @@ axs[0].set_xlabel('Time (ns)')
 axs[0].set_ylabel('Voltage (mV)')
 fig.suptitle('PicoScope 2000 Series (A API) MSO Block Capture Example', fontsize=16)
 
-axs[1].plot(time, bufferD0)
+axs[1].plot(time, bufferD0[:])
 axs[1].set_title('Digital data acquisition')
 axs[1].set_xlabel('Time (ns)')
 axs[1].set_ylabel('Logic Level')
