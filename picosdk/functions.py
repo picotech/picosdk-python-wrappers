@@ -67,7 +67,7 @@ def splitMSODataPort0(cmaxSamples, bufferMax):
         MSOData = bufferMax[i]
         binaryMSOData = bin(MSOData)
         binaryMSOData = binaryMSOData[2:]
-        binaryMSOData=binaryMSOData.zfill(8)
+        binaryMSOData = binaryMSOData.zfill(8)
         bufferMaxBinaryD0[i] = binaryMSOData[7]
         bufferMaxBinaryD1[i] = binaryMSOData[6]
         bufferMaxBinaryD2[i] = binaryMSOData[5]
@@ -101,7 +101,7 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
         MSOData = bufferMax[i]
         binaryMSOData = bin(MSOData)
         binaryMSOData = binaryMSOData[2:]
-        binaryMSOData=binaryMSOData.zfill(8)
+        binaryMSOData = binaryMSOData.zfill(8)
         bufferMaxBinaryD8[i] = binaryMSOData[7]
         bufferMaxBinaryD9[i] = binaryMSOData[6]
         bufferMaxBinaryD10[i] = binaryMSOData[5]
