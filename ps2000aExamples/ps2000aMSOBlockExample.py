@@ -5,7 +5,7 @@
 # This example demonstrates how to use the PicoScope 2000 Series (ps2000a) driver API functions in order to do the
 # following:
 #
-# Opens a connection to a PicoScope 2000 Series device
+# Opens a connection to a PicoScope 2000 Series MSO device
 # Setup input analog channels and a digital port
 # Setup a trigger on a digital channel
 # Collect a block of data
@@ -271,9 +271,8 @@ assert_pico_ok(status["maximumValue"])
 adc2mVChA = adc2mV(bufferA, chARange, maxADC)
 adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 
-# Obtain binary for digital channel D0
-bufferD0, bufferD1, bufferD2, bufferD3, bufferD4, bufferD5, bufferD6, bufferD7 = splitMSOData(cTotalSamples,
-                                                                                              bufferDPort0)
+# Obtain binary for digital port 0
+dPort0BinaryData = splitMSOData(cTotalSamples, bufferDPort0)
 
 # Create time data
 time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
@@ -288,7 +287,7 @@ axs[0].set_title('Analog data acquisition')
 axs[0].set_xlabel('Time (ns)')
 axs[0].set_ylabel('Voltage (mV)')
 
-axs[1].plot(time, bufferD0)
+axs[1].plot(time, dPort0BinaryData[0])
 axs[1].set_title('Digital data acquisition')
 axs[1].set_xlabel('Time (ns)')
 axs[1].set_ylabel('Logic Level')
