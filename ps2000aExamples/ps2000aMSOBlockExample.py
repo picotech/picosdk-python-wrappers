@@ -56,7 +56,7 @@ assert_pico_ok(status["setChA"])
 # range = PS2000A_2V = 7
 # analogue offset = 0 V
 
-channelB = ps.PS2000A_CHANNEL['PS2000A_CHANNEL_A']
+channelB = ps.PS2000A_CHANNEL['PS2000A_CHANNEL_B']
 chBEnabled = 1
 chBCoupling = ps.PS2000A_COUPLING['PS2000A_DC']
 chBRange = ps.PS2000A_RANGE['PS2000A_2V']
@@ -135,25 +135,41 @@ totalSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
 # handle = chandle
-# timebase = 8 = timebase
+# timebase = 1252 = 10000 ns = timebase (see Programmer's guide for mre information on timebases)
 # noSamples = totalSamples
 # pointer to timeIntervalNanoseconds = ctypes.byref(timeIntervalNs)
 # pointer to totalSamples = ctypes.byref(returnedMaxSamples)
 # segment index = 0
-timebase = 8
+timebase = 1252
 timeIntervalNs = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int32()
 oversample = ctypes.c_int16(0)
-status["getTimebase2"] = ps.ps2000aGetTimebase2(chandle, timebase, totalSamples, ctypes.byref(timeIntervalNs), oversample,
-                                                ctypes.byref(returnedMaxSamples), 0)
+
+# Query this function in a loop in case the timebase index selected is invalid.
+
+status["getTimebase2"] = ps.PICO_STATUS['PICO_INVALID_TIMEBASE']
+
+while status["getTimebase2"] == ps.PICO_STATUS['PICO_INVALID_TIMEBASE']:
+
+    status["getTimebase2"] = ps.ps2000aGetTimebase2(chandle, timebase, totalSamples, ctypes.byref(timeIntervalNs),
+                                                    oversample, ctypes.byref(returnedMaxSamples), 0)
+
+    if status["getTimebase2"] == ps.PICO_STATUS['PICO_OK']:
+        break
+    else:
+
+        timebase = timebase + 1
+
 assert_pico_ok(status["getTimebase2"])
+
+print "Starting data collection - waiting for trigger on channel D0..."
 
 # Run block capture
 # handle = chandle
 # number of pre-trigger samples = preTriggerSamples
 # number of post-trigger samples = PostTriggerSamples
-# timebase = 8 = 80 ns = timebase (see Programmer's guide for mre information on timebases)
-# oversample = 0 = oversample
+# timebase = 1252 = 10000 ns = timebase (see Programmer's guide for mre information on timebases)
+# oversample = 0
 # time indisposed ms = None (not needed in the example)
 # segment index = 0
 # lpReady = None (using ps2000aIsReady() rather than ps2000aBlockReady())
@@ -229,7 +245,7 @@ cTotalSamples = ctypes.c_int32(totalSamples)
 # Retried data from scope to buffers assigned above
 # handle = chandle
 # start index = 0
-# pointer to number of samples = ctypes.byref(cmaxSamples)
+# pointer to number of samples = ctypes.byref(cTotalSamples)
 # downsample ratio = 1
 # downsample ratio mode = PS2000A_RATIO_MODE_NONE
 # pointer to overflow = ctypes.byref(overflow))
@@ -242,6 +258,7 @@ status["getValues"] = ps.ps2000aGetValues(chandle,
                                           ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
+print "Data collection complete."
 
 # Find maximum ADC count value
 # handle = chandle
@@ -263,27 +280,30 @@ time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.
 
 # Plot data from channels A, B and D0
 
+print "Plotting data..."
+
 fig, axs = plt.subplots(2, 1, constrained_layout=True)
 axs[0].plot(time, adc2mVChA[:], time, adc2mVChB[:])
 axs[0].set_title('Analog data acquisition')
 axs[0].set_xlabel('Time (ns)')
 axs[0].set_ylabel('Voltage (mV)')
-fig.suptitle('PicoScope 2000 Series (A API) MSO Block Capture Example', fontsize=12)
 
 axs[1].plot(time, bufferD0)
 axs[1].set_title('Digital data acquisition')
 axs[1].set_xlabel('Time (ns)')
 axs[1].set_ylabel('Logic Level')
 
+fig.canvas.set_window_title('PicoScope 2000 Series (A API) MSO Block Capture Example')
 plt.show()
 
+print "Close figure to stop the device and close the connection."
 
 # Stop the scope
 # handle = chandle
 status["stop"] = ps.ps2000aStop(chandle)
 assert_pico_ok(status["stop"])
 
-# Close unitDisconnect the scope
+# Close the connection to the device
 # handle = chandle
 status["close"] = ps.ps2000aCloseUnit(chandle)
 assert_pico_ok(status["close"])

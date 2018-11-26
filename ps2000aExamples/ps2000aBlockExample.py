@@ -61,9 +61,9 @@ maxSamples = preTriggerSamples + postTriggerSamples
 # Get timebase information
 # handle = chandle
 # timebase = 8 = timebase
-# noSamples = maxSamples
+# noSamples = totalSamples
 # pointer to timeIntervalNanoseconds = ctypes.byref(timeIntervalns)
-# pointer to maxSamples = ctypes.byref(returnedMaxSamples)
+# pointer to totalSamples = ctypes.byref(returnedMaxSamples)
 # segment index = 0
 timebase = 8
 timeIntervalns = ctypes.c_float()
@@ -102,7 +102,7 @@ bufferBMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't
 # source = PS2000A_CHANNEL_A = 0
 # pointer to buffer max = ctypes.byref(bufferAMax)
 # pointer to buffer min = ctypes.byref(bufferAMin)
-# buffer length = maxSamples
+# buffer length = totalSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
 status["setDataBuffersA"] = ps.ps2000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxSamples, 0, 0)
@@ -113,7 +113,7 @@ assert_pico_ok(status["setDataBuffersA"])
 # source = PS2000A_CHANNEL_B = 1
 # pointer to buffer max = ctypes.byref(bufferBMax)
 # pointer to buffer min = ctypes.byref(bufferBMin)
-# buffer length = maxSamples
+# buffer length = totalSamples
 # segment index = 0
 # ratio mode = PS2000A_RATIO_MODE_NONE = 0
 status["setDataBuffersB"] = ps.ps2000aSetDataBuffers(chandle, 1, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), maxSamples, 0, 0)
@@ -121,7 +121,7 @@ assert_pico_ok(status["setDataBuffersB"])
 
 # create overflow loaction
 overflow = ctypes.c_int16()
-# create converted type maxSamples
+# create converted type totalSamples
 cmaxSamples = ctypes.c_int32(maxSamples)
 
 # Retried data from scope to buffers assigned above
