@@ -5,7 +5,7 @@
 # This example demonstrates how to use the PicoScope 2000 Series (ps2000a) driver API functions in order to do the
 # following:
 #
-# Opens a connection to a PicoScope 2000 Series MSO device
+# Open a connection to a PicoScope 2000 Series MSO device
 # Setup input analog channels and a digital port
 # Setup a trigger on a digital channel
 # Collect a block of data

@@ -48,7 +48,7 @@ def mV2adc(volts, range, maxADC):
 def splitMSODataPort0(cmaxSamples, bufferMax):
     """
         splitMSODataPort0(
-                        c_int32         cmaxSamples
+                        c_int32         cTotalSamples
                         c_int16 array   bufferMax
                         )
     """
@@ -82,7 +82,7 @@ def splitMSODataPort0(cmaxSamples, bufferMax):
 def splitMSODataPort1(cmaxSamples, bufferMax):
     """
         splitMSODataPort1(
-                        c_int32         cmaxSamples
+                        c_int32         cTotalSamples
                         c_int16 array   bufferMax
                         )
     """
