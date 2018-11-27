@@ -109,7 +109,9 @@ triggerConditions = PS2000A_TRIGGER_CONDITIONS(dont_care,
                                                dont_care,
                                                trigger_true)
 
-status["setTriggerChannelConditions"] = ps.ps2000aSetTriggerChannelConditions(chandle, ctypes.byref(triggerConditions), nConditions)
+status["setTriggerChannelConditions"] = ps.ps2000aSetTriggerChannelConditions(chandle,
+                                                                              ctypes.byref(triggerConditions),
+                                                                              nConditions)
 assert_pico_ok(status["setTriggerChannelConditions"])
 
 # Set digital trigger directions
@@ -120,7 +122,10 @@ assert_pico_ok(status["setTriggerChannelConditions"])
 # direction = PS2000A_DIGITAL_DIRECTION_RISING = 3
 # nDirections = 1
 
-digitalDirections = PS2000A_DIGITAL_CHANNEL_DIRECTIONS(0, 3)
+digitalChannel = ps.PS2000A_DIGITAL_CHANNEL['PS2000A_DIGITAL_CHANNEL_0']
+digiTriggerDirection = ps.PS2000A_DIGITAL_DIRECTION['PS2000A_DIGITAL_DIRECTION_RISING']
+
+digitalDirections = PS2000A_DIGITAL_CHANNEL_DIRECTIONS(digitalChannel, digiTriggerDirection)
 nDigitalDirections = 1
 
 status["setTriggerDigitalPortProperties"] = ps.ps2000aSetTriggerDigitalPortProperties(chandle,
@@ -135,7 +140,7 @@ totalSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
 # handle = chandle
-# timebase = 1252 = 10000 ns = timebase (see Programmer's guide for mre information on timebases)
+# timebase = 1252 = 10000 ns = timebase (see Programmer's guide for more information on timebases)
 # noSamples = totalSamples
 # pointer to timeIntervalNanoseconds = ctypes.byref(timeIntervalNs)
 # pointer to totalSamples = ctypes.byref(returnedMaxSamples)
@@ -151,8 +156,13 @@ status["getTimebase2"] = ps.PICO_STATUS['PICO_INVALID_TIMEBASE']
 
 while status["getTimebase2"] == ps.PICO_STATUS['PICO_INVALID_TIMEBASE']:
 
-    status["getTimebase2"] = ps.ps2000aGetTimebase2(chandle, timebase, totalSamples, ctypes.byref(timeIntervalNs),
-                                                    oversample, ctypes.byref(returnedMaxSamples), 0)
+    status["getTimebase2"] = ps.ps2000aGetTimebase2(chandle,
+                                                    timebase,
+                                                    totalSamples,
+                                                    ctypes.byref(timeIntervalNs),
+                                                    oversample,
+                                                    ctypes.byref(returnedMaxSamples),
+                                                    0)
 
     if status["getTimebase2"] == ps.PICO_STATUS['PICO_OK']:
         break
@@ -174,8 +184,15 @@ print "Starting data collection - waiting for trigger on channel D0..."
 # segment index = 0
 # lpReady = None (using ps2000aIsReady() rather than ps2000aBlockReady())
 # pParameter = None
-status["runBlock"] = ps.ps2000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, oversample, None, 0,
-                                        None, None)
+status["runBlock"] = ps.ps2000aRunBlock(chandle,
+                                        preTriggerSamples,
+                                        postTriggerSamples,
+                                        timebase,
+                                        oversample,
+                                        None,
+                                        0,
+                                        None,
+                                        None)
 assert_pico_ok(status["runBlock"])
 
 # Check for data collection to finish using ps2000aIsReady()
@@ -271,7 +288,8 @@ assert_pico_ok(status["maximumValue"])
 adc2mVChA = adc2mV(bufferA, chARange, maxADC)
 adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 
-# Obtain binary for digital port 0
+# Obtain binary for Digital Port 0
+# The tuple returned contains the channels in order (D7, D6, D5, ... D0).
 dPort0BinaryData = splitMSOData(cTotalSamples, bufferDPort0)
 
 # Create time data
@@ -286,11 +304,13 @@ axs[0].plot(time, adc2mVChA[:], time, adc2mVChB[:])
 axs[0].set_title('Analog data acquisition')
 axs[0].set_xlabel('Time (ns)')
 axs[0].set_ylabel('Voltage (mV)')
+axs[0].legend(('Ch. A', 'Ch. B'), loc="upper right")
 
-axs[1].plot(time, dPort0BinaryData[0])
+axs[1].plot(time, dPort0BinaryData[7], label='D0')  # D0 is the last array in the tuple.
 axs[1].set_title('Digital data acquisition')
 axs[1].set_xlabel('Time (ns)')
 axs[1].set_ylabel('Logic Level')
+axs[1].legend(loc="upper right")
 
 fig.canvas.set_window_title('PicoScope 2000 Series (A API) MSO Block Capture Example')
 plt.show()

@@ -114,31 +114,34 @@ def splitMSODataPort1(cmaxSamples, bufferMax):
     return bufferMaxBinaryD8, bufferMaxBinaryD9, bufferMaxBinaryD10, bufferMaxBinaryD11, bufferMaxBinaryD12, bufferMaxBinaryD13, bufferMaxBinaryD14, bufferMaxBinaryD15
 
 
-def splitMSOData(cmaxSamples, data):
+def splitMSOData(dataLength, data):
     """
     # This implementation will work on either channel in the same way as the Port0 and Port1 methods above.
+    We will return a tuple of 8 arrays, each of which is the values over time of a different digital channel.
+    The tuple contains the channels in order (D7, D6, D5, ... D0) or equivalently (D15, D14, D13, ... D8).
         splitMSOData(
-                        c_int32         cmaxSamples
+                        c_int32         dataLength
                         c_int16 array   data
                         )
     """
     # Makes an array for each digital channel
     bufferBinaryDj = (
-        np.chararray(cmaxSamples.value),
-        np.chararray(cmaxSamples.value),
-        np.chararray(cmaxSamples.value),
-        np.chararray(cmaxSamples.value),
-        np.chararray(cmaxSamples.value),
-        np.chararray(cmaxSamples.value),
-        np.chararray(cmaxSamples.value),
-        np.chararray(cmaxSamples.value),
+        np.chararray(dataLength.value),
+        np.chararray(dataLength.value),
+        np.chararray(dataLength.value),
+        np.chararray(dataLength.value),
+        np.chararray(dataLength.value),
+        np.chararray(dataLength.value),
+        np.chararray(dataLength.value),
+        np.chararray(dataLength.value),
     )
-    # Splits out the individual bits from the port into the binary values for each channel/pin.
-    for i in range(cmaxSamples.value):
-        for j in range(7):
-            bufferBinaryDj[j][i] = 1 if (data[i] & 1 << (7-j)) else 0
+    # Splits out the individual bits from the port into the binary values for each digital channel/pin.
+    for i in range(dataLength.value):
+        for j in range(8):
+            bufferBinaryDj[j][i] = 1 if (data[i] & (1 << (7-j))) else 0
 
     return bufferBinaryDj
+
 
 def assert_pico_ok(status):
     """
