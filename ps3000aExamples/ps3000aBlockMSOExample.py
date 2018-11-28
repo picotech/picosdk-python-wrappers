@@ -5,9 +5,8 @@
 # This example demonstrates how to use the PicoScope 3000 Series (ps3000a) driver API functions in order to do the
 # following:
 #
-# Opens a connection to a PicoScope 3000 Series MSO device
+# Open a connection to a PicoScope 3000 Series MSO device
 # Setup a digital port
-# Setup a trigger on a digital channel
 # Collect a block of data
 # Plot data
 
@@ -43,115 +42,143 @@ except:
 
     assert_pico_ok(status["ChangePowerSource"])
 
-# set up digital port
+# Set up digital port
 # handle = chandle
-# PS3000A_DIGITAL_PORT = 0x80
-# Enable = 1
+# channel = PS3000A_DIGITAL_PORT0 = 0x80
+# enabled = 1
 # logicLevel = 10000
 status["SetDigitalPort"] = ps.ps3000aSetDigitalPort( chandle, 0x80, 1, 10000)
 assert_pico_ok(status["SetDigitalPort"])
 
-# Setting the number of sample to be collected
-preTriggerSamples = 400
-postTriggerSamples = 400
-maxsamples = preTriggerSamples + postTriggerSamples
+# Set the number of sample to be collected
+preTriggerSamples = 2500
+postTriggerSamples = 2500
+totalSamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase information
-# Handle = chandle
-# Timebase = 2 = timebase
-# Nosample = maxsamples
-# TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
+# handle = chandle
+# timebase = 1252
+# Nosample = totalSamples
+# TimeIntervalNanoseconds = ctypes.byref(timeIntervalNs)
 # MaxSamples = ctypes.byref(returnedMaxSamples)
 # Segement index = 0
-timebase = 8
-timeIntervalns = ctypes.c_float()
+timebase = 1252
+timeIntervalNs = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
-status["GetTimebase"] = ps.ps3000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), 1, ctypes.byref(returnedMaxSamples), 0)
+status["GetTimebase"] = ps.ps3000aGetTimebase2(chandle,
+                                               timebase,
+                                               totalSamples,
+                                               ctypes.byref(timeIntervalNs),
+                                               1,
+                                               ctypes.byref(returnedMaxSamples),
+                                               0)
 assert_pico_ok(status["GetTimebase"])
 
-# Creates a overlow location for data
-overflow = ctypes.c_int16()
-# Creates converted types maxsamples
-cmaxSamples = ctypes.c_int32(maxsamples)
-
 # Create buffers ready for assigning pointers for data collection
-bufferAMax = (ctypes.c_int16 * maxsamples)()
-bufferAMin = (ctypes.c_int16 * maxsamples)()
+bufferDPort0Max = (ctypes.c_int16 * totalSamples)()
+bufferDPort0Min = (ctypes.c_int16 * totalSamples)()
 
-# Setting the data buffer location for data collection from PS3000A_DIGITAL_PORT0
-# Handle = Chandle
+# Set the data buffer location for data collection from PS3000A_DIGITAL_PORT0
+# handle = chandle
 # source = PS3000A_DIGITAL_PORT0 = 0x80
-# Buffer max = ctypes.byref(bufferAMax)
-# Buffer min = ctypes.byref(bufferAMin)
-# Buffer length = maxsamples
+# Buffer max = ctypes.byref(bufferDPort0Max)
+# Buffer min = ctypes.byref(bufferDPort0Min)
+# Buffer length = totalSamples
 # Segment index = 0
-# Ratio mode = ps3000A_Ratio_Mode_None = 0
-status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0x80, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin),
-                                                    maxsamples, 0, 0)
+# Ratio mode = PS3000A_RATIO_MODE_NONE = 0
+status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle,
+                                                    0x80,
+                                                    ctypes.byref(bufferDPort0Max),
+                                                    ctypes.byref(bufferDPort0Min),
+                                                    totalSamples,
+                                                    0,
+                                                    0)
 assert_pico_ok(status["SetDataBuffers"])
 
+print "Starting data collection..."
+
 # Starts the block capture
-# Handle = chandle
-# Number of prTriggerSamples
+# handle = chandle
+# Number of preTriggerSamples
 # Number of postTriggerSamples
-# Timebase = 2 = 4ns (see Programmer's guide for more information on timebases)
+# Timebase = 1252 = 10000 ns (see Programmer's guide for more information on timebases)
 # time indisposed ms = None (This is not needed within the example)
 # Segment index = 0
 # LpRead = None
 # pParameter = None
-status["runblock"] = ps.ps3000aRunBlock(chandle, preTriggerSamples, postTriggerSamples, timebase, 1, None, 0, None, None)
+status["runblock"] = ps.ps3000aRunBlock(chandle,
+                                        preTriggerSamples,
+                                        postTriggerSamples,
+                                        timebase,
+                                        1,
+                                        None,
+                                        0,
+                                        None,
+                                        None)
 assert_pico_ok(status["runblock"])
 
-# Creates a overlow location for data
+# Creates a overflow location for data
 overflow = (ctypes.c_int16 * 10)()
-# Creates converted types maxsamples
-cmaxSamples = ctypes.c_int32(maxsamples)
+# Creates converted types totalSamples
+cTotalSamples = ctypes.c_int32(totalSamples)
 
 # Checks data collection to finish the capture
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
+
 while ready.value == check.value:
     status["isReady"] = ps.ps3000aIsReady(chandle, ctypes.byref(ready))
 
 # Handle = chandle
 # start index = 0
-# noOfSamples = ctypes.byref(cmaxSamples)
-# DownSampleRatio = 0
+# noOfSamples = ctypes.byref(cTotalSamples)
+# DownSampleRatio = 1
 # DownSampleRatioMode = 0
 # SegmentIndex = 0
 # Overflow = ctypes.byref(overflow)
 
-status["GetValues"] = ps.ps3000aGetValues(chandle, 0, ctypes.byref(cmaxSamples), 0, 0, 0, ctypes.byref(overflow))
+status["GetValues"] = ps.ps3000aGetValues(chandle, 0, ctypes.byref(cTotalSamples), 1, 0, 0, ctypes.byref(overflow))
 assert_pico_ok(status["GetValues"])
 
-bufferDPort0 = splitMSOData(cmaxSamples, bufferAMax)
+print "Data collection complete."
+
+# Obtain binary for Digital Port 0
+# The tuple returned contains the channels in order (D7, D6, D5, ... D0).
+bufferDPort0 = splitMSOData(cTotalSamples, bufferDPort0Max)
 
 # Creates the time data
-time = np.linspace(0, cmaxSamples.value * timeIntervalns.value, cmaxSamples.value)
+time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
 
-# Plots the data from digital channel onto a graph
-plt.plot(time, bufferDPort0[0])
-plt.plot(time, bufferDPort0[1])
-plt.plot(time, bufferDPort0[2])
-plt.plot(time, bufferDPort0[3])
-plt.plot(time, bufferDPort0[4])
-plt.plot(time, bufferDPort0[5])
-plt.plot(time, bufferDPort0[6])
-plt.plot(time, bufferDPort0[7])
+# Plot the data from digital channels onto a graph
+
+print "Plotting data..."
+
+plt.figure(num='PicoScope 3000 Series (A API) MSO Block Capture Example')
+plt.title('Plot of Digital Port 0 digital channels vs. time')
+plt.plot(time, bufferDPort0[0], label='D7')  # D7 is the last array in the tuple.
+plt.plot(time, bufferDPort0[1], label='D6')
+plt.plot(time, bufferDPort0[2], label='D5')
+plt.plot(time, bufferDPort0[3], label='D4')
+plt.plot(time, bufferDPort0[4], label='D3')
+plt.plot(time, bufferDPort0[5], label='D2')
+plt.plot(time, bufferDPort0[6], label='D1')
+plt.plot(time, bufferDPort0[7], label='D0')  # D0 is the last array in the tuple.
 plt.xlabel('Time (ns)')
-plt.ylabel('Binary')
+plt.ylabel('Logic Level')
+plt.legend(loc="upper right")
 plt.show()
 
+print "Close figure to stop the device and close the connection."
 
 # Stops the scope
-# Handle = chandle
+# handle = chandle
 status["stop"] = ps.ps3000aStop(chandle)
 assert_pico_ok(status["stop"])
 
 # Closes the unit
-# Handle = chandle
-status["stop"] = ps.ps3000aCloseUnit(chandle)
-assert_pico_ok(status["stop"])
+# handle = chandle
+status["closeUnit"] = ps.ps3000aCloseUnit(chandle)
+assert_pico_ok(status["closeUnit"])
 
-# Displays the staus returns
+# Displays the status returns
 print(status)
