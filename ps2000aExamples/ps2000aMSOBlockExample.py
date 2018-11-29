@@ -15,7 +15,7 @@ import ctypes
 import numpy as np
 from picosdk.ps2000a import ps2000a as ps, PS2000A_TRIGGER_CONDITIONS, PS2000A_DIGITAL_CHANNEL_DIRECTIONS
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, splitMSOData, assert_pico_ok
+from picosdk.functions import adc2mV, splitMSODataFast, assert_pico_ok
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -290,7 +290,7 @@ adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 
 # Obtain binary for Digital Port 0
 # The tuple returned contains the channels in order (D7, D6, D5, ... D0).
-dPort0BinaryData = splitMSOData(cTotalSamples, bufferDPort0)
+dPort0BinaryData = splitMSODataFast(cTotalSamples, bufferDPort0)
 
 # Create time data
 time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)

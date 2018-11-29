@@ -12,7 +12,7 @@
 
 import ctypes
 from picosdk.ps3000a import ps3000a as ps
-from picosdk.functions import splitMSOData, assert_pico_ok
+from picosdk.functions import splitMSODataFast, assert_pico_ok
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -144,7 +144,7 @@ print "Data collection complete."
 
 # Obtain binary for Digital Port 0
 # The tuple returned contains the channels in order (D7, D6, D5, ... D0).
-bufferDPort0 = splitMSOData(cTotalSamples, bufferDPort0Max)
+bufferDPort0 = splitMSODataFast(cTotalSamples, bufferDPort0Max)
 
 # Creates the time data
 time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
