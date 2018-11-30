@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PicoScope 6000 SERIES SIGNAL GENERATOR EXAMPLE
+# PicoScope 6000 Series Signal Generator Example
 # This example demonstrates how to use the PicoScope 6000 Series (ps6000) driver API functions to to set up the signal generator to do the following:
 # 
 # 1. Output a sine wave 
