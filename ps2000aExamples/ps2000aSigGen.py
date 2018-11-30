@@ -101,7 +101,7 @@ time.sleep(10)
 # waveType = ctypes.c_int16(1) = PS2000A_SQUARE
 # startFrequency = 10 kHz
 # stopFrequency = 100 kHz
-# increment = 5
+# increment = 5 kHz
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS2000A_UP
 # operation = 0
