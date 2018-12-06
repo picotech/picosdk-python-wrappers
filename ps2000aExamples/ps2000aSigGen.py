@@ -101,7 +101,11 @@ time.sleep(10)
 # waveType = ctypes.c_int16(1) = PS2000A_SQUARE
 # startFrequency = 10 kHz
 # stopFrequency = 100 kHz
+<<<<<<< HEAD
 # increment = 5000
+=======
+# increment = 5 kHz
+>>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS2000A_UP
 # operation = 0
@@ -114,8 +118,13 @@ wavetype = ctypes.c_int16(1)
 sweepType = ctypes.c_int32(2)
 triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
+<<<<<<< HEAD
 
 status["SetSigGenBuiltIn"] = ps.ps2000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 100000, 5000, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+=======
+
+status["SetSigGenBuiltIn"] = ps.ps2000aSetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 100000, 5000, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+>>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # Pauses the script to show signal

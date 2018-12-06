@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 # PicoScope 6000 SERIES SIGNAL GENERATOR EXAMPLE
+=======
+#
+# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+#
+# PicoScope 6000 Series Signal Generator Example
+>>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 # This example demonstrates how to use the PicoScope 6000 Series (ps6000) driver API functions to to set up the signal generator to do the following:
 # 
 # 1. Output a sine wave 
@@ -83,6 +90,7 @@ time.sleep(10)
 # waveType = ctypes.c_int16(1) = PS6000_SQUARE
 # startFrequency = 10 kHz
 # stopFrequency = 100 kHz
+<<<<<<< HEAD
 # increment = 5
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS6000_UP
@@ -109,4 +117,32 @@ status["close"] = ps.ps6000CloseUnit(chandle)
 assert_pico_ok(status["close"])
 
 # Displays the status returns
+=======
+# increment = 5 kHz
+# dwellTime = 1
+# sweepType = ctypes.c_int16(1) = PS6000_UP
+# operation = 0
+# shots = 0
+# sweeps = 0
+# triggerType = ctypes.c_int16(0) = PS6000_SIGGEN_RISING
+# triggerSource = ctypes.c_int16(0) = PS6000_SIGGEN_NONE
+# extInThreshold = 1
+wavetype = ctypes.c_int16(1)
+sweepType = ctypes.c_int32(2)
+triggertype = ctypes.c_int32(0)
+triggerSource = ctypes.c_int32(0)
+
+status["SetSigGenBuiltIn"] = ps.ps6000SetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 100000, 5000, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
+assert_pico_ok(status["SetSigGenBuiltIn"])
+
+# Pauses the script to show signal
+time.sleep(36)
+
+# Closes the unit
+# Handle = chandle
+status["close"] = ps.ps6000CloseUnit(chandle)
+assert_pico_ok(status["close"])
+
+# Displays the status returns
+>>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 print(status)

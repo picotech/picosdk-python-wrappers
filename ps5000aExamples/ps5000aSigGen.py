@@ -98,12 +98,21 @@ time.sleep(10)
 # waveType = ctypes.c_int16(1) = PS5000A_SQUARE
 # startFrequency = 10 kHz
 # stopFrequency = 100 kHz
+<<<<<<< HEAD
 # increment = 5
 # dwellTime = 1
 # sweepType = ctypes.c_int16(1) = PS5000A_UP
 # operation = 0
 # shots = 0
 # sweeps = 0
+=======
+# increment = 5 kHz
+# dwellTime = 1
+# sweepType = ctypes.c_int16(1) = PS5000A_UP
+# operation = 0
+# shots = 0
+# sweeps = 0
+>>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 # triggerType = ctypes.c_int16(0) = PS5000A_SIGGEN_RISING
 # triggerSource = ctypes.c_int16(0) = PS5000A_SIGGEN_NONE
 # extInThreshold = 0
@@ -114,6 +123,7 @@ triggerSource = ctypes.c_int32(0)
 
 status["setSigGenBuiltInV2"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000, wavetype, 10000, 100000, 5000, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 0)
 assert_pico_ok(status["setSigGenBuiltInV2"])
+<<<<<<< HEAD
 
 # Pauses the script to show signal
 time.sleep(36)
@@ -124,4 +134,16 @@ status["close"] = ps.ps5000aCloseUnit(chandle)
 assert_pico_ok(status["stop"])
 
 # Displays the status returns
+=======
+
+# Pauses the script to show signal
+time.sleep(36)
+
+# Closes the unit
+# Handle = chandle
+status["close"] = ps.ps5000aCloseUnit(chandle)
+assert_pico_ok(status["stop"])
+
+# Displays the status returns
+>>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 print(status)
