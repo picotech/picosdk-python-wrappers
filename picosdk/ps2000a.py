@@ -104,8 +104,6 @@ ps2000a.PICO_THRESHOLD_DIRECTION = {
     k[8:]: v for k, v in ps2000a.PS2000A_THRESHOLD_DIRECTION.items()
 }
 
-<<<<<<< HEAD
-=======
 ps2000a.PS2000A_THRESHOLD_MODE = make_enum([
     "PS2000A_LEVEL",
     "PS2000A_WINDOW",
@@ -119,7 +117,6 @@ ps2000a.PS2000A_TRIGGER_STATE = make_enum([
 ])
 
 
->>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 def _define_digital_port():
     ps2000a_digital_port0 = 0x80
     ps2000a_digital_port1 = ps2000a_digital_port0 + 1
@@ -128,12 +125,7 @@ def _define_digital_port():
     ps2000a_max_digital_ports = ps2000a_digital_port3 - ps2000a_digital_port0 + 1
     
     return {k.upper(): v for k, v in locals().items() if k.startswith("ps2000a")}
-<<<<<<< HEAD
-    
-=======
 
-
->>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 ps2000a.PS2000A_DIGITAL_PORT = _define_digital_port()
 
 ps2000a.PS2000A_DIGITAL_CHANNEL = make_enum([
@@ -181,8 +173,6 @@ ps2000a.PS2000A_DIGITAL_DIRECTION = make_enum([
     "PS2000A_DIGITAL_DIRECTION_RISING_OR_FALLING",
     "PS2000A_DIGITAL_MAX_DIRECTION",
 ])
-<<<<<<< HEAD
-=======
 
 # Structure definitions
 
@@ -227,7 +217,6 @@ class PS2000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
 
 
 # Function definitions
->>>>>>> 5e0135f9d98cbcc52b3e67336ed1873ba93cd40c
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (
