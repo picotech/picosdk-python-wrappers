@@ -3,12 +3,8 @@
 #
 from __future__ import division
 import numpy as np
-import ctypes
 from picosdk.constants import PICO_STATUS, PICO_STATUS_LOOKUP
-
-
-class PicoSDKCtypesError(Exception):
-    pass
+from picosdk.errors import PicoSDKCtypesError
 
 
 def adc2mV(bufferADC, range, maxADC):

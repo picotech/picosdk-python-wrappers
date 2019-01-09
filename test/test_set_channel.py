@@ -8,7 +8,7 @@ Unit tests for the wrapper functions for configuring channels
 from __future__ import print_function
 
 from test.test_helpers import DriverTest, drivers_with_device_connected
-from picosdk.library import ArgumentOutOfRangeError
+from picosdk.errors import ArgumentOutOfRangeError
 from picosdk.device import ChannelConfig
 
 

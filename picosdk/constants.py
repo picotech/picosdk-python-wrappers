@@ -7,10 +7,7 @@ All constants in this file are exposed directly on the Library class specific to
 (rather than importing this file directly) is the supported way of accessing them, since some
 older drivers have different names/values for some of the macros.
 """
-
-
-class UnknownConstantError(Exception):
-    pass
+from picosdk.errors import UnknownConstantError
 
 
 # convenience functions provided in the old python SDK:

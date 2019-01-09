@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-from picosdk.library import DeviceNotFoundError
+from picosdk.errors import DeviceNotFoundError
 from picosdk.ps2000 import ps2000
 from picosdk.ps2000a import ps2000a
 from picosdk.ps3000 import ps3000
@@ -48,5 +48,3 @@ def find_all_units():
     if not devices:
         raise DeviceNotFoundError("Could not find any devices on any drivers.")
     return devices
-
-

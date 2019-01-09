@@ -16,52 +16,11 @@ import collections
 import picosdk.constants as constants
 import numpy
 
-
-class CannotFindPicoSDKError(Exception):
-    pass
-
-
-class CannotOpenPicoSDKError(Exception):
-    pass
+from picosdk.errors import CannotFindPicoSDKError, CannotOpenPicoSDKError, DeviceNotFoundError, \
+    ArgumentOutOfRangeError, ValidRangeEnumValueNotValidForThisDevice, DeviceCannotSegmentMemoryError, \
+    InvalidMemorySegmentsError, InvalidTimebaseError, InvalidTriggerParameters, InvalidCaptureParameters
 
 
-class DeviceNotFoundError(Exception):
-    pass
-
-
-class CannotCloseUnitError(Exception):
-    pass
-
-
-class ArgumentOutOfRangeError(Exception):
-    pass
-
-
-class ValidRangeEnumValueNotValidForThisDevice(Exception):
-    pass
-
-
-class DeviceCannotSegmentMemoryError(Exception):
-    pass
-
-
-class InvalidMemorySegmentsError(Exception):
-    pass
-
-
-class InvalidTimebaseError(Exception):
-    pass
-
-
-class InvalidTriggerParameters(Exception):
-    pass
-
-
-class InvalidCaptureParameters(Exception):
-    pass
-
-
-# !! TODO put all exception types into one file, and have all other files import what they need.
 from picosdk.device import Device
 
 
@@ -487,7 +446,6 @@ class Library(object):
                 raise InvalidTriggerParameters("set_simple_trigger failed (%s)" % constants.pico_tag(status))
         else:
             raise NotImplementedError("not done other driver types yet")
-
 
     @requires_device()
     def run_block(self, device, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):

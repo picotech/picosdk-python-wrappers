@@ -11,15 +11,8 @@ import collections
 import numpy
 import math
 import time
-from picosdk.library import DeviceCannotSegmentMemoryError, InvalidTimebaseError
-
-
-class ClosedDeviceError(Exception):
-    pass
-
-
-class NoChannelsEnabledError(Exception):
-    pass
+from picosdk.errors import DeviceCannotSegmentMemoryError, InvalidTimebaseError, ClosedDeviceError, \
+    NoChannelsEnabledError, NoValidTimebaseForOptionsError
 
 
 def requires_open(error_message="This operation requires a device to be connected."):
@@ -54,10 +47,6 @@ TimebaseOptions = collections.namedtuple('TimebaseOptions', ['max_time_interval'
                                                              'oversample'])
 _TIMEBASE_OPTIONS_DEFAULTS = (None, None, None, 1)
 TimebaseOptions.__new__.__defaults__ = _TIMEBASE_OPTIONS_DEFAULTS
-
-
-class NoValidTimebaseForOptionsError(Exception):
-    pass
 
 
 class Device(object):
@@ -173,17 +162,24 @@ class Device(object):
         if self._timebase_options_are_impossible(timebase_options):
             raise NoValidTimebaseForOptionsError()
         # TODO binary search?
+        last_error = None
+        found_one_good = False
         while True:
             try:
                 timebase_info = self.driver.get_timebase(self, timebase_id, 0, timebase_options.oversample)
+                found_one_good = True
                 if self._validate_timebase(timebase_options, timebase_info):
                     return timebase_info
-            except InvalidTimebaseError:
-                if timebase_id > 0:
+            except InvalidTimebaseError as e:
+                if found_one_good:
                     # we won't find a valid timebase.
+                    last_error = e
                     break
             timebase_id += 1
-        raise NoValidTimebaseForOptionsError()
+        args = ()
+        if last_error is not None:
+            args = (last_error.args[0],)
+        raise NoValidTimebaseForOptionsError(*args)
 
     @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):

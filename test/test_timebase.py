@@ -9,8 +9,9 @@ from __future__ import print_function
 
 from test.test_helpers import DriverTest, drivers_with_device_connected
 import unittest
-from picosdk.library import TimebaseInfo, InvalidTimebaseError
-from picosdk.device import Device, TimebaseOptions, NoValidTimebaseForOptionsError
+from picosdk.library import TimebaseInfo
+from picosdk.errors import InvalidTimebaseError, NoValidTimebaseForOptionsError
+from picosdk.device import Device, TimebaseOptions
 import math
 
 
@@ -25,7 +26,7 @@ class FindTimebaseTest(DriverTest):
                                     input_config.min_collection_time)
 
     def test_find_timebase_success(self):
-        """test_get_timebase_success
+        """test_find_timebase_success
         note: test assumes you have set test_helpers.drivers_with_device_connected"""
         if not drivers_with_device_connected:
             return
@@ -72,7 +73,7 @@ class FindTimebaseTest(DriverTest):
         self.run_snippet_and_count_problems(drivers_to_use, test)
 
     def test_find_timebase_impossible(self):
-        """test_get_timebase_impossible
+        """test_find_timebase_impossible
         note: test assumes you have set test_helpers.drivers_with_device_connected"""
         if not drivers_with_device_connected:
             return
@@ -96,6 +97,34 @@ class FindTimebaseTest(DriverTest):
                     threw = True
                 if not threw:
                     return "didn't throw an NoValidTimebaseForOptionsError."
+
+        self.run_snippet_and_count_problems(drivers_to_use, test)
+
+    def test_get_timebase_throws_on_bad_params(self):
+        """test_get_timebase_impossible
+        note: test assumes you have set test_helpers.drivers_with_device_connected"""
+        if not drivers_with_device_connected:
+            return
+        drivers_to_use = drivers_with_device_connected
+
+        def test(driver):
+            with driver.open_unit() as device:
+                threw = False
+                try:
+                    # we ask for a config which cannot be achieved (specifying all 3 variables can lead to invalid
+                    # configs.)
+                    no_of_samples = 150
+                    duration = 0.4
+                    computed_timebase = duration / no_of_samples
+                    max_timebase_requested = computed_timebase / 4
+
+                    # we manually invoke the Library method, to check that if invalid options sneak through, we throw
+                    # a different error:
+                    timebase_info = device.driver.get_timebase(device, 1, no_of_samples)
+                except InvalidTimebaseError:
+                    threw = True
+                if not threw:
+                    return "didn't throw an InvalidTimebaseError."
 
         self.run_snippet_and_count_problems(drivers_to_use, test)
 
@@ -128,4 +157,3 @@ class TimebaseValidationTest(unittest.TestCase):
                                 segment_id=0)
 
         self.assertFalse(Device._validate_timebase(request, response))
-

@@ -8,7 +8,7 @@ Unit tests for the wrapper functions for opening and closing devices.
 from __future__ import print_function
 
 from test.test_helpers import DriverTest, drivers_to_load, drivers_with_device_connected
-from picosdk.library import DeviceNotFoundError
+from picosdk.errors import DeviceNotFoundError
 
 
 class OpenCloseTest(DriverTest):
@@ -16,6 +16,7 @@ class OpenCloseTest(DriverTest):
         """test_open_unit_failure
         note: test assumes that at maximum one device is attached for each driver."""
         drivers_to_use = drivers_to_load
+
         def test(driver):
             threw = False
             devices = []
@@ -37,6 +38,7 @@ class OpenCloseTest(DriverTest):
         if not drivers_with_device_connected:
             return
         drivers_to_use = drivers_with_device_connected[:]
+
         def test(driver):
             threw = False
             devices = []
@@ -58,6 +60,7 @@ class OpenCloseTest(DriverTest):
         if not drivers_with_device_connected:
             return
         drivers_to_use = drivers_with_device_connected
+
         def test(driver):
             devices = []
             try:

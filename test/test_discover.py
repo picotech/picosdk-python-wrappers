@@ -7,9 +7,9 @@ Unit tests for the wrapper functions for discovering devices
 
 from __future__ import print_function
 
-from test.test_helpers import DriverTest, drivers_to_load, drivers_with_device_connected
+from test.test_helpers import DriverTest, drivers_with_device_connected
 from picosdk.device import Device
-from picosdk.library import DeviceNotFoundError
+from picosdk.errors import DeviceNotFoundError
 import picosdk.discover as dut
 
 
@@ -70,4 +70,3 @@ class OpenCloseTest(DriverTest):
             for device in devices:
                 device.close()
         self.assertTrue(threw)
-

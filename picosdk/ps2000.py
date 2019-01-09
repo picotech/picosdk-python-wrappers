@@ -7,7 +7,8 @@ for PicoScope 2000 Series oscilloscopes using the ps2000 driver API functions.
 """
 
 from ctypes import *
-from picosdk.library import Library, ArgumentOutOfRangeError
+from picosdk.library import Library
+from picosdk.errors import ArgumentOutOfRangeError
 from picosdk.constants import make_enum
 
 

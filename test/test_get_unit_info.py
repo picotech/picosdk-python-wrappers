@@ -8,8 +8,7 @@ Unit tests for the wrapper function for retrieving device information.
 from __future__ import print_function
 
 from test.test_helpers import DriverTest, drivers_with_device_connected
-from picosdk.library import DeviceNotFoundError, ArgumentOutOfRangeError
-
+from picosdk.errors import DeviceNotFoundError, ArgumentOutOfRangeError
 
 try:
     STRING_TYPES = (str, unicode)
