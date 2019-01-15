@@ -56,7 +56,8 @@ class Library(object):
         self.PICO_COUPLING = {}
         self.PICO_VOLTAGE_RANGE = {}
 
-        self.MAX_MEMORY = float('inf')
+        # most series of scopes top out at 512MS.
+        self.MAX_MEMORY = 2**29
 
         # These are set in some driver files, but not all.
         self.PICO_RATIO_MODE = {}

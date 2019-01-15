@@ -173,6 +173,19 @@ doc = """ PICO_STATUS ps5000aSetBandwidthFilter
     ); """
 ps5000a.make_symbol("_SetBandwidthFilter", "ps5000aSetBandwidthFilter", c_uint32, [c_int16, c_int32, c_int32], doc)
 
+doc = """ PICO_STATUS ps5000aGetTimebase
+    (
+        int16_t   handle,
+        uint32_t  timebase,
+        int32_t   noSamples,
+        int32_t  *timeIntervalNanoseconds,
+        int32_t  *maxSamples,
+        uint32_t  segmentIndex
+    ); """
+ps5000a.make_symbol("_GetTimebase", "ps5000aGetTimebase", c_uint32,
+                    [c_int16, c_uint32, c_int32, c_void_p, c_void_p, c_uint32], doc)
+
+
 doc = """ PICO_STATUS ps5000aGetTimebase2
     (
         int16_t   handle,
@@ -182,7 +195,7 @@ doc = """ PICO_STATUS ps5000aGetTimebase2
         int32_t  *maxSamples,
         uint32_t  segmentIndex
     ); """
-ps5000a.make_symbol("_GetTimebase", "ps5000aGetTimebase2", c_uint32,
+ps5000a.make_symbol("_GetTimebase2", "ps5000aGetTimebase2", c_uint32,
                     [c_int16, c_uint32, c_int32, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps5000aSetSigGenArbitrary

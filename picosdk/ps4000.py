@@ -202,7 +202,7 @@ doc = """ PICO_STATUS ps4000GetTimebase
         int32_t  *maxSamples,
         uint16_t  segmentIndex
     ); """
-ps4000.make_symbol("_GetTimebase0", "ps4000GetTimebase", c_uint32,
+ps4000.make_symbol("_GetTimebase", "ps4000GetTimebase", c_uint32,
                    [c_int16, c_uint32, c_int32, c_void_p, c_int16, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps4000GetTimebase2
@@ -215,7 +215,7 @@ doc = """ PICO_STATUS ps4000GetTimebase2
         int32_t  *maxSamples,
         uint16_t  segmentIndex
     ); """
-ps4000.make_symbol("_GetTimebase", "ps4000GetTimebase2", c_uint32,
+ps4000.make_symbol("_GetTimebase2", "ps4000GetTimebase2", c_uint32,
                    [c_int16, c_uint32, c_int32, c_void_p, c_int16, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps4000SigGenOff

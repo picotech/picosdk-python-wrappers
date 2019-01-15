@@ -18,6 +18,9 @@ class Ps6000lib(Library):
 
 ps6000 = Ps6000lib()
 
+# some ps6000 scopes have 2GS of memory.
+ps6000.MAX_MEMORY = 2**31
+
 doc = """ PICO_STATUS ps6000OpenUnit
     (
         int16_t *handle,
