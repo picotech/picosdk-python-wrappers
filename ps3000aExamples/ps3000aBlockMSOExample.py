@@ -22,6 +22,7 @@ chandle = ctypes.c_int16()
 
 # Opens the device/s
 status["openunit"] = ps.ps3000aOpenUnit(ctypes.byref(chandle), None)
+digital_port0 = ps.PS3000A_DIGITAL_PORT["PS3000A_DIGITAL_PORT0"]
 
 try:
     assert_pico_ok(status["openunit"])
@@ -47,7 +48,7 @@ except:
 # channel = PS3000A_DIGITAL_PORT0 = 0x80
 # enabled = 1
 # logicLevel = 10000
-status["SetDigitalPort"] = ps.ps3000aSetDigitalPort( chandle, 0x80, 1, 10000)
+status["SetDigitalPort"] = ps.ps3000aSetDigitalPort( chandle, digital_port0, 1, 10000)
 assert_pico_ok(status["SetDigitalPort"])
 
 # Set the number of sample to be collected
@@ -87,7 +88,7 @@ bufferDPort0Min = (ctypes.c_int16 * totalSamples)()
 # Segment index = 0
 # Ratio mode = PS3000A_RATIO_MODE_NONE = 0
 status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle,
-                                                    0x80,
+                                                    digital_port0,
                                                     ctypes.byref(bufferDPort0Max),
                                                     ctypes.byref(bufferDPort0Min),
                                                     totalSamples,
