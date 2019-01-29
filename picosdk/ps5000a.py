@@ -46,6 +46,11 @@ ps5000a.PS5000A_CHANNEL = make_enum([
     ("PS5000A_EXTERNAL", "PS5000A_MAX_CHANNELS"),
     "PS5000A_TRIGGER_AUX",
     "PS5000A_MAX_TRIGGER_SOURCE",
+    "PS5000A_DIGITAL_PORT0",
+    "PS5000A_DIGITAL_PORT1",
+    "PS5000A_DIGITAL_PORT2",
+    "PS5000A_DIGITAL_PORT3",
+    "PS5000A_PULSE_WIDTH_SOURCE"
 ])
 
 # only include the normal analog channels for now:
@@ -89,6 +94,67 @@ ps5000a.PICO_VOLTAGE_RANGE = {
     for k, v in ps5000a.PS5000A_RANGE.items() if k != "PS5000A_MAX_RANGES"
 }
 
+ps5000a.PS5000A_DIGITAL_CHANNEL = make_enum([
+    "PS5000A_DIGITAL_CHANNEL_0",
+    "PS5000A_DIGITAL_CHANNEL_1",
+    "PS5000A_DIGITAL_CHANNEL_2",
+    "PS5000A_DIGITAL_CHANNEL_3",
+    "PS5000A_DIGITAL_CHANNEL_4",
+    "PS5000A_DIGITAL_CHANNEL_5",
+    "PS5000A_DIGITAL_CHANNEL_6",
+    "PS5000A_DIGITAL_CHANNEL_7",
+    "PS5000A_DIGITAL_CHANNEL_8",
+    "PS5000A_DIGITAL_CHANNEL_9",
+    "PS5000A_DIGITAL_CHANNEL_10",
+    "PS5000A_DIGITAL_CHANNEL_11",
+    "PS5000A_DIGITAL_CHANNEL_12",
+    "PS5000A_DIGITAL_CHANNEL_13",
+    "PS5000A_DIGITAL_CHANNEL_14",
+    "PS5000A_DIGITAL_CHANNEL_15",
+    "PS5000A_DIGITAL_CHANNEL_16",
+    "PS5000A_DIGITAL_CHANNEL_17",
+    "PS5000A_DIGITAL_CHANNEL_18",
+    "PS5000A_DIGITAL_CHANNEL_19",
+    "PS5000A_DIGITAL_CHANNEL_20",
+    "PS5000A_DIGITAL_CHANNEL_21",
+    "PS5000A_DIGITAL_CHANNEL_22",
+    "PS5000A_DIGITAL_CHANNEL_23",
+    "PS5000A_DIGITAL_CHANNEL_24",
+    "PS5000A_DIGITAL_CHANNEL_25",
+    "PS5000A_DIGITAL_CHANNEL_26",
+    "PS5000A_DIGITAL_CHANNEL_27",
+    "PS5000A_DIGITAL_CHANNEL_28",
+    "PS5000A_DIGITAL_CHANNEL_29",
+    "PS5000A_DIGITAL_CHANNEL_30",
+    "PS5000A_DIGITAL_CHANNEL_31",
+    "PS5000A_MAX_DIGITAL_CHANNELS"
+])
+
+ps5000a.PS5000A_DIGITAL_DIRECTION = make_enum([
+    "PS5000A_DIGITAL_DONT_CARE",
+    "PS5000A_DIGITAL_DIRECTION_LOW",
+    "PS5000A_DIGITAL_DIRECTION_HIGH",
+    "PS5000A_DIGITAL_DIRECTION_RISING",
+    "PS5000A_DIGITAL_DIRECTION_FALLING",
+    "PS5000A_DIGITAL_DIRECTION_RISING_OR_FALLING",
+    "PS5000A_DIGITAL_MAX_DIRECTION"
+])
+
+def _define_digital_port():
+    PS5000A_DIGITAL_PORT0 = 0x80
+    PS5000A_DIGITAL_PORT1 = PS5000A_DIGITAL_PORT0 + 1
+    PS5000A_DIGITAL_PORT2 = PS5000A_DIGITAL_PORT0 + 2
+    PS5000A_DIGITAL_PORT3 = PS5000A_DIGITAL_PORT0 + 3
+    PS5000A_MAX_DIGITAL_PORTS = (PS5000A_DIGITAL_PORT3 - PS5000A_DIGITAL_PORT0) + 1
+
+    return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
+
+ps5000a.PS5000A_DIGITAL_PORT = _define_digital_port()
+
+class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_int32),
+                ("direction", c_int32)]
 
 doc = """ PICO_STATUS (ps5000aOpenUnit)
     (
@@ -722,3 +788,30 @@ doc = """ PICO_STATUS ps5000aGetDeviceResolution
         PS5000A_DEVICE_RESOLUTION *resolution
     ); """
 ps5000a.make_symbol("_GetDeviceResolution", "ps5000aGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS ps5000aSetDigitalPort
+    (
+        int16_t                 handle,
+        PS5000A_CHANNEL         port,
+        int16_t                 enabled,
+        int16_t                 logicLevel
+    ); """
+ps5000a.make_symbol("_SetDigitalPort", "ps5000aSetDigitalPort", c_uint32, [c_int16, c_int32, c_int16, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetPulseWidthDigitalPortProperties
+    (
+        int16_t                             handle,
+        PS5000A_DIGITAL_CHANNEL_DIRECTIONS *directions,
+        int16_t                             nDirections
+    ); """
+ps5000a.make_symbol("_SetPulseWidthDigitalPortProperties", "ps5000aSetPulseWidthDigitalPortProperties", c_uint32,
+                    [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetTriggerDigitalPortProperties
+    (
+        int16_t                             handle,
+        PS5000A_DIGITAL_CHANNEL_DIRECTIONS *directions,
+        int16_t                             nDirections
+    ); """
+ps5000a.make_symbol("_SetTriggerDigitalPortProperties", "ps5000aSetTriggerDigitalPortProperties", c_uint32,
+                    [c_int16, c_void_p, c_int16], doc)
