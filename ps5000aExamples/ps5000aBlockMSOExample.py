@@ -43,7 +43,7 @@ except:
     assert_pico_ok(status["ChangePowerSource"])
 
 
-digital_port0 = ps.PS5000A_DIGITAL_PORT["PS5000A_DIGITAL_PORT0"]
+digital_port0 = ps.PS5000A_CHANNEL["PS5000A_DIGITAL_PORT0"]
 # Set up digital port
 # handle = chandle
 # channel = ps5000a_DIGITAL_PORT0 = 0x80
@@ -155,7 +155,7 @@ print ("Plotting data...")
 
 plt.figure(num='PicoScope 3000 Series (A API) MSO Block Capture Example')
 plt.title('Plot of Digital Port 0 digital channels vs. time')
-plt.plot(time, bufferDPort0[0], label='D7')  # D7 is the last array in the tuple.
+plt.plot(time, bufferDPort0[0], label='D7')  # D7 is the first array in the tuple.
 plt.plot(time, bufferDPort0[1], label='D6')
 plt.plot(time, bufferDPort0[2], label='D5')
 plt.plot(time, bufferDPort0[3], label='D4')

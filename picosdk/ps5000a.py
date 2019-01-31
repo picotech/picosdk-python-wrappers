@@ -56,6 +56,24 @@ ps5000a.PS5000A_CHANNEL = make_enum([
 # only include the normal analog channels for now:
 ps5000a.PICO_CHANNEL = {k[-1]: v for k, v in ps5000a.PS5000A_CHANNEL.items() if "PS5000A_CHANNEL_" in k}
 
+def _define_channel():
+	PS5000A_CHANNEL_A = 0
+	PS5000A_CHANNEL_B = 1
+	PS5000A_CHANNEL_C = 2
+	PS5000A_CHANNEL_D = 3
+	PS5000A_EXTERNAL = PS5000A_MAX_CHANNELS = 4
+	PS5000A_TRIGGER_AUX = 5
+	PS5000A_MAX_TRIGGER_SOURCE = 6
+    PS5000A_DIGITAL_PORT0 = 0x80
+    PS5000A_DIGITAL_PORT1 = PS5000A_DIGITAL_PORT0 + 1
+    PS5000A_DIGITAL_PORT2 = PS5000A_DIGITAL_PORT0 + 2
+    PS5000A_DIGITAL_PORT3 = PS5000A_DIGITAL_PORT0 + 3
+	PS5000A_PULSE_WIDTH_SOURCE = 0x10000000
+	   
+
+    return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
+
+ps5000a.PS5000A_CHANNEL = _define_channel()
 
 ps5000a.PS5000A_RANGE = make_enum([
     "PS5000A_10MV",
@@ -140,16 +158,7 @@ ps5000a.PS5000A_DIGITAL_DIRECTION = make_enum([
     "PS5000A_DIGITAL_MAX_DIRECTION"
 ])
 
-def _define_digital_port():
-    PS5000A_DIGITAL_PORT0 = 0x80
-    PS5000A_DIGITAL_PORT1 = PS5000A_DIGITAL_PORT0 + 1
-    PS5000A_DIGITAL_PORT2 = PS5000A_DIGITAL_PORT0 + 2
-    PS5000A_DIGITAL_PORT3 = PS5000A_DIGITAL_PORT0 + 3
-    PS5000A_MAX_DIGITAL_PORTS = (PS5000A_DIGITAL_PORT3 - PS5000A_DIGITAL_PORT0) + 1
 
-    return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
-
-ps5000a.PS5000A_DIGITAL_PORT = _define_digital_port()
 
 class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _pack_ = 1
