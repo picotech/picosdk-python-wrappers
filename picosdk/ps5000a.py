@@ -141,12 +141,37 @@ ps5000a.PS5000A_DIGITAL_DIRECTION = make_enum([
     "PS5000A_DIGITAL_MAX_DIRECTION"
 ])
 
+def _define_conditionsInfo():
+    PS5000A_CLEAR = 0x00000001
+    PS5000A_ADD = 0x00000002
 
+    return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
+
+PS5000AConditionsInfo = _define_conditionsInfo()
+
+ps5000a.PS5000A_THRESHOLD_MODE = make_enum([
+    "PS5000A_LEVEL",
+    "PS5000A_WINDOW"
+])
 
 class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32)]
+
+class PS5000A_DIRECTION(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_int32),
+                ("direction", c_int32),
+                ("mode", c_int32)]
+
+class PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(Structure):
+    _pack_ = 1
+    _fields_ = [("thresholdUpper", c_int16),
+                ("thresholdUpperHysteresis", c_uint16),
+                ("thresholdLower", c_int16),
+                ("thresholdLowerHysteresis", c_uint16),
+                ("channel", c_int32)]
 
 doc = """ PICO_STATUS (ps5000aOpenUnit)
     (
@@ -388,6 +413,16 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelProperties
 ps5000a.make_symbol("_SetTriggerChannelProperties", "ps5000aSetTriggerChannelProperties", c_uint32,
                     [c_int16, c_void_p, c_int16, c_int16, c_int32], doc)
 
+doc = """ PICO_STATUS ps5000aSetTriggerChannelPropertiesV2
+    (
+        int16_t                             handle,
+        PS5000A_TRIGGER_CHANNEL_PROPERTIESV2 *channelProperties,
+        int16_t                             nChannelProperties,
+        int16_t                             auxOutputEnable,
+    ); """
+ps5000a.make_symbol("_SetTriggerChannelPropertiesV2", "ps5000aSetTriggerChannelPropertiesV2", c_uint32,
+                    [c_int16, c_void_p, c_int16, c_int16], doc)
+
 doc = """ PICO_STATUS ps5000aSetTriggerChannelConditions
     (
         int16_t                     handle,
@@ -396,6 +431,16 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelConditions
     ); """
 ps5000a.make_symbol("_SetTriggerChannelConditions", "ps5000aSetTriggerChannelConditions", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetTriggerChannelConditionsV2
+    (
+        int16_t                     handle,
+        PS5000A_TRIGGER_CONDITIONS *conditions,
+        int16_t                     nConditions
+        PS5000A_CONDITIONS_INFO     info
+    ); """
+ps5000a.make_symbol("_SetTriggerChannelConditionsV2", "ps5000aSetTriggerChannelConditionsV2", c_uint32,
+                    [c_int16, c_void_p, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps5000aSetTriggerChannelDirections
     (
@@ -409,6 +454,15 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelDirections
     ); """
 ps5000a.make_symbol("_SetTriggerChannelDirections", "ps5000aSetTriggerChannelDirections", c_uint32,
                     [c_int16, c_int32, c_int32, c_int32, c_int32, c_int32, c_int32], doc)
+
+dpc = """ PICO_STATUS ps5000aSetTriggerChannelDirectionsV2
+    (
+        int16_t                    handle,
+        PS5000A_DIRECTION          *directions
+        uint16_t                       nDirections
+     ); """
+ps5000a.make_symbol("_SetTriggerChannelDirectionsV2", "ps5000aSetTriggerChannelDirectionsV2", c_uint32,
+                   [c_int16, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps5000aSetSimpleTrigger
     (
