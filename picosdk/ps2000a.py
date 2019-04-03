@@ -7,6 +7,7 @@ file for PicoScope 2000 Series oscilloscopes using the ps2000a driver API functi
 """
 
 from ctypes import *
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.library import Library
 from picosdk.constants import make_enum
 
@@ -70,6 +71,16 @@ ps2000a.PS2000A_RATIO_MODE = {
     'PS2000A_RATIO_MODE_DECIMATE': 2,
     'PS2000A_RATIO_MODE_AVERAGE': 4,
 }
+
+ps2000a.PS2000A_TIME_UNITS = make_enum([
+    'PS2000A_FS',
+    'PS2000A_PS',
+    'PS2000A_NS',
+    'PS2000A_US',
+    'PS2000A_MS',
+    'PS2000A_S',
+    'PS2000A_MAX_TIME_UNITS',
+])
 
 ps2000a.PICO_RATIO_MODE = {k[19:]: v for k, v in ps2000a.PS2000A_RATIO_MODE.items()}
 
@@ -174,8 +185,6 @@ ps2000a.PS2000A_DIGITAL_DIRECTION = make_enum([
     "PS2000A_DIGITAL_MAX_DIRECTION",
 ])
 
-# Structure definitions
-
 
 class PS2000A_TRIGGER_CONDITIONS(Structure):
     _pack_ = 1
@@ -215,8 +224,6 @@ class PS2000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
                 ("channel", c_int32),
                 ("thresholdMode", c_int32)]
 
-
-# Function definitions
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (
@@ -655,20 +662,31 @@ doc = """ PICO_STATUS ps2000aGetStreamingLatestValues
 ps2000a.make_symbol("_GetStreamingLatestValues", "ps2000aGetStreamingLatestValues", c_uint32,
                     [c_int16, c_void_p, c_void_p], doc)
 
-# TODO sort out how to make a callback for a C function in ctypes!
-# doc = """ void *ps2000aStreamingReady
-#     (
-#         int16_t   handle,
-#         int32_t   noOfSamples,
-#         uint32_t  startIndex,
-#         int16_t   overflow,
-#         uint32_t  triggerAt,
-#         int16_t   triggered,
-#         int16_t   autoStop,
-#         void     *pParameter
-#     ); """
-# ps2000a.make_symbol("_StreamingReady", "ps2000aStreamingReady", c_void_p,
-#                     [c_int16, c_int32, c_uint32, c_int16, c_uint32, c_int16, c_int16, c_void_p], doc)
+doc = """ void *ps2000aStreamingReady
+    (
+        int16_t   handle,
+        int32_t   noOfSamples,
+        uint32_t  startIndex,
+        int16_t   overflow,
+        uint32_t  triggerAt,
+        int16_t   triggered,
+        int16_t   autoStop,
+        void     *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps2000a.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                         c_int32,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_void_p)
+
+ps2000a.StreamingReadyType.__doc__ = doc
 
 doc = """ PICO_STATUS ps2000aNoOfStreamingValues
     (
