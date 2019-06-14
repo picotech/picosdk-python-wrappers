@@ -154,6 +154,14 @@ ps5000a.PS5000A_THRESHOLD_MODE = make_enum([
     "PS5000A_WINDOW"
 ])
 
+ps5000a.PS5000A_TRIGGER_STATE = make_enum([
+	"PS5000A_CONDITION_DONT_CARE",
+	"PS5000A_CONDITION_TRUE",
+	"PS5000A_CONDITION_FALSE",
+	"PS5000A_CONDITION_MAX"
+])
+
+
 class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
@@ -172,6 +180,13 @@ class PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(Structure):
                 ("thresholdLower", c_int16),
                 ("thresholdLowerHysteresis", c_uint16),
                 ("channel", c_int32)]
+				
+class PS5000A_CONDITION (Structure):
+	_pack_ = 1
+	_fields_ = [("source", c_int32),
+				("condition", c_int16)]
+				
+
 
 doc = """ PICO_STATUS (ps5000aOpenUnit)
     (

@@ -52,6 +52,9 @@ digital_port0 = ps.PS5000A_CHANNEL["PS5000A_DIGITAL_PORT0"]
 status["SetDigitalPort"] = ps.ps5000aSetDigitalPort( chandle, digital_port0, 1, 10000)
 assert_pico_ok(status["SetDigitalPort"])
 
+#Set a trigger on digital channel
+
+
 # Set the number of sample to be collected
 preTriggerSamples = 2500
 postTriggerSamples = 2500
