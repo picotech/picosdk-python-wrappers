@@ -37,20 +37,26 @@ ps5000a.PS5000A_COUPLING = make_enum([
 # Just use AC and DC.
 ps5000a.PICO_COUPLING = {k[-2:]: v for k, v in ps5000a.PS5000A_COUPLING.items()}
 
-# A tuple in an enum like this is 2 names for the same value.
-ps5000a.PS5000A_CHANNEL = make_enum([
-    "PS5000A_CHANNEL_A",
-    "PS5000A_CHANNEL_B",
-    "PS5000A_CHANNEL_C",
-    "PS5000A_CHANNEL_D",
-    ("PS5000A_EXTERNAL", "PS5000A_MAX_CHANNELS"),
-    "PS5000A_TRIGGER_AUX",
-    "PS5000A_MAX_TRIGGER_SOURCE",
-])
+def _define_channel():
+    PS5000A_CHANNEL_A = 0
+    PS5000A_CHANNEL_B = 1
+    PS5000A_CHANNEL_C = 2
+    PS5000A_CHANNEL_D = 3
+    PS5000A_EXTERNAL = PS5000A_MAX_CHANNELS = 4
+    PS5000A_TRIGGER_AUX = 5
+    PS5000A_MAX_TRIGGER_SOURCE = 6
+    PS5000A_DIGITAL_PORT0 = 0x80
+    PS5000A_DIGITAL_PORT1 = PS5000A_DIGITAL_PORT0 + 1
+    PS5000A_DIGITAL_PORT2 = PS5000A_DIGITAL_PORT0 + 2
+    PS5000A_DIGITAL_PORT3 = PS5000A_DIGITAL_PORT0 + 3
+    PS5000A_PULSE_WIDTH_SOURCE = 0x10000000
+	
+    return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
+
+ps5000a.PS5000A_CHANNEL = _define_channel()
 
 # only include the normal analog channels for now:
 ps5000a.PICO_CHANNEL = {k[-1]: v for k, v in ps5000a.PS5000A_CHANNEL.items() if "PS5000A_CHANNEL_" in k}
-
 
 ps5000a.PS5000A_RANGE = make_enum([
     "PS5000A_10MV",
@@ -88,6 +94,98 @@ ps5000a.PICO_VOLTAGE_RANGE = {
     v: float(k.split('_')[1][:-1]) if k[-2] != 'M' else (0.001 * float(k.split('_')[1][:-2]))
     for k, v in ps5000a.PS5000A_RANGE.items() if k != "PS5000A_MAX_RANGES"
 }
+
+ps5000a.PS5000A_DIGITAL_CHANNEL = make_enum([
+    "PS5000A_DIGITAL_CHANNEL_0",
+    "PS5000A_DIGITAL_CHANNEL_1",
+    "PS5000A_DIGITAL_CHANNEL_2",
+    "PS5000A_DIGITAL_CHANNEL_3",
+    "PS5000A_DIGITAL_CHANNEL_4",
+    "PS5000A_DIGITAL_CHANNEL_5",
+    "PS5000A_DIGITAL_CHANNEL_6",
+    "PS5000A_DIGITAL_CHANNEL_7",
+    "PS5000A_DIGITAL_CHANNEL_8",
+    "PS5000A_DIGITAL_CHANNEL_9",
+    "PS5000A_DIGITAL_CHANNEL_10",
+    "PS5000A_DIGITAL_CHANNEL_11",
+    "PS5000A_DIGITAL_CHANNEL_12",
+    "PS5000A_DIGITAL_CHANNEL_13",
+    "PS5000A_DIGITAL_CHANNEL_14",
+    "PS5000A_DIGITAL_CHANNEL_15",
+    "PS5000A_DIGITAL_CHANNEL_16",
+    "PS5000A_DIGITAL_CHANNEL_17",
+    "PS5000A_DIGITAL_CHANNEL_18",
+    "PS5000A_DIGITAL_CHANNEL_19",
+    "PS5000A_DIGITAL_CHANNEL_20",
+    "PS5000A_DIGITAL_CHANNEL_21",
+    "PS5000A_DIGITAL_CHANNEL_22",
+    "PS5000A_DIGITAL_CHANNEL_23",
+    "PS5000A_DIGITAL_CHANNEL_24",
+    "PS5000A_DIGITAL_CHANNEL_25",
+    "PS5000A_DIGITAL_CHANNEL_26",
+    "PS5000A_DIGITAL_CHANNEL_27",
+    "PS5000A_DIGITAL_CHANNEL_28",
+    "PS5000A_DIGITAL_CHANNEL_29",
+    "PS5000A_DIGITAL_CHANNEL_30",
+    "PS5000A_DIGITAL_CHANNEL_31",
+    "PS5000A_MAX_DIGITAL_CHANNELS"
+])
+
+ps5000a.PS5000A_DIGITAL_DIRECTION = make_enum([
+    "PS5000A_DIGITAL_DONT_CARE",
+    "PS5000A_DIGITAL_DIRECTION_LOW",
+    "PS5000A_DIGITAL_DIRECTION_HIGH",
+    "PS5000A_DIGITAL_DIRECTION_RISING",
+    "PS5000A_DIGITAL_DIRECTION_FALLING",
+    "PS5000A_DIGITAL_DIRECTION_RISING_OR_FALLING",
+    "PS5000A_DIGITAL_MAX_DIRECTION"
+])
+
+def _define_conditionsInfo():
+    PS5000A_CLEAR = 0x00000001
+    PS5000A_ADD = 0x00000002
+
+    return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
+
+PS5000AConditionsInfo = _define_conditionsInfo()
+
+ps5000a.PS5000A_THRESHOLD_MODE = make_enum([
+    "PS5000A_LEVEL",
+    "PS5000A_WINDOW"
+])
+
+ps5000a.PS5000A_TRIGGER_STATE = make_enum([
+	"PS5000A_CONDITION_DONT_CARE",
+	"PS5000A_CONDITION_TRUE",
+	"PS5000A_CONDITION_FALSE",
+	"PS5000A_CONDITION_MAX"
+])
+
+
+class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_int32),
+                ("direction", c_int32)]
+
+class PS5000A_DIRECTION(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_int32),
+                ("direction", c_int32),
+                ("mode", c_int32)]
+
+class PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(Structure):
+    _pack_ = 1
+    _fields_ = [("thresholdUpper", c_int16),
+                ("thresholdUpperHysteresis", c_uint16),
+                ("thresholdLower", c_int16),
+                ("thresholdLowerHysteresis", c_uint16),
+                ("channel", c_int32)]
+				
+class PS5000A_CONDITION (Structure):
+	_pack_ = 1
+	_fields_ = [("source", c_int32),
+				("condition", c_int16)]
+				
 
 
 doc = """ PICO_STATUS (ps5000aOpenUnit)
@@ -330,6 +428,16 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelProperties
 ps5000a.make_symbol("_SetTriggerChannelProperties", "ps5000aSetTriggerChannelProperties", c_uint32,
                     [c_int16, c_void_p, c_int16, c_int16, c_int32], doc)
 
+doc = """ PICO_STATUS ps5000aSetTriggerChannelPropertiesV2
+    (
+        int16_t                             handle,
+        PS5000A_TRIGGER_CHANNEL_PROPERTIESV2 *channelProperties,
+        int16_t                             nChannelProperties,
+        int16_t                             auxOutputEnable,
+    ); """
+ps5000a.make_symbol("_SetTriggerChannelPropertiesV2", "ps5000aSetTriggerChannelPropertiesV2", c_uint32,
+                    [c_int16, c_void_p, c_int16, c_int16], doc)
+
 doc = """ PICO_STATUS ps5000aSetTriggerChannelConditions
     (
         int16_t                     handle,
@@ -338,6 +446,16 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelConditions
     ); """
 ps5000a.make_symbol("_SetTriggerChannelConditions", "ps5000aSetTriggerChannelConditions", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetTriggerChannelConditionsV2
+    (
+        int16_t                     handle,
+        PS5000A_TRIGGER_CONDITIONS *conditions,
+        int16_t                     nConditions
+        PS5000A_CONDITIONS_INFO     info
+    ); """
+ps5000a.make_symbol("_SetTriggerChannelConditionsV2", "ps5000aSetTriggerChannelConditionsV2", c_uint32,
+                    [c_int16, c_void_p, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps5000aSetTriggerChannelDirections
     (
@@ -351,6 +469,15 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelDirections
     ); """
 ps5000a.make_symbol("_SetTriggerChannelDirections", "ps5000aSetTriggerChannelDirections", c_uint32,
                     [c_int16, c_int32, c_int32, c_int32, c_int32, c_int32, c_int32], doc)
+
+dpc = """ PICO_STATUS ps5000aSetTriggerChannelDirectionsV2
+    (
+        int16_t                    handle,
+        PS5000A_DIRECTION          *directions
+        uint16_t                       nDirections
+     ); """
+ps5000a.make_symbol("_SetTriggerChannelDirectionsV2", "ps5000aSetTriggerChannelDirectionsV2", c_uint32,
+                   [c_int16, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps5000aSetSimpleTrigger
     (
@@ -722,3 +849,30 @@ doc = """ PICO_STATUS ps5000aGetDeviceResolution
         PS5000A_DEVICE_RESOLUTION *resolution
     ); """
 ps5000a.make_symbol("_GetDeviceResolution", "ps5000aGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS ps5000aSetDigitalPort
+    (
+        int16_t                 handle,
+        PS5000A_CHANNEL         port,
+        int16_t                 enabled,
+        int16_t                 logicLevel
+    ); """
+ps5000a.make_symbol("_SetDigitalPort", "ps5000aSetDigitalPort", c_uint32, [c_int16, c_int32, c_int16, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetPulseWidthDigitalPortProperties
+    (
+        int16_t                             handle,
+        PS5000A_DIGITAL_CHANNEL_DIRECTIONS *directions,
+        int16_t                             nDirections
+    ); """
+ps5000a.make_symbol("_SetPulseWidthDigitalPortProperties", "ps5000aSetPulseWidthDigitalPortProperties", c_uint32,
+                    [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetTriggerDigitalPortProperties
+    (
+        int16_t                             handle,
+        PS5000A_DIGITAL_CHANNEL_DIRECTIONS *directions,
+        int16_t                             nDirections
+    ); """
+ps5000a.make_symbol("_SetTriggerDigitalPortProperties", "ps5000aSetTriggerDigitalPortProperties", c_uint32,
+                    [c_int16, c_void_p, c_int16], doc)
