@@ -1,8 +1,8 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2019 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS2000A STREAMING MODE EXAMPLE
-# This example opens a 2000a driver device, sets up two channels then collects some streamed data (1 buffer).
+# PS2000 Series (A API) STREAMING MODE EXAMPLE
+# This example demonstrates how to call the ps2000a driver API functions in order to open a device, setup 2 channels and collects streamed data (1 buffer).
 # This data is then plotted as mV against time in ns.
 
 import ctypes
@@ -16,7 +16,7 @@ import time
 chandle = ctypes.c_int16()
 status = {}
 
-# Open 2000 series PicoScope
+# Open PicoScope 2000 Series device
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps2000aOpenUnit(ctypes.byref(chandle), None)
 assert_pico_ok(status["openunit"])
@@ -31,7 +31,7 @@ analogue_offset = 0.0
 # channel = PS2000A_CHANNEL_A = 0
 # enabled = 1
 # coupling type = PS2000A_DC = 1
-# range = PS2000A_2V = 9
+# range = PS2000A_2V = 7
 # analogue offset = 0 V
 channel_range = ps.PS2000A_RANGE['PS2000A_2V']
 status["setChA"] = ps.ps2000aSetChannel(chandle,
@@ -47,7 +47,7 @@ assert_pico_ok(status["setChA"])
 # channel = PS2000A_CHANNEL_B = 1
 # enabled = 1
 # coupling type = PS2000A_DC = 1
-# range = PS2000A_2V = 9
+# range = PS2000A_2V = 7
 # analogue offset = 0 V
 status["setChB"] = ps.ps2000aSetChannel(chandle,
                                         ps.PS2000A_CHANNEL['PS2000A_CHANNEL_B'],
@@ -106,10 +106,10 @@ assert_pico_ok(status["setDataBuffersB"])
 # Begin streaming mode:
 sampleInterval = ctypes.c_int32(250)
 sampleUnits = ps.PS2000A_TIME_UNITS['PS2000A_US']
-# we are not triggering:
+# We are not triggering:
 maxPreTriggerSamples = 0
 autoStopOn = 1
-# no downsampling:
+# No downsampling:
 downsampleRatio = 1
 status["runStreaming"] = ps.ps2000aRunStreaming(chandle,
                                                 ctypes.byref(sampleInterval),
@@ -125,7 +125,7 @@ assert_pico_ok(status["runStreaming"])
 actualSampleInterval = sampleInterval.value
 actualSampleIntervalNs = actualSampleInterval * 1000
 
-print("capturing at sample interval %s ns" % actualSampleIntervalNs)
+print("Capturing at sample interval %s ns" % actualSampleIntervalNs)
 
 # We need a big buffer, not registered with the driver, to keep our complete capture in.
 bufferCompleteA = np.zeros(shape=totalSamples, dtype=np.int16)
@@ -147,35 +147,35 @@ def streaming_callback(handle, noOfSamples, startIndex, overflow, triggerAt, tri
         autoStopOuter = True
 
 
-# convert the python function into a C function pointer.
+# Convert the python function into a C function pointer.
 cFuncPtr = ps.StreamingReadyType(streaming_callback)
 
-# fetch data from the driver in a loop, copying it out of the registered buffers and into our complete one.
+# Fetch data from the driver in a loop, copying it out of the registered buffers and into our complete one.
 while nextSample < totalSamples and not autoStopOuter:
     wasCalledBack = False
-    status["isReady"] = ps.ps2000aGetStreamingLatestValues(chandle, cFuncPtr, None)
+    status["getStreamingLastestValues"] = ps.ps2000aGetStreamingLatestValues(chandle, cFuncPtr, None)
     if not wasCalledBack:
-        # if we weren't called back by the driver, this means no data is ready. Sleep for a short while before trying
+        # If we weren't called back by the driver, this means no data is ready. Sleep for a short while before trying
         # again.
         time.sleep(0.01)
 
-print("done grabbing values.")
+print("Done grabbing values.")
 
-# find maximum ADC count value
+# Find maximum ADC count value
 # handle = chandle
 # pointer to value = ctypes.byref(maxADC)
 maxADC = ctypes.c_int16()
 status["maximumValue"] = ps.ps2000aMaximumValue(chandle, ctypes.byref(maxADC))
 assert_pico_ok(status["maximumValue"])
 
-# convert ADC counts data to mV
+# Convert ADC counts data to mV
 adc2mVChAMax = adc2mV(bufferCompleteA, channel_range, maxADC)
 adc2mVChBMax = adc2mV(bufferCompleteB, channel_range, maxADC)
 
 # Create time data
 time = np.linspace(0, (totalSamples) * actualSampleIntervalNs, totalSamples)
 
-# plot data from channel A and B
+# Plot data from channel A and B
 plt.plot(time, adc2mVChAMax[:])
 plt.plot(time, adc2mVChBMax[:])
 plt.xlabel('Time (ns)')
@@ -187,10 +187,10 @@ plt.show()
 status["stop"] = ps.ps2000aStop(chandle)
 assert_pico_ok(status["stop"])
 
-# Close unitDisconnect the scope
+# Disconnect the scope
 # handle = chandle
 status["close"] = ps.ps2000aCloseUnit(chandle)
 assert_pico_ok(status["close"])
 
-# display status returns
+# Display status returns
 print(status)

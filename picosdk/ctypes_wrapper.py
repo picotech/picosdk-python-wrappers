@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2019 Pico Technology Ltd. See LICENSE file for terms.
 #
 import ctypes
 import sys
