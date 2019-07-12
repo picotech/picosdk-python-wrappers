@@ -70,7 +70,6 @@ The following drivers and devices are not yet supported:
 * `ps5000` - PicoScope 5203 & 5204
 * `usbdrdaq` - DrDAQ Data Logger
 * `usbpt104` - PT-104 Platinum Resistance Data Logger
-* `usbtc08` - TC-08 Thermocouple Data Logger
 
 ### Dependencies
 
