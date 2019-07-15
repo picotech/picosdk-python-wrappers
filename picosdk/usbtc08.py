@@ -41,7 +41,7 @@ doc = """ int16_t usb_tc08_open_unit
 	); """
 usbtc08.make_symbol("_open_unit_","usb_tc08_open_unit", c_int16, [], doc)
 
-doc = """ int16_t usb_tec08_open_unit_async
+doc = """ int16_t usb_tc08_open_unit_async
     (
 	    void
 	); """
