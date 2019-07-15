@@ -63,7 +63,6 @@ or a [Pull Request](https://github.com/picotech/picosdk-python-wrappers/pulls) (
 
 The following drivers and devices are not yet supported:
 
-* `picohrdl` - ADC-20 & ADC-24 High Resolution Data Loggers
 * `pl1000` - PicoLog 1012 & 1216 Data Loggers
 * `plcm3` - PicoLog CM3 Current Data Logger
 * `ps3000` - PicoScope 3204, 3205, 3206, 3223, 3224, 3423 & 3423
