@@ -48,10 +48,10 @@ assert_pico2000_ok(status["setChB"])
 # handle = chandle
 # source = PS2000_CHANNEL_A = 0
 # threshold = 1024 ADC counts
-# direction = PS2000_RISING = 2
+# direction = PS2000_RISING = 0
 # delay = 0 s
 # auto Trigger = 1000 ms
-status["trigger"] = ps.ps2000_set_trigger(chandle, 0, 64, 2, 0, 1000)
+status["trigger"] = ps.ps2000_set_trigger(chandle, 0, 64, 0, 0, 1000)
 assert_pico2000_ok(status["trigger"])
 
 # Set number of pre and post trigger samples to be collected

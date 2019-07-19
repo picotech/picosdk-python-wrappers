@@ -27,15 +27,15 @@ def adc2mV(bufferADC, range, maxADC):
 def mV2adc(volts, range, maxADC):
     """
         mV2adc(
-                float                   volts
-                int                     range
+                float                   millivolts
+				int                     range
                 c_int32                 maxADC
                 )
         Takes a voltage value and converts it into adc counts
     """
     channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
     vRange = channelInputRanges[range]
-    adcValue = round((volts * maxADC.value)/vRange)
+    adcValue = round((millivolts * maxADC.value)/vRange)
 
     return adcValue
 
