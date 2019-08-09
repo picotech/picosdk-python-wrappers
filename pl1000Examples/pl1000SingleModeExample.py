@@ -20,7 +20,7 @@ status["openUnit"] = pl.pl1000OpenUnit(ctypes.byref(chandle))
 assert_pico_ok(status["openUnit"])
 
 value = ctypes.c_int16()
-# get a single values from channel 1
+# get a single ADC count value from channel 1
 status["getSingle"] = pl.pl1000GetSingle(chandle, pl.PL1000Inputs["PL1000_CHANNEL_1"], ctypes.byref(value))
 assert_pico_ok(status["getSingle"])
 print(value.value)
