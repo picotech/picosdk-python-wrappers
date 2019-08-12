@@ -24,7 +24,7 @@ def adc2mV(bufferADC, range, maxADC):
 
     return bufferV
 
-def mV2adc(volts, range, maxADC):
+def mV2adc(millivolts, range, maxADC):
     """
         mV2adc(
                 float                   millivolts
