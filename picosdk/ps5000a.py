@@ -8,8 +8,10 @@ functions.
 """
 
 from ctypes import *
+
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.library import Library
-from picosdk.constants import make_enum, PICO_STATUS
+from picosdk.constants import make_enum
 
 
 class Ps5000alib(Library):
@@ -324,7 +326,7 @@ class PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(Structure):
 
 class PS5000A_TRIGGER_INFO(Structure):
     _pack_ = 1
-    _fields_ = [("status", PICO_STATUS),
+    _fields_ = [("status", c_uint32),
                 ("segmentIndex", c_uint32),
                 ("triggerIndex", c_uint32),
                 ("triggerTime", c_int64),
@@ -341,36 +343,36 @@ class PS5000A_CONDITION(Structure):
 
 class PS5000A_PWQ_CONDITIONS(Structure):
     _pack_ = 1
-    _fields_ = [("channelA", ps5000a.PS5000A_TRIGGER_STATE),
-                ("channelB", ps5000a.PS5000A_TRIGGER_STATE),
-                ("channelC", ps5000a.PS5000A_TRIGGER_STATE),
-                ("channelD", ps5000a.PS5000A_TRIGGER_STATE),
-                ("external", ps5000a.PS5000A_TRIGGER_STATE),
-                ("aux", ps5000a.PS5000A_TRIGGER_STATE)]
+    _fields_ = [("channelA", c_int32),
+                ("channelB", c_int32),
+                ("channelC", c_int32),
+                ("channelD", c_int32),
+                ("external", c_int32),
+                ("aux", c_int32)]
 
 
 class PS5000A_TRIGGER_CONDITIONS(Structure):
     _pack_ = 1
-    _fields_ = [("channelA", ps5000a.PS5000A_TRIGGER_STATE),
-                ("channelB", ps5000a.PS5000A_TRIGGER_STATE),
-                ("channelC", ps5000a.PS5000A_TRIGGER_STATE),
-                ("channelD", ps5000a.PS5000A_TRIGGER_STATE),
-                ("external", ps5000a.PS5000A_TRIGGER_STATE),
-                ("aux", ps5000a.PS5000A_TRIGGER_STATE),
-                ("pulseWidthQualifier", ps5000a.PS5000A_TRIGGER_STATE)]
+    _fields_ = [("channelA", c_int32),
+                ("channelB", c_int32),
+                ("channelC", c_int32),
+                ("channelD", c_int32),
+                ("external", c_int32),
+                ("aux", c_int32),
+                ("pulseWidthQualifier", c_int32)]
 
 
 class PS5000A_DIRECTION(Structure):
     _pack_ = 1
-    _fields_ = [("source", ps5000a.PS5000A_CHANNEL),
-                ("condition", ps5000a.PS5000A_TRIGGER_STATE)]
+    _fields_ = [("source", c_int32),
+                ("condition", c_int32)]
 
 
 class PS5000A_CONDITION(Structure):
     _pack_ = 1
-    _fields_ = [("source", ps5000a.PS5000A_CHANNEL),
-                ("direction", ps5000a.PS5000A_THRESHOLD_DIRECTION),
-                ("mode", ps5000a.PS5000A_THRESHOLD_MODE)]
+    _fields_ = [("source", c_int32),
+                ("direction", c_int32),
+                ("mode", c_int32)]
 
 
 class PS5000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
@@ -379,8 +381,8 @@ class PS5000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
                 ("thresholdUpperHysteresis", c_uint16),
                 ("thresholdLower", c_int16),
                 ("thresholdLowerHysteresis", c_uint16),
-                ("channel", ps5000a.PS5000A_CHANNEL),
-                ("thresholdMode", ps5000a.PS5000A_THRESHOLD_MODE)]
+                ("channel", c_int32),
+                ("thresholdMode", c_int32)]
 
 
 doc = """ PICO_STATUS (ps5000aOpenUnit)
@@ -829,6 +831,68 @@ ps5000a.make_symbol("_GetStreamingLatestValues", "ps5000aGetStreamingLatestValue
 # ps5000a.make_symbol("_StreamingReady", "ps5000aStreamingReady", c_void_p,
 #                     [c_int16, c_int32, c_uint32, c_int16, c_uint32, c_int16, c_int16, c_void_p], doc)
 
+doc = """ void *ps5000aStreamingReady
+    (
+        int16_t   handle,
+        int32_t   noOfSamples,
+        uint32_t  startIndex,
+        int16_t   overflow,
+        uint32_t  triggerAt,
+        int16_t   triggered,
+        int16_t   autoStop,
+        void     *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps5000a.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                         c_int32,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_void_p)
+
+ps5000a.StreamingReadyType.__doc__ = doc
+
+doc = """ void *ps5000aBlockReady
+    (
+        int16_t     handle,
+        PICO_STATUS status,
+        void        *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps5000a.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                     c_int16,
+                                                     c_int32,
+                                                     c_void_p)
+
+ps5000a.BlockReadyType.__doc__ = doc
+
+doc = """ void *ps5000aDataReady
+    (
+        int16_t     handle,
+        PICO_STATUS status,
+        uint32_t    noOfSamples,
+        int16_t     overflow,
+        void        *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps5000a.DataReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                    c_int16,
+                                                    c_int32,
+                                                    c_uint32,
+                                                    c_int16,
+                                                    c_void_p)
+
+ps5000a.DataReadyType.__doc__ = doc
+
 doc = """ PICO_STATUS ps5000aNoOfStreamingValues
     (
         int16_t   handle,
@@ -984,20 +1048,6 @@ doc = """ PICO_STATUS ps5000aGetMaxSegments
     ); """
 ps5000a.make_symbol("_GetMaxSegments", "ps5000aGetMaxSegments", c_uint32, [c_int16, c_void_p], doc)
 
-##TODO
-doc = """ PICO_STATUS ps5000aChannelCombinationsStateless
-    (
-        int16_t                     handle,
-        PS5000A_CHANNEL_FLAGS       *channelOrPortFlagsCombinations,
-        uint32_t                    *nChannelCombinations,
-        PS5000A_DEVICE_RESOLUTION   resolution,
-        uint32_t                    timebase,
-        int16_t                     hasDcPowerSupplyConnected
-    ); """
-ps5000a.make_symbol("_ChannelCombinationsStateless", "ps5000aChannelCombinationsStateless", c_uint32,
-                    [c_int16, c_uint32], doc)
-##TIL HERE
-
 doc = """ PICO_STATUS ps5000aChangePowerSource
     (
         int16_t     handle,
@@ -1084,3 +1134,80 @@ doc = """ PICO_STATUS ps5000aSetTriggerDigitalPortProperties
     ); """
 ps5000a.make_symbol("_SetTriggerDigitalPortProperties", "ps5000aSetTriggerDigitalPortProperties", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aGetMinimumTimebaseStateless
+    (
+        int16_t                             handle,
+        PS5000A_CHANNEL_FLAGS               enableChannelOrPortFlags,
+        uint32_t                            *timebase,
+        double                              *timeInterval,
+        PS5000A_DEVICE_RESOLUTION           resolution
+    ); """
+ps5000a.make_symbol("_GetMinimumTimebaseStateless", "ps5000aGetMinimumTimebaseStateless", c_uint32,
+                    [c_int16, c_int32, c_void_p, c_void_p, c_int32], doc)
+
+doc = """ PICO_STATUS ps5000aNearestSampleIntervalStateless
+    (
+        int16_t                             handle,
+        PS5000A_CHANNEL_FLAGS               enableChannelOrPortFlags,
+        double                              timeIntervalRequested,
+        PS5000A_DEVICE_RESOLUTION           resolution,
+        uint16_t                            useEts,
+        uint32_t                            *timebase,
+        double                              *timeIntervalAvailable
+    ); """
+ps5000a.make_symbol("_NearestSampleIntervalStateless", "ps5000aNearestSampleIntervalStateless", c_uint32,
+                    [c_int16, c_int32, c_double, c_int32, c_uint16, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS ps5000aQueryOutputEdgeDetect
+    (
+        int16_t                             handle,
+        int16_t                             *state
+    ); """
+ps5000a.make_symbol("_QueryOutputEdgeDetect", "ps5000aQueryOutputEdgeDetect", c_uint32,
+                    [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS ps5000aSetAutoTriggerMicroSeconds
+    (
+        int16_t                             handle,
+        uint64_t                            autoTriggerMicroseconds
+    ); """
+ps5000a.make_symbol("_SetAutoTriggerMicroSeconds", "ps5000aSetAutoTriggerMicroSeconds", c_uint32,
+                    [c_int16, c_uint64], doc)
+
+doc = """ PICO_STATUS ps5000aSetOutputEdgeDetect
+    (
+        int16_t                             handle,
+        int16_t                             state
+    ); """
+ps5000a.make_symbol("_SetOutputEdgeDetect", "ps5000aSetOutputEdgeDetect", c_uint32,
+                    [c_int16, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierConditions
+    (
+        int16_t                             handle,
+        PS5000A_CONDITION                   *conditions,
+        int16_t                             nConditions,
+        PS5000A_CONDITIONS_INFO             info
+    ); """
+ps5000a.make_symbol("_SetPulseWidthQualifierConditions", "ps5000aSetPulseWidthQualifierConditions", c_uint32,
+                    [c_int16, c_void_p, c_int16, c_int32], doc)
+
+doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierDirections
+    (
+        int16_t                             handle,
+        PS5000A_DIRECTION                   *directions,
+        int16_t                             nDirections
+    ); """
+ps5000a.make_symbol("_SetPulseWidthQualifierDirections", "ps5000aSetPulseWidthQualifierDirections", c_uint32,
+                    [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierProperties
+    (
+        int16_t                             handle,
+        uint32_t                            lower,
+        uint32_t                            upper,
+        PS5000A_PULSE_WIDTH_TYPE            type
+    ); """
+ps5000a.make_symbol("_SetPulseWidthQualifierProperties", "ps5000aSetPulseWidthQualifierProperties", c_uint32,
+                    [c_int16, c_uint32, c_uint32, c_int32], doc)
