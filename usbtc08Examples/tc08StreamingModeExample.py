@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2019 Pico Technology Ltd. See LICENSE file for terms.
 #
-# TC-08 SINGLE MODE EXAMPLE
+# TC-08 STREAMING MODE EXAMPLE
 
 
 import ctypes
