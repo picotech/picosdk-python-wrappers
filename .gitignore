@@ -12,3 +12,7 @@
 
 # distutils build directory
 build/
+
+# venv directory
+
+venv/
