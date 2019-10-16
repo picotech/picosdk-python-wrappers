@@ -3,7 +3,7 @@
 #
 # PICOLOG HIGH RESOLUTION DATA LOGGER SINGLE MODE EXAMPLE
 #
-# This example demonstrates how to capture a single value from an ADC-20 or ADC-24 High Resolution Data Logger.
+# This example demonstrates how to capture a single value from an ADC-20 or ADC-24 Precision Data Loggers.
 
 
 import ctypes
