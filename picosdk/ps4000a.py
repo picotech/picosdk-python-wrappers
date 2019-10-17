@@ -10,7 +10,7 @@ functions.
 from ctypes import *
 from picosdk.library import Library
 from picosdk.constants import make_enum
-
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 
 class Ps4000alib(Library):
     def __init__(self):
@@ -188,6 +188,24 @@ def process_enum(enum):
 
 ps4000a.PICO_VOLTAGE_RANGE = process_enum(ps4000a.PICO_CONNECT_PROBE_RANGE)
 
+ps4000a.PS4000A_RATIO_MODE = {
+    'PS4000A_RATIO_MODE_NONE': 0,
+    'PS4000A_RATIO_MODE_AGGREGATE': 1,
+    'PS4000A_RATIO_MODE_DECIMATE': 2,
+    'PS4000A_RATIO_MODE_AVERAGE': 4,
+}
+
+ps4000a.PICO_RATIO_MODE = {k[19:]: v for k, v in ps4000a.PS4000A_RATIO_MODE.items()}
+
+ps4000a.PS4000A_TIME_UNITS = make_enum([
+    'PS4000A_FS',
+    'PS4000A_PS',
+    'PS4000A_NS',
+    'PS4000A_US',
+    'PS4000A_MS',
+    'PS4000A_S',
+    'PS4000A_MAX_TIME_UNITS',
+])
 
 doc = """ PICO_STATUS ps4000aOpenUnit
     (
@@ -647,6 +665,33 @@ doc = """ PICO_STATUS ps4000aGetStreamingLatestValues
     ); """
 ps4000a.make_symbol("_GetStreamingLatestValues", "ps4000aGetStreamingLatestValues", c_uint32,
                     [c_int16, c_void_p, c_void_p], doc)
+
+doc = """ void *ps4000aStreamingReady
+    (
+        int16_t   handle,
+        int32_t   noOfSamples,
+        uint32_t  startIndex,
+        int16_t   overflow,
+        uint32_t  triggerAt,
+        int16_t   triggered,
+        int16_t   autoStop,
+        void     *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps4000a.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                         c_int32,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_void_p)
+
+ps4000a.StreamingReadyType.__doc__ = doc
+
 
 doc = """ PICO_STATUS ps4000aNoOfStreamingValues
     (
