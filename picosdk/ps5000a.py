@@ -8,6 +8,7 @@ functions.
 """
 
 from ctypes import *
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.library import Library
 from picosdk.constants import make_enum
 
@@ -160,6 +161,25 @@ ps5000a.PS5000A_TRIGGER_STATE = make_enum([
 	"PS5000A_CONDITION_FALSE",
 	"PS5000A_CONDITION_MAX"
 ])
+
+ps5000a.PS5000A_RATIO_MODE = {
+    'PS5000A_RATIO_MODE_NONE': 0,
+    'PS5000A_RATIO_MODE_AGGREGATE': 1,
+    'PS5000A_RATIO_MODE_DECIMATE': 2,
+    'PS5000A_RATIO_MODE_AVERAGE': 4,
+}
+
+ps5000a.PS5000A_TIME_UNITS = make_enum([
+    'PS5000A_FS',
+    'PS5000A_PS',
+    'PS5000A_NS',
+    'PS5000A_US',
+    'PS5000A_MS',
+    'PS5000A_S',
+    'PS5000A_MAX_TIME_UNITS',
+])
+
+ps5000a.PICO_RATIO_MODE = {k[19:]: v for k, v in ps5000a.PS5000A_RATIO_MODE.items()}
 
 
 class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
@@ -619,6 +639,32 @@ doc = """ PICO_STATUS ps5000aGetStreamingLatestValues
     ); """
 ps5000a.make_symbol("_GetStreamingLatestValues", "ps5000aGetStreamingLatestValues", c_uint32,
                     [c_int16, c_void_p, c_void_p], doc)
+					
+doc = """ void *ps5000aStreamingReady
+    (
+        int16_t   handle,
+        int32_t   noOfSamples,
+        uint32_t  startIndex,
+        int16_t   overflow,
+        uint32_t  triggerAt,
+        int16_t   triggered,
+        int16_t   autoStop,
+        void     *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps5000a.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                         c_int32,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_void_p)
+
+ps5000a.StreamingReadyType.__doc__ = doc
 
 # TODO sort out how to make a callback for a C function in ctypes!
 # doc = """ void *ps5000aStreamingReady
