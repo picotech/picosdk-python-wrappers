@@ -8,6 +8,7 @@ functions.
 """
 
 from ctypes import *
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.library import Library
 from picosdk.constants import make_enum
 
@@ -102,6 +103,16 @@ def process_enum(enum):
 
 
 ps4000.PICO_VOLTAGE_RANGE = process_enum(ps4000.PS4000_RANGE)
+
+ps4000.PS4000_TIME_UNITS = make_enum([
+    'PS4000_FS',
+    'PS4000_PS',
+    'PS4000_NS',
+    'PS4000_US',
+    'PS4000_MS',
+    'PS4000_S',
+    'PS4000_MAX_TIME_UNITS',
+])
 
 doc = """ PICO_STATUS ps4000OpenUnit
     (
@@ -614,6 +625,32 @@ doc = """ PICO_STATUS ps4000GetStreamingLatestValues
     ); """
 ps4000.make_symbol("_GetStreamingLatestValues", "ps4000GetStreamingLatestValues", c_uint32,
                    [c_int16, c_void_p, c_void_p], doc)
+				   
+doc = """ void *ps4000StreamingReady
+    (
+        int16_t   handle,
+        int32_t   noOfSamples,
+        uint32_t  startIndex,
+        int16_t   overflow,
+        uint32_t  triggerAt,
+        int16_t   triggered,
+        int16_t   autoStop,
+        void     *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps4000.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                         c_int32,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_void_p)
+
+ps4000.StreamingReadyType.__doc__ = doc
 
 doc = """ PICO_STATUS ps4000NoOfStreamingValues
     (
