@@ -1,6 +1,6 @@
 # PicoScope 6000 Series (A API) - MATLAB Generic Instrument Driver
 
-This MATLAB<sup>®</sup> Generic Instrument Driver allows you to acquire data from the PicoScope<sup>®</sup> 6000 Series Oscilloscopes and control built-in signal generator functionality. The data could be processed in MATLAB using functions from Toolboxes such as [Signal Processing Toolbox](https://www.mathworks.com/products/signal.html). 
+This MATLAB<sup>®</sup> Generic Instrument Driver allows you to acquire data from the PicoScope<sup>®</sup> 6000 Series oscilloscopes and control built-in signal generator functionality. The data could be processed in MATLAB using functions from Toolboxes such as [Signal Processing Toolbox](https://www.mathworks.com/products/signal.html). 
 
 The driver has been created using Instrument Control Toolbox (TBC). 
 
