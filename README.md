@@ -38,7 +38,12 @@ You should now have the drivers installed.
 
 ## Installing the python driver bindings
 
-A `distutils` installer is provided. After you have installed the PicoSDK
+You can use pip to directly install the python bindings from GitHub:
+```
+$ pip install git+https://github.com/picotech/picosdk-python-wrappers
+```
+
+If you want to do this manually, download or clone this repository and a `distutils` installer is provided. After you have installed the PicoSDK
 driver package (see above), the Python installer can be used as follows:
 
     python setup.py install
@@ -92,6 +97,10 @@ examples scripts also use the `matplotlib` plotting library. You can install the
 
     pip install -r requirements.txt
     pip install -r requirements-for-examples.txt
+
+or, without specifying versions or cloning this repository (if you use conda, replace pip with conda):
+
+    pip install numpy matplotlib
 
 ### Driver-agnostic examples
 
