@@ -21,7 +21,7 @@ to install the required driver packages for your product.
 macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C
 libraries.
 
-If you're using conda to create environments (or if you're using the Anaconda python distribution) you can create an environment with the drivers and python wrappers in the following way. Create a new conda environment:
+If you're using [conda](https://docs.conda.io/en/latest/miniconda.html) to create environments (or if you're using the [Anaconda python distribution](https://www.anaconda.com/distribution/)) you can create an environment with the drivers and python wrappers in the following way. Create a new conda environment:
 
     $ conda create -n picosdk python
     $ conda activate picosdk
