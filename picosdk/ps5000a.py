@@ -368,13 +368,6 @@ class PS5000A_DIRECTION(Structure):
                 ("condition", c_int32)]
 
 
-class PS5000A_CONDITION(Structure):
-    _pack_ = 1
-    _fields_ = [("source", c_int32),
-                ("direction", c_int32),
-                ("mode", c_int32)]
-
-
 class PS5000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
     _pack_ = 1
     _fields_ = [("thresholdUpper", c_int16),
