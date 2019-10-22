@@ -8,17 +8,17 @@ To use this code you will need to install the PicoSDK C libraries.
 
 ### Microsoft Windows
 
-Please visit [our Downloads page](https://www.picotech.com/downloads) to download the 32-bit or 64-bit PicoSDK C Libraries for Windows. 
+Please visit [our Downloads page](https://www.picotech.com/downloads) to download the 32-bit or 64-bit PicoSDK C Libraries for Windows.
 Please take care to match the "bitness" of your python to the PicoSDK.
 
 ### Linux
 
-Follow the instructions from our [Linux Software & Drivers for Oscilloscopes and Data Loggers page](https://www.picotech.com/downloads/linux) 
+Follow the instructions from our [Linux Software & Drivers for Oscilloscopes and Data Loggers page](https://www.picotech.com/downloads/linux)
 to install the required driver packages for your product.
 
 ### macOS
 
-macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C 
+macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C
 libraries.
 
 ## Installing the python driver bindings
@@ -40,7 +40,7 @@ Within python, the library for `import` is called `picosdk`.
 
 This code is written to be compatible with both python 2.7 and python 3 (any version).
 
-If you find a compatibility problem please raise an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues), listing all the versions you can find (python, numpy, 
+If you find a compatibility problem please raise an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues), listing all the versions you can find (python, numpy,
 picosdk commit hash, etc.) and your error message(s).
 
 ## C interface
@@ -50,13 +50,13 @@ Guides](https://github.com/picotech/picosdk-python-wrappers#programmers-guides) 
 
 ### Programmer's Guides
 
-You can download Programmer's Guides providing a description of the API functions for the relevant PicoScope or 
+You can download Programmer's Guides providing a description of the API functions for the relevant PicoScope or
 PicoLog driver from our [Documentation page](https://www.picotech.com/library/documentation).
 
 ## Python interface
 
 We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature yet or your device is listed as one of the [unsupported models](https://github.com/picotech/picosdk-python-wrappers#unsupported-models),
-let us know that you're waiting in an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues) (good) 
+let us know that you're waiting in an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues) (good)
 or a [Pull Request](https://github.com/picotech/picosdk-python-wrappers/pulls) (better!)
 
 ### Unsupported models
@@ -102,15 +102,15 @@ ADC counts that the driver uses for amplitude into physical units.
 
 ## Testing this code
 
-Check which device driver your device uses, and check the constants at the top of test/test_helpers.py to enable the 
+Check which device driver your device uses, and check the constants at the top of test/test_helpers.py to enable the
 relevant drivers for connected-device tests. (most tests use this).
 
 To check which driver your device uses, you can use `picosdk.discover`:
 
     from picosdk.discover import find_all_units
-    
+
     scopes = find_all_units()
-    
+
     for scope in scopes:
         print(scope.info)
         scope.close()
@@ -118,8 +118,8 @@ To check which driver your device uses, you can use `picosdk.discover`:
 You should then configure test/test_helpers.py's list of connected devices, so it can run all the tests we have
 on your device.
 
-To run the unit tests, you will need to install nose (e.g. `pip install nose`.) Then, run `nosetests` in the root of 
-the repo. 
+To run the unit tests, you will need to install nose (e.g. `pip install nose`.) Then, run `nosetests` in the root of
+the repo.
 
 ## Obtaining support
 
@@ -131,14 +131,14 @@ Contributions are welcome. Please refer to our [guidelines for contributing](.gi
 
 ## Copyright and licensing
 
-See [LICENSE.md](LICENSE.md) for license terms. 
+See [LICENSE.md](LICENSE.md) for license terms.
 
-*PicoScope*, *PicoLog* and *PicoSDK* are registered trademarks of Pico Technology Ltd. 
+*PicoScope*, *PicoLog* and *PicoSDK* are registered trademarks of Pico Technology Ltd.
 
-*Windows* is a registered trademark of Microsoft Corporation. 
+*Windows* is a registered trademark of Microsoft Corporation.
 
-*macOS* is a registered trademark of Apple Inc. 
+*macOS* is a registered trademark of Apple Inc.
 
 *Linux* is the registered trademark of Linus Torvalds in the U.S. and other countries.
 
-Copyright © 2018-2019 Pico Technology Ltd. All rights reserved. 
+Copyright © 2018-2019 Pico Technology Ltd. All rights reserved.
