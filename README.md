@@ -21,6 +21,21 @@ to install the required driver packages for your product.
 macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C
 libraries.
 
+If you're using conda to create environments (or if you're using the Anaconda python distribution) you can create an environment with the drivers and python wrappers in the following way. Create a new conda environment:
+
+    $ conda create -n picosdk python
+    $ conda activate picosdk
+
+Then, after you have installed the PicoScope application, copy the drivers and fix a broken link to the external openMP libraries:
+
+    $ cd ~/anaconda3/envs/picosdk/lib
+    $ cp '/Applications/PicoScope 6.app'/Contents/Resources/lib/libps*.dylib .
+    $ cp '/Applications/PicoScope 6.app'/Contents/Resources/lib/libpicoipp*.dylib .
+    $ install_name_tool -change libiomp5.dylib @rpath/libiomp5.dylib libpicoipp.dylib
+    $ install_name_tool -change libiomp5.dylib @rpath/libiomp5.dylib libpicoipp.1.dylib
+
+You should now have the drivers installed.
+
 ## Installing the python driver bindings
 
 A `distutils` installer is provided. After you have installed the PicoSDK
