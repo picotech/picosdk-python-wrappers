@@ -7,11 +7,11 @@ from picosdk.constants import PICO_STATUS, PICO_STATUS_LOOKUP
 from picosdk.errors import PicoSDKCtypesError
 
 
-def adc2mV(bufferADC, range, maxADC):
+def adc2mV(bufferADC, vRange_enum, maxADC):
     """ 
         adc2mc(
                 c_short_Array           bufferADC
-                int                     range
+                int                     vRange_enum
                 c_int32                 maxADC
                 )
                
@@ -19,22 +19,22 @@ def adc2mV(bufferADC, range, maxADC):
     """
 
     channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
-    vRange = channelInputRanges[range]
+    vRange = channelInputRanges[vRange_enum]
     bufferV = [(x * vRange) / maxADC.value for x in bufferADC]
 
     return bufferV
 
-def mV2adc(volts, range, maxADC):
+def mV2adc(millivolts, vRange_enum, maxADC):
     """
         mV2adc(
                 float                   millivolts
-				int                     range
+				int                     vRange_enum
                 c_int32                 maxADC
                 )
         Takes a voltage value and converts it into adc counts
     """
     channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
-    vRange = channelInputRanges[range]
+    vRange = channelInputRanges[vRange_enum]
     adcValue = round((millivolts * maxADC.value)/vRange)
 
     return adcValue
