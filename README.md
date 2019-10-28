@@ -40,7 +40,7 @@ Within python, the library for `import` is called `picosdk`.
 
 This code is written to be compatible with both python 2.7 and python 3 (any version).
 
-If you find a compatibility problem please raise an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues), listing all the versions you can find (python, numpy, 
+If you find a compatibility problem please raise an [Issue](https://www.picotech.com/tech-support), listing all the versions you can find (python, numpy, 
 picosdk commit hash, etc.) and your error message(s).
 
 ## C interface
@@ -56,14 +56,12 @@ PicoLog driver from our [Documentation page](https://www.picotech.com/library/do
 ## Python interface
 
 We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature yet or your device is listed as one of the [unsupported models](https://github.com/picotech/picosdk-python-wrappers#unsupported-models),
-let us know that you're waiting in an [Issue](https://github.com/picotech/picosdk-python-wrappers/issues) (good) 
-or a [Pull Request](https://github.com/picotech/picosdk-python-wrappers/pulls) (better!)
+let us know that you're waiting in an [Issue](https://www.picotech.com/tech-support)
 
 ### Unsupported models
 
 The following drivers and devices are not yet supported:
 
-* `pl1000` - PicoLog 1012 & 1216 Data Loggers
 * `plcm3` - PicoLog CM3 Current Data Logger
 * `ps3000` - PicoScope 3204, 3205, 3206, 3223, 3224, 3423 & 3423
 * `ps5000` - PicoScope 5203 & 5204
