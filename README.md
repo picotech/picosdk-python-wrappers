@@ -123,10 +123,6 @@ the repo.
 
 Please visit our [Support page](https://www.picotech.com/tech-support) to contact us directly or visit our [Test and Measurement Forum](https://www.picotech.com/support/forum17.html) to post questions.
 
-## Contributing
-
-Contributions are welcome. Please refer to our [guidelines for contributing](.github/CONTRIBUTING.md) for further information.
-
 ## Copyright and licensing
 
 See [LICENSE.md](LICENSE.md) for license terms. 
