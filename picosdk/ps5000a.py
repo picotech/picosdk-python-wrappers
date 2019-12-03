@@ -187,12 +187,14 @@ class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32)]
 
+				
 class PS5000A_DIRECTION(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32),
                 ("mode", c_int32)]
 
+				
 class PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(Structure):
     _pack_ = 1
     _fields_ = [("thresholdUpper", c_int16),
@@ -200,6 +202,7 @@ class PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(Structure):
                 ("thresholdLower", c_int16),
                 ("thresholdLowerHysteresis", c_uint16),
                 ("channel", c_int32)]
+				
 				
 class PS5000A_CONDITION (Structure):
 	_pack_ = 1
