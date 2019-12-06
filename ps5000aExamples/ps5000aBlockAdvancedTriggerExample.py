@@ -65,25 +65,28 @@ assert_pico_ok(status["maximumValue"])
 
 # Set up an advanced trigger
 adcTriggerLevel = mV2adc(500, chARange, maxADC)
-triggerProperties = PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevel,
+
+triggerProperties = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevel,
 															10,
 															0,
 															10,
 															ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"])
 															
-status["setTriggerChannelPropertiesV2"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, triggerProperties, length(triggerProperties), 0)
+status["setTriggerChannelPropertiesV2"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, ctypes.byref(triggerProperties), 1, 0)
 
-triggerConditions = PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"],
+triggerConditions = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"],
                                                            ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
 
 clear = 1
 add = 2
 														   
-status["setTriggerChannelConditionsV2"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, triggerConditions, length(triggerConditions), (clear + add))
+status["setTriggerChannelConditionsV2"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditions), 1, (clear + add))
 
-triggerDirections = PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"], ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
+triggerDirections = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"], 
+                                                            ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], 
+                                                            ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
 
-status["setTriggerChannelDirections"] = ps5000aSetTriggerChannelDirectionsV2(chandle, triggerDirections, length(triggerDirections))
+status["setTriggerChannelDirections"] = ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), 1)
 
 
 # Set number of pre and post trigger samples to be collected
