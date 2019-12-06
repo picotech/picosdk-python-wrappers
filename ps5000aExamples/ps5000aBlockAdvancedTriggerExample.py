@@ -86,7 +86,7 @@ triggerDirections = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
                                                             ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], 
                                                             ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
 
-status["setTriggerChannelDirections"] = ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), 1)
+status["setTriggerChannelDirections"] = ps.ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), 1)
 
 
 # Set number of pre and post trigger samples to be collected

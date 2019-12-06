@@ -214,7 +214,7 @@ class PS5000A_CONDITION (Structure):
 	_fields_ = [("source", c_int32),
 				("condition", c_int16)]
                 
-ps5000a.PS5000A_CONDITION PS5000A_CONDITION
+ps5000a.PS5000A_CONDITION = PS5000A_CONDITION
 				
 
 
@@ -500,11 +500,11 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelDirections
 ps5000a.make_symbol("_SetTriggerChannelDirections", "ps5000aSetTriggerChannelDirections", c_uint32,
                     [c_int16, c_int32, c_int32, c_int32, c_int32, c_int32, c_int32], doc)
 
-dpc = """ PICO_STATUS ps5000aSetTriggerChannelDirectionsV2
+doc = """ PICO_STATUS ps5000aSetTriggerChannelDirectionsV2
     (
         int16_t                    handle,
         PS5000A_DIRECTION          *directions
-        uint16_t                       nDirections
+        uint16_t                   nDirections
      ); """
 ps5000a.make_symbol("_SetTriggerChannelDirectionsV2", "ps5000aSetTriggerChannelDirectionsV2", c_uint32,
                    [c_int16, c_void_p, c_uint16], doc)
