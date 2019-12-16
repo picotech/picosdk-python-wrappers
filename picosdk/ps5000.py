@@ -19,7 +19,41 @@ class Ps5000lib(Library):
 
 ps5000 = Ps5000lib()
 
+ps5000.PS5000_CHANNEL = make_enum([
+	"PS5000_CHANNEL_A",
+	"PS5000_CHANNEL_B",
+	"PS5000_CHANNEL_C",
+	"PS5000_CHANNEL_D",
+	("PS5000_MAX_CHANNELS", "PS5000_EXTERNAL")
+	"PS5000_TRIGGER_AUX",
+	"PS5000_MAX_TRIGGER_SOURCES",
+])
 
+ps5000.PS5000_RANGE = make_enum([
+	"PS5000_10MV",
+	"PS5000_20MV",
+	"PS5000_50MV",
+	"PS5000_100MV",
+	"PS5000_200MV",
+	"PS5000_1V",
+	"PS5000_2V",
+	"PS5000_5V",
+	"PS5000_10V",
+	"PS5000_20V",
+	"PS5000_50V",
+	"PS5000_MAX_RANGES",
+])
+
+ps5000.PS5000_TIME_UNITS = make_enum([
+	"PS5000_FS",
+	"PS5000_PS",
+	"PS5000_NS",
+	"PS5000_US",
+	"PS5000_MS",
+	"PS5000_S",
+	"PS5000_MAX_TIME_UNITS",
+])
+	
 
 class PWQ_CONDITIONS (Structure):
 	_pack = 1
@@ -371,7 +405,9 @@ doc = """ PICO_STATUS ps5000SetSigGenArbitary
 		SIGGEN_TRIG_SOURCE  triggerSource,
 		short  extInThreshold
 	); """
-ps5000.make_symbol("_SetSigGenArbitary", "ps5000SetSigGenArbitary", c_uint32, [c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p, c_int32, c_int32, c_int16, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
+ps5000.make_symbol("_SetSigGenArbitary", "ps5000SetSigGenArbitary", c_uint32, 
+					[c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p, 
+						c_int32, c_int32, c_int16, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps5000SetSigGenBuiltIn
 	(
@@ -391,7 +427,8 @@ doc = """ PICO_STATUS ps5000SetSigGenBuiltIn
 		SIGGEN_TRIG_SOURCE  triggerSource,
 		short  extInThreshold
 	); """
-ps5000.make_symbol("_SetSigGenBuiltIn", "ps5000SetSigGenBuiltIn", c_uint32, [c_int16, c_int32, c_uint32, c_int16, c_int64, c_int64, c_int64, c_int64, c_int64, c_int32, c_int16, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
+ps5000.make_symbol("_SetSigGenBuiltIn", "ps5000SetSigGenBuiltIn", c_uint32, 
+					[c_int16, c_int32, c_uint32, c_int16, c_int64, c_int64, c_int64, c_int64, c_int64, c_int32, c_int16, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps5000SetSimpleTrigger
 	(
@@ -454,3 +491,61 @@ doc = """ PICO_STATUS ps5000Stop
 		short  handle
 	); """
 ps5000.make_symbol("_Stop", "ps5000Stop", c_uint32, [c_int16], doc)
+
+doc = """ void ps5000BlockReady
+	(
+		short  handle,
+		PICO_STATUS  status,
+		void  *pParameter
+	); """
+
+ps5000.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+													c_int16,
+													c_uint32,
+													c_void_p)
+													
+ps5000.BlockReadyType.__doc__ = doc
+
+doc = """ void (CALLBACK *ps5000DataReady)
+	(
+		short  handle,
+		long  noOfSamples,
+		short  overflow,
+		unsigned long  triggerAt,
+		short  triggered,
+		void  *pParameter
+	); """
+	
+ps5000.DataReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+													c_int16,
+													c_int32,
+													c_int16,
+													c_uint32,
+													c_int16,
+													c_void_p)
+													
+ps5000.DataReadyType.__doc__ = doc
+
+doc = """ void (CALLBACK *ps5000StreamingReady)
+	(
+		short  handle,
+		long  noOfSamples,
+		unsigned long  startIndex,
+		short  overflow,
+		unsigned long  triggerAt,
+		short  triggered,
+		short  autoStop,
+		void  *pParameter
+	); """
+
+ps5000.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+														c_int16,
+														c_int32,
+														c_uint32, 
+														c_int16,
+														c_uint32,
+														c_int16,
+														c_int16,
+														c_void_p)
+														
+ps5000.StreamingReadyType.__doc__ = doc
