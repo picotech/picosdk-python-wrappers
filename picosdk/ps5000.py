@@ -24,7 +24,7 @@ ps5000.PS5000_CHANNEL = make_enum([
 	"PS5000_CHANNEL_B",
 	"PS5000_CHANNEL_C",
 	"PS5000_CHANNEL_D",
-	("PS5000_MAX_CHANNELS", "PS5000_EXTERNAL")
+	("PS5000_MAX_CHANNELS", "PS5000_EXTERNAL"),
 	"PS5000_TRIGGER_AUX",
 	"PS5000_MAX_TRIGGER_SOURCES",
 ])
@@ -129,7 +129,7 @@ doc = """ PICO_STATUS ps5000GetTimebase
         long  *maxSamples,
         unsigned short  segmentIndex
     ); """
-ps.make_symbol("_GetTimebase", "ps5000GetTimebase", c_uint16, [c_int16, c_uint32, c_int32, c_void_p, c_int16, c_void_p, c_uint16], doc)
+ps5000.make_symbol("_GetTimebase", "ps5000GetTimebase", c_uint16, [c_int16, c_uint32, c_int32, c_void_p, c_int16, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps5000GetTriggerTimeOffset
     (
@@ -139,7 +139,7 @@ doc = """ PICO_STATUS ps5000GetTriggerTimeOffset
         PS5000_TIME_UNITS  *timeUnits,
         unsigned short  segmentIndex
     ); """
-ps.make_symbol("_GetTriggerTimeOffset", "ps5000GetTriggerTimeOffset", c_uint16, [c_int16, c_void_p, c_void_p, c_void_p, c_uint16], doc)
+ps5000.make_symbol("_GetTriggerTimeOffset", "ps5000GetTriggerTimeOffset", c_uint16, [c_int16, c_void_p, c_void_p, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps5000GetTriggerTimeOffset64
     (
@@ -148,7 +148,7 @@ doc = """ PICO_STATUS ps5000GetTriggerTimeOffset64
         PS5000_TIME_UNITS  *timeUnits,
         unsigned short  segmentIndex
     ); """
-ps.make_symbol("_GetTriggerTimeOffset64", "ps5000GetTriggerTimeOffset64", c_uint32, [c_int16, c_void_p, c_void_p, c_uint16], doc)
+ps5000.make_symbol("_GetTriggerTimeOffset64", "ps5000GetTriggerTimeOffset64", c_uint32, [c_int16, c_void_p, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps5000GetUnitInfo
     (
@@ -158,7 +158,7 @@ doc = """ PICO_STATUS ps5000GetUnitInfo
         short  *requiredSize,
         PICO_INFO  info
     ); """
-ps.make_symbol("_GetUnitInfo", "ps5000GetUnitInfo", c_uint32, [c_int16, c_void_p, c_int16, c_void_p, c_uint32], doc)
+ps5000.make_symbol("_GetUnitInfo", "ps5000GetUnitInfo", c_uint32, [c_int16, c_void_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps5000GetValues
     (
@@ -170,7 +170,7 @@ doc = """ PICO_STATUS ps5000GetValues
         unsigned short  segmentIndex,
         short  *overflow
     ); """
-ps.make_symbol("_GetValues", "ps5000GetValues", c_uint32, [c_int16, c_uint32, c_void_p, c_uint32, c_int16, c_uint16, c_void_p], doc)
+ps5000.make_symbol("_GetValues", "ps5000GetValues", c_uint32, [c_int16, c_uint32, c_void_p, c_uint32, c_int16, c_uint16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps5000GetValuesAsync
     (
@@ -183,7 +183,7 @@ doc = """ PICO_STATUS ps5000GetValuesAsync
         void  *lpDataReady,
         void  *pParameter
     ); """
-ps.make_symbol("_GetValuesAsync", "ps5000GetValuesAsync", c_uint32, [c_int16, c_uint32, c_uint32, c_uint32, c_int16, c_uint16, c_void_p, c_void_p], doc)
+ps5000.make_symbol("_GetValuesAsync", "ps5000GetValuesAsync", c_uint32, [c_int16, c_uint32, c_uint32, c_uint32, c_int16, c_uint16, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps5000GetValuesBulk
     (
@@ -195,7 +195,7 @@ doc = """ PICO_STATUS ps5000GetValuesBulk
     ); """
 ps5000.make_symbol("_GetValuesBulk", "ps5000GetValuesBulk", c_uint32, [c_int16, c_void_p, c_uint16, c_uint16, c_void_p], doc)
 
-doc = """ PICO_STATUS ps5000GetTriggerTimeOffsetBulk
+doc = """ PICO_STATUS ps5000GetValuesTriggerTimeOffsetBulk
 	(
 		short  handle,
 		unsigned long  *timesUpper,
@@ -204,9 +204,9 @@ doc = """ PICO_STATUS ps5000GetTriggerTimeOffsetBulk
 		unsigned short   fromSegmentIndex,
 		unsigned short  toSegmentIndex
 	); """
-ps5000.make_symbol("_GetTriggerTimeOffsetBulk", "ps5000GetTriggerTimeOffsetBulk", c_uint32, [c_int16, c_void_p, c_void_p, c_void_p, c_uint16, c_uint16], doc)
+ps5000.make_symbol("_GetValuesTriggerTimeOffsetBulk", "ps5000GetValuesTriggerTimeOffsetBulk", c_uint32, [c_int16, c_void_p, c_void_p, c_void_p, c_uint16, c_uint16], doc)
 
-doc = """ PICO_STATUS ps5000GetTriggerTimeOffsetBulk64
+doc = """ PICO_STATUS ps5000GetValuesTriggerTimeOffsetBulk64
 	(
 		short  handle,
 		_int64  *times,
@@ -214,7 +214,7 @@ doc = """ PICO_STATUS ps5000GetTriggerTimeOffsetBulk64
 		unsigned short  fromSegmentIndex,
 		unsigned short  toSegmentIndex
 	); """
-ps5000.make_symbol("_GetTriggerTimeOffsetBulk64", "ps5000GetTriggerTimeOffsetBulk64", c_uint32, [c_int16, c_void_p, c_void_p, c_uint16, c_int16], doc)
+ps5000.make_symbol("_GetValuesTriggerTimeOffsetBulk64", "ps5000GetValuesTriggerTimeOffsetBulk64", c_uint32, [c_int16, c_void_p, c_void_p, c_uint16, c_int16], doc)
 
 doc = """ PICO_STATUS ps5000IsLedFlashing
 	(
@@ -385,7 +385,7 @@ doc = """ PICO_STATUS ps5000SetPulseWidthQualifier
 	); """
 ps5000.make_symbol("_SetPulseWidthQualifier", "ps5000SetPulseWidthQualifier", c_uint32, [c_int16, c_void_p, c_int16, c_int32, c_uint32, c_uint32, c_int32], doc)
 
-doc = """ PICO_STATUS ps5000SetSigGenArbitary
+doc = """ PICO_STATUS ps5000SetSigGenArbitrary
 	(
 		short  handle,
 		long  offsetVoltage,
@@ -405,7 +405,7 @@ doc = """ PICO_STATUS ps5000SetSigGenArbitary
 		SIGGEN_TRIG_SOURCE  triggerSource,
 		short  extInThreshold
 	); """
-ps5000.make_symbol("_SetSigGenArbitary", "ps5000SetSigGenArbitary", c_uint32, 
+ps5000.make_symbol("_SetSigGenArbitrary", "ps5000SetSigGenArbitrary", c_uint32, 
 					[c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p, 
 						c_int32, c_int32, c_int16, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
@@ -440,7 +440,7 @@ doc = """ PICO_STATUS ps5000SetSimpleTrigger
 		unsigned long  delay,
 		short  autoTrigger_ms
 	); """
-ps5000.make_symbol("_SetSimpleTrigger", "ps5000SetSimpleTrigger", c_uint32, [c_int16, c_int16, c_int32, c_int16 c_int32, c_uint32, c_int16], doc)
+ps5000.make_symbol("_SetSimpleTrigger", "ps5000SetSimpleTrigger", c_uint32, [c_int16, c_int16, c_int32, c_int16, c_int32, c_uint32, c_int16], doc)
 
 doc = """ PICO_STATUS ps5000SetTriggerChannelConditions
 	(
