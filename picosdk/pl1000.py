@@ -54,6 +54,12 @@ pl1000.PL1000OpenProgress = {
 	'PL1000_OPEN_PROGRESS_COMPLETE' : 1,
 }
 
+pl1000.PL1000_BLOCK_METHOD = make_enum([
+	"BM_SINGLE",
+	"BM_WINDOW",
+	"BM_STREAM",
+])
+
 doc = """ PICO_STATUS pl1000CloseUnit
     (
 	    int16_t  handle

@@ -23,6 +23,21 @@ def adc2mV(bufferADC, range, maxADC):
     bufferV = [(x * vRange) / maxADC.value for x in bufferADC]
 
     return bufferV
+	
+def adc2mVpl1000(bufferADC, range, maxADC):
+	"""
+		adc2mVpl1000(
+						c_short_Array		bufferADC,
+						int 				range,
+						c_int32				maxADC
+						)
+		
+		Takes a buffer of raw adc count values and converts it into millvolts
+	"""
+	
+	bufferV = [(x * range) / maxADC.value for x in bufferADC]
+	
+	return bufferV
 
 def mV2adc(millivolts, range, maxADC):
     """
@@ -39,6 +54,18 @@ def mV2adc(millivolts, range, maxADC):
 
     return adcValue
 
+def mV2adcpl1000(millivolts, range, maxADC):
+	"""
+		mV2adc(
+				float				millivolts,
+				int					range,
+				c_int32				maxADC
+				)
+		Takes a voltage value and converts it to adc counts
+	"""
+	adcValue = round((millivolts * maxADC.value)/range)
+	
+	return adcValue
 
 
 def splitMSOData(dataLength, data):
