@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2018-2019 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS2000 Series (A API) STREAMING MODE EXAMPLE
+# PS5000 Series (A API) STREAMING MODE EXAMPLE
 # This example demonstrates how to call the ps5000a driver API functions in order to open a device, setup 2 channels and collects streamed data (1 buffer).
 # This data is then plotted as mV against time in ns.
 
@@ -16,7 +16,7 @@ import time
 chandle = ctypes.c_int16()
 status = {}
 
-# Open PicoScope 2000 Series device
+# Open PicoScope 5000 Series device
 # Resolution set to 12 Bit
 resolution =ps.PS5000A_DEVICE_RESOLUTION["PS5000A_DR_12BIT"]
 # Returns handle to chandle for use in future API functions
