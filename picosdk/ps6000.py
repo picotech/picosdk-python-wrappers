@@ -481,6 +481,29 @@ doc = """ PICO_STATUS ps6000RunStreaming
     ); """
 ps6000.make_symbol("_RunStreaming", "ps6000RunStreaming", c_uint32,
                    [c_int16, c_void_p, c_int32, c_uint32, c_uint32, c_int16, c_uint32, c_int32, c_uint32], doc)
+				   
+doc = """ void ps6000StreamingReady
+	(
+		int16_t				handle,
+		uint32_t			noOfSamples,
+		uint32_t			startIndex,
+		int16_t				overflow,
+		uint32_t			triggerAt,
+		int16_t				triggered,
+		int16_t				autoStop,
+		void				*pParameter
+	); """
+ps6000.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+														c_int16,
+														c_uint32,
+														c_uint32,
+														c_int16,
+														c_uint32,
+														c_int16,
+														c_int16,
+														c_void_p)
+														
+ps6000.StreamingReadyType.__doc__ = doc
 
 doc = """ PICO_STATUS ps6000GetStreamingLatestValues
     (
