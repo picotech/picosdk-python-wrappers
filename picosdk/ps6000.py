@@ -9,6 +9,8 @@ functions.
 
 from ctypes import *
 from picosdk.library import Library
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
+from picosdk.constants import make_enum
 
 
 class Ps6000lib(Library):
@@ -17,6 +19,62 @@ class Ps6000lib(Library):
 
 
 ps6000 = Ps6000lib()
+
+ps6000.PS6000_RANGE = make_enum([
+    "PS6000A_10MV",
+    "PS6000_20MV",
+    "PS6000_50MV",
+    "PS6000_100MV",
+    "PS6000_200MV",
+    "PS6000_500MV",
+    "PS6000_1V",
+    "PS6000_2V",
+    "PS6000_5V",
+    "PS6000_10V",
+    "PS6000_20V",
+    "PS6000_50V",
+    "PS6000_MAX_RANGES",
+])
+
+ps6000.PS6000_CHANNEL = make_enum([
+	"PS6000_CHANNEL_A",
+	"PS6000_CHANNEL_B",
+	"PS6000_CHANNEL_C",
+	"PS6000_CHANNEL_D",
+	("PS6000_EXTERNAL", "PS6000_MAX_CHANNELS"),
+	"PS6000_TRIGGER_AUX",
+	"PS6000_MAX_TRIGGER_SOURCES",
+])
+
+ps6000.PS6000_COUPLING = make_enum([
+	"PS6000_AC",
+	"PS6000_DC_1M",
+	"PS6000_DC_50R",
+])
+
+ps6000.PS6000_BANDWIDTH_LIMITER = make_enum([
+	"PS6000_BW_FULL",
+	"PS6000_BW_20MHZ",
+	"PS6000_BW_25MHZ",
+])
+
+ps6000.PS6000_RATIO_MODE = {
+	"PS6000_RATIO_MODE_NONE" : 0,
+	"PS6000_RATIO_MODE_AGGREGATE" : 1,
+	"PS6000_RATIO_MODE_AVERAGE" : 2,
+	"PS6000_RATIO_MODE_DECIMATE" : 4,
+	"PS6000_RATIO_MODE_DISTRIBUTION" : 8,
+}
+
+ps6000.PS6000_TIME_UNITS = make_enum([
+	"PS6000_FS",
+	"PS6000_PS",
+	"PS6000_NS",
+	"PS6000_US",
+	"PS6000_MS",
+	"PS6000_S",
+	"PS6000_MAX_TIME_UNITS",
+])
 
 # some ps6000 scopes have 2GS of memory.
 ps6000.MAX_MEMORY = 2**31
