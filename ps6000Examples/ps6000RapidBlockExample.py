@@ -269,7 +269,7 @@ assert_pico_ok(status["GetValuesBulk"])
 # Fromsegmentindex = 0
 # Tosegementindex = 9
 Times = (ctypes.c_int16*10)()
-TimeUnits = ctypes.c_char()
+TimeUnits = (ctypes.c_int16*10)()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps6000GetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
