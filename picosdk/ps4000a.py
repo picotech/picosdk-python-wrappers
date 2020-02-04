@@ -973,3 +973,25 @@ doc = """ PICO_STATUS ps4000aSetFrequencyCounter
     ); """
 ps4000a.make_symbol("_SetFrequencyCounter", "ps4000aSetFrequencyCounter", c_uint32,
                     [c_int16, c_int32, c_int16, c_int32, c_int16, c_int16], doc)
+
+doc = """ PICO_STATUS ps4000aOpenUnitWithResolution
+    (
+	    int16_t    *handle,
+		int8_t     *serial,
+		PS4000A_DEVICE_RESOLUTION    resolution
+	); """
+ps4000a.make_symbol("_OpenUnitWithResolution", "ps4000aOpenUnitWithResolution", c_uint32, [c_void_p, c_void_p, c_int32], doc)
+
+doc = """ PICO_STATUS ps4000aGetDeviceResolution
+    (
+	    int16_t    handle,
+		PS4000A_DEVICE_RESOLUTION    *resolution
+	); """
+ps4000a.make_symbol("_GetResolution", "ps4000aGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS ps4000aSetDeviceResolution
+    (
+	    int16_t    handle,
+		PS4000A_DEVICE_RESOLUTION    resolution
+	); """
+ps4000a.make_symbol("_SetResolution", "ps4000aSetDeviceResolution", c_uint32, [c_int16, c_int32], doc)
