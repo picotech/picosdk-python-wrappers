@@ -601,20 +601,31 @@ doc = """ PICO_STATUS ps3000aGetStreamingLatestValues
 ps3000a.make_symbol("_GetStreamingLatestValues", "ps3000aGetStreamingLatestValues", c_uint32,
                     [c_int16, c_void_p, c_void_p], doc)
 
-# TODO sort out how to make a callback for a C function in ctypes!
-# doc = """ void *ps3000aStreamingReady
-#     (
-#         int16_t   handle,
-#         int32_t   noOfSamples,
-#         uint32_t  startIndex,
-#         int16_t   overflow,
-#         uint32_t  triggerAt,
-#         int16_t   triggered,
-#         int16_t   autoStop,
-#         void     *pParameter
-#     ); """
-# ps3000a.make_symbol("_StreamingReady", "ps3000aStreamingReady", c_void_p,
-#                     [c_int16, c_int32, c_uint32, c_int16, c_uint32, c_int16, c_int16, c_void_p], doc)
+doc = """ void *ps3000aStreamingReady
+    (
+        int16_t   handle,
+        int32_t   noOfSamples,
+        uint32_t  startIndex,
+        int16_t   overflow,
+        uint32_t  triggerAt,
+        int16_t   triggered,
+        int16_t   autoStop,
+        void     *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps3000a.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                         c_int32,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_void_p)
+
+ps3000a.StreamingReadyType.__doc__ = doc
 
 doc = """ PICO_STATUS ps3000aNoOfStreamingValues
     (
