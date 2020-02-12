@@ -8,6 +8,7 @@ functions.
 """
 
 from ctypes import *
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.library import Library
 from picosdk.constants import make_enum
 
