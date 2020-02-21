@@ -39,6 +39,28 @@ usbDrDaq.USB_DRDAQ_GPIO = {
 	"USB_DRDAQ_GPIO_4":4
 }
 
+usbDrDaq.USB_DRDAQ_SCOPE_RANGE = make_enum([
+    "USB_DRDAQ_1V25",
+	"USB_DRDAQ_2V5",
+	"USB_DRDAQ_5V",
+	"USB_DRDAQ_10V"
+])
+
+usbDrDaq.USB_DRDAQ_WAVE = make_enum([
+    "USB_DRDAQ_SINE",
+	"USB_DRDAQ_SQUARE",
+	"USB_DRDAQ_TRIANGLE",
+	"USB_DRDAQ_RAMP_UP",
+	"USB_DRDAQ_RAMP_DOWN",
+	"USB_DRDAQ_DC"
+])
+
+usbDrDaq.USB_DRDAQ_BLOCK_METHOD = make_enum([
+    "BM_SINGLE",
+	"BM_WINDOW",
+	"BM_STREAM"
+])
+
 doc = """ PICO_STATUS UsbDrDaqCloseUnit
     (
 	    int16_t    handle
@@ -114,7 +136,7 @@ doc = """ PICO_STATUS UsbDrDaqGetTriggerTimeOffestNs
 	    int16_t    handle,
 		int64_t    *time
     ); """
-usbDrDaq.make_symbol("_GetTriggerTimeOffsetNs", "UsbDrDaqGetTriggerTimeOffestNs", c_uint32, [c_int16, c_void_p], doc)
+usbDrDaq.make_symbol("_GetTriggerTimeOffsetNs", "UsbDrDaqGetTriggerTimeOffsetNs", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS UsbDrDaqGetUnitInfo
     (
@@ -257,7 +279,7 @@ doc = """ PICO_STATUS UsbDrDaqSetSigGenArbitary
 		int16_t    arbitaryWaveformSize,
 		int32_t    updateRate
 	); """
-usbDrDaq.make_symbol("_SetSigGenArbitary", "UsbDrDaqSetSigGenArbitary", c_uint32, [c_int16, c_int32, c_uint32, c_void_p, c_int16, c_int32], doc)
+usbDrDaq.make_symbol("_SetSigGenArbitary", "UsbDrDaqSetSigGenArbitrary", c_uint32, [c_int16, c_int32, c_uint32, c_void_p, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS UsbDrDaqSetSigGenBuiltIn
     (
