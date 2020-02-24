@@ -45,7 +45,16 @@ status["setChB"] = ps.ps6000SetChannel(chandle, 1, 1, 1, chBRange, 0, 0)
 assert_pico_ok(status["setChB"])
 
 # Set up level drop out tirgger on A
+conditions = ps.PS6000_TRIGGER_CONDITIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
+											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"])
+nConditions = 1
 
+status["setTriggerChannelConditions"] = ps.ps6000SetTriggerChannelConditions(chandle, ctypes.byref(conditions), nConditions)
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
