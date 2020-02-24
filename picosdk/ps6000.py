@@ -76,6 +76,42 @@ ps6000.PS6000_TIME_UNITS = make_enum([
 	"PS6000_MAX_TIME_UNITS",
 ])
 
+class PS6000_TRIGGER_CONDITIONS (Structure):
+    _pack_ = 1
+    _fields_ = [("channelA", c_uint32),
+                ("channelB", c_uint32),
+				("channelC", c_uint32),
+				("channelD", c_uint32),
+				("external", c_uint32),
+				("aux", c_uint32),
+				("pulseWidthQualifier", c_uint32)]
+				
+ps6000.PS6000_TRIGGER_CONDITIONS = PS6000_TRIGGER_CONDITIONS
+
+class PS6000_TRIGGER_CHANNEL_PROPERTIES (Structure):
+    _pack_ = 1
+    _fields_ = [("thresholdUpper", c_int16),
+                ("hysteresisUpper", c_uint16),
+                ("thresholdLower", c_int16),
+                ("hysteresisLower", c_uint16),
+                ("channel", c_uint32),
+                ("thresholdMode", c_uint32)]
+				
+ps6000.PS6000_TRIGGER_CHANNEL_PROPERTIES = PS6000_TRIGGER_CHANNEL_PROPERTIES
+
+class PS6000_PWQ_CONDITIONS (Structure):
+	_pack_ = 1
+	_fields_ = [("channelA", c_uint32),
+				("channelB", c_uint32),
+				("channelC", c_uint32),
+				("channelD", c_uint32),
+				("external", c_uint32),
+				("aux", c_uint32)]
+				
+ps6000.PS6000_PWQ_CONDITIONS = PS6000_PWQ_CONDITIONS
+	
+
+
 # some ps6000 scopes have 2GS of memory.
 ps6000.MAX_MEMORY = 2**31
 
