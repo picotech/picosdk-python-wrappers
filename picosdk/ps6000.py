@@ -76,6 +76,13 @@ ps6000.PS6000_TIME_UNITS = make_enum([
 	"PS6000_MAX_TIME_UNITS",
 ])
 
+ps6000.PS6000_TRIGGER_STATE = make_enum([
+	"PS6000_CONDITION_DONT_CARE",
+	"PS6000_CONDITION_TRUE",
+	"PS6000_CONDITION_FALSE",
+	"PS6000_CONDITION_MAX",
+])
+
 class PS6000_TRIGGER_CONDITIONS (Structure):
     _pack_ = 1
     _fields_ = [("channelA", c_uint32),
