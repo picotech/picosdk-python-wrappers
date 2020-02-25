@@ -1,8 +1,8 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2020 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS6000 BLOCK MODE EXAMPLE
-# This example opens a 6000 driver device, sets up two channels and a trigger then collects a block of data.
+# PS6000 BLOCK MODE ADVANCED TRIGGER EXAMPLE
+# This example opens a 6000 driver device, sets up two channels and a level drop out advanced trigger then collects a block of data.
 # This data is then plotted as mV against time in ns.
 
 import ctypes
@@ -45,16 +45,51 @@ status["setChB"] = ps.ps6000SetChannel(chandle, 1, 1, 1, chBRange, 0, 0)
 assert_pico_ok(status["setChB"])
 
 # Set up level drop out tirgger on A
-conditions = ps.PS6000_TRIGGER_CONDITIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
+triggerConditions = ps.PS6000_TRIGGER_CONDITIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
 											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"])
-nConditions = 1
+nTriggerConditions = 1
 
-status["setTriggerChannelConditions"] = ps.ps6000SetTriggerChannelConditions(chandle, ctypes.byref(conditions), nConditions)
+status["setTriggerChannelConditions"] = ps.ps6000SetTriggerChannelConditions(chandle, ctypes.byref(triggerConditions), nTriggerConditions)
+assert_pico_ok(status["setTriggerChannelConditions"])
+
+status["setTriggerChannelDirections"] = ps.ps6000SetTriggerChannelDirections(chandle, ps.PS6000_THRESHOLD_DIRECTION["PS6000_RISING_OR_FALLING"], ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"],
+																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"], ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"]. ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"],
+																			ps.PS6000_THRESHOLD_DIRECTION[PS6000_NONE"])
+assert_pico_ok(status["setTriggerChannelDirections"])
+
+maxADC = ctypes.c_int16(32512)
+threshold = mV2adc(109.2, chARange, maxADC)
+hysteresis = mV2adc(109.2 * 0.015), chARange, maxADC
+channelProperties = ps.PS6000_TRIGGER_CHANNEL_PROPERTIES(threshold,
+															hysteresis,
+															threshold,
+															hysteresis,
+															ps.PS6000_CHANNEL["PS6000_CHANNEL_A"],
+															ps.PS6000_THRESHOLD_MODE["PS6000_LEVEL"])
+nChannelProperties = 1
+auxOutputEnable = 0
+autoTriggerMilliseconds = 1000
+status["setTriggerChannelProperties"] = ps.ps6000SetTriggerChannelProperties(chandle, ctypes.byref(channelProperties), nChannelProperties, auxOutputEnable, autoTriggerMilliseconds)
+assert_pico_ok(status["setTriggerChannelProperties"])
+
+pwqConditions = ps.PS6000_PWQ_CONDTIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
+										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"])
+nPwqConditions = 1
+direction = ps.PS6000_THRESHOLD_DIRECTION["PS6000_RISING_OR_FALLING"]
+lower = 390625 #samples at timebase 8 is 10 ms
+upper = lower
+type = ps.PS6000_PULSE_WIDTH_TYPE["PS6000_PW_TYPE_GREATER_THAN"]
+status["setPulseWidthQualifier"] = ps.ps6000SetPulseWidthQualifier(chandle, ctypes.byref(pwqConditions), nPwqConditions, direction, lower, upper, type)
+assert_pico_ok(status["setPulseWidthQualifier"])
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
