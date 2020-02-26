@@ -10,6 +10,7 @@ this type and attach the missing methods.
 from __future__ import print_function
 
 import sys
+import os
 from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer, byref
 from ctypes.util import find_library
 import collections
@@ -65,6 +66,11 @@ class Library(object):
 
     def _load(self):
         library_path = find_library(self.name)
+
+        if sys.platform == 'darwin':
+            library_path = f"/Applications/PicoScope 6.app/Contents/Resources/lib/lib{self.name}.dylib"
+            if not os.path.exists(library_path):
+                raise CannotFindPicoSDKError("PicoScope is not installed or cannot be found.")
 
         if library_path is None:
             env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
