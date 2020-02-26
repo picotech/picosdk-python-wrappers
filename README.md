@@ -65,6 +65,7 @@ The following drivers and devices are not yet supported:
 * `plcm3` - PicoLog CM3 Current Data Logger
 * `ps3000` - PicoScope 3204, 3205, 3206, 3223, 3224, 3423 & 3423
 * `usbpt104` - PT-104 Platinum Resistance Data Logger
+* `ps6000a - PicoScope 6804E & 6824E
 
 ### Dependencies
 
