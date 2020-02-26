@@ -32,7 +32,7 @@ chARange = 7
 status["setChA"] = ps.ps6000SetChannel(chandle, 0, 1, 1, chARange, 0, 0)
 assert_pico_ok(status["setChA"])
 
-# Set up level drop out trigger on A
+# Set up window pulse width trigger on A
 triggerConditions = ps.PS6000_TRIGGER_CONDITIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
 												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
