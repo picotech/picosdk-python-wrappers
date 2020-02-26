@@ -2,14 +2,14 @@
 # Copyright (C) 2018-2020 Pico Technology Ltd. See LICENSE file for terms.
 #
 # PS6000 BLOCK MODE ADVANCED TRIGGER EXAMPLE
-# This example opens a 6000 driver device, sets up two channels and a level drop out advanced trigger then collects a block of data.
+# This example opens a 6000 driver device, sets up one channel and a window pulse width advanced trigger then collects a block of data.
 # This data is then plotted as mV against time in ns.
 
 import ctypes
 import numpy as np
 from picosdk.ps6000 import ps6000 as ps
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, assert_pico_ok
+from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -32,52 +32,44 @@ chARange = 7
 status["setChA"] = ps.ps6000SetChannel(chandle, 0, 1, 1, chARange, 0, 0)
 assert_pico_ok(status["setChA"])
 
-# Set up channel B
-# handle = chandle
-# channel = PS6000_CHANNEL_B = 1
-# enabled = 1
-# coupling type = PS6000_DC = 1
-# range = PS6000_2V = 7
-# analogue offset = 0 V
-# bandwidth limiter = PS6000_BW_FULL = 0
-chBRange = 7
-status["setChB"] = ps.ps6000SetChannel(chandle, 1, 1, 1, chBRange, 0, 0)
-assert_pico_ok(status["setChB"])
-
-# Set up level drop out tirgger on A
+# Set up level drop out trigger on A
 triggerConditions = ps.PS6000_TRIGGER_CONDITIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
-											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
-											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
-											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
-											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
-											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
-											ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"])
+												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
+												ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"])
 nTriggerConditions = 1
 
 status["setTriggerChannelConditions"] = ps.ps6000SetTriggerChannelConditions(chandle, ctypes.byref(triggerConditions), nTriggerConditions)
 assert_pico_ok(status["setTriggerChannelConditions"])
 
-status["setTriggerChannelDirections"] = ps.ps6000SetTriggerChannelDirections(chandle, ps.PS6000_THRESHOLD_DIRECTION["PS6000_RISING_OR_FALLING"], ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"],
-																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"], ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"]. ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"],
-																			ps.PS6000_THRESHOLD_DIRECTION[PS6000_NONE"])
+status["setTriggerChannelDirections"] = ps.ps6000SetTriggerChannelDirections(chandle, 
+																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_INSIDE"], 
+																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"],
+																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"], 
+																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"], 
+																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"],
+																			ps.PS6000_THRESHOLD_DIRECTION["PS6000_NONE"])
 assert_pico_ok(status["setTriggerChannelDirections"])
 
 maxADC = ctypes.c_int16(32512)
 threshold = mV2adc(109.2, chARange, maxADC)
-hysteresis = mV2adc(109.2 * 0.015), chARange, maxADC
+hysteresis = mV2adc((109.2 * 0.015), chARange, maxADC)
 channelProperties = ps.PS6000_TRIGGER_CHANNEL_PROPERTIES(threshold,
-															hysteresis,
-															threshold,
-															hysteresis,
-															ps.PS6000_CHANNEL["PS6000_CHANNEL_A"],
-															ps.PS6000_THRESHOLD_MODE["PS6000_LEVEL"])
+														hysteresis,
+														(threshold * -1),
+														hysteresis,
+														ps.PS6000_CHANNEL["PS6000_CHANNEL_A"],
+														ps.PS6000_THRESHOLD_MODE["PS6000_WINDOW"])
 nChannelProperties = 1
 auxOutputEnable = 0
-autoTriggerMilliseconds = 1000
+autoTriggerMilliseconds = 10000
 status["setTriggerChannelProperties"] = ps.ps6000SetTriggerChannelProperties(chandle, ctypes.byref(channelProperties), nChannelProperties, auxOutputEnable, autoTriggerMilliseconds)
 assert_pico_ok(status["setTriggerChannelProperties"])
 
-pwqConditions = ps.PS6000_PWQ_CONDTIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
+pwqConditions = ps.PS6000_PWQ_CONDITIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_TRUE"],
 										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
 										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"],
@@ -85,15 +77,15 @@ pwqConditions = ps.PS6000_PWQ_CONDTIONS(ps.PS6000_TRIGGER_STATE["PS6000_CONDITIO
 										ps.PS6000_TRIGGER_STATE["PS6000_CONDITION_DONT_CARE"])
 nPwqConditions = 1
 direction = ps.PS6000_THRESHOLD_DIRECTION["PS6000_RISING_OR_FALLING"]
-lower = 390625 #samples at timebase 8 is 10 ms
-upper = lower
+upper = 390625 #samples at timebase 8 is 10 ms
+lower = upper
 type = ps.PS6000_PULSE_WIDTH_TYPE["PS6000_PW_TYPE_GREATER_THAN"]
 status["setPulseWidthQualifier"] = ps.ps6000SetPulseWidthQualifier(chandle, ctypes.byref(pwqConditions), nPwqConditions, direction, lower, upper, type)
 assert_pico_ok(status["setPulseWidthQualifier"])
 
 # Set number of pre and post trigger samples to be collected
-preTriggerSamples = 2500
-postTriggerSamples = 2500
+preTriggerSamples = 390625*2
+postTriggerSamples = 390625
 maxSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
@@ -145,16 +137,6 @@ bufferBMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't
 status["setDataBuffersA"] = ps.ps6000SetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxSamples, 0)
 assert_pico_ok(status["setDataBuffersA"])
 
-# Set data buffer location for data collection from channel B
-# handle = chandle
-# source = PS6000_CHANNEL_B = 1
-# pointer to buffer max = ctypes.byref(bufferBMax)
-# pointer to buffer min = ctypes.byref(bufferBMin)
-# buffer length = maxSamples
-# ratio mode = PS6000_RATIO_MODE_NONE = 0
-status["setDataBuffersB"] = ps.ps6000SetDataBuffers(chandle, 1, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), maxSamples, 0)
-assert_pico_ok(status["setDataBuffersB"])
-
 # create overflow loaction
 overflow = ctypes.c_int16()
 # create converted type maxSamples
@@ -175,14 +157,12 @@ maxADC = ctypes.c_int16(32512)
 
 # convert ADC counts data to mV
 adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
-adc2mVChBMax =  adc2mV(bufferBMax, chBRange, maxADC)
 
 # Create time data
 time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
 
-# plot data from channel A and B
+# plot data from channel A
 plt.plot(time, adc2mVChAMax[:])
-plt.plot(time, adc2mVChBMax[:])
 plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
