@@ -55,8 +55,8 @@ status["trigger"] = ps.ps2000_set_trigger(chandle, 0, 64, 0, 0, 1000)
 assert_pico2000_ok(status["trigger"])
 
 # Set number of pre and post trigger samples to be collected
-preTriggerSamples = 2500
-postTriggerSamples = 2500
+preTriggerSamples = 1000
+postTriggerSamples = 1000
 maxSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
