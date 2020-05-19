@@ -19,6 +19,86 @@ class Ps6000alib(Library):
 
 ps6000a = Ps6000alib()
 
+doc = """ void ps6000aBlockReady
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        PICO_POINTER    pParameter
+    ); """
+ps6000a.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                     c_int16,
+                                                     c_uint32,
+                                                     c_void_p)
+ps6000a.BlockReadyType.__doc__ = doc
+
+doc = """ void ps6000aStreamingReady
+    (
+        int16_t    handle,
+        int64_t    noOfSamples,
+        uint64_t    bufferIndex,
+        uint32_t    startIndex,
+        int16_t    overflow,
+        uint32_t    triggerAt,
+        int16_t    triggered,
+        int16_t    autoStop,
+        PICO_POINTER    pParameter
+    ); """
+ps6000a.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                         c_int64,
+                                                         c_uint64,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_void_p)
+ps6000a.StreamingReadyType.__doc__ = doc
+
+doc = """ void ps6000aDataReady
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        uint64_t    noOfSamples,
+        int16_t    overflow,
+        PICO_POINTER    pParameter
+    ); """
+ps6000a.DataReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                    c_int16,
+                                                    c_uint32,
+                                                    c_uint64,
+                                                    c_int16,
+                                                    c_void_p)
+ps6000a.DataReadyType.__doc__ = doc
+
+doc = """ void ps6000aProbeInteractions
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        PICO_USER_PROBE_INTERACTIONS    *probes,
+        uint32_t    nProbes
+    ); """
+ps6000a.ProbeInteractionsType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                            c_int16,
+                                                            c_uint32,
+                                                            c_void_p,
+                                                            c_uint32)
+ps6000a.ProbeInteractionsType.__doc__ = doc
+
+doc = """ void ps6000aDigitalPortInteractions
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        PICO_DIGITAL_PORT_INTERACTIONS    *ports,
+        uint32_t    nPorts
+    ); """
+ps6000a.DigitalPortInteractionsType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                                  c_int16,
+                                                                  c_uint32,
+                                                                  c_void_p,
+                                                                  c_uint32)
+ps6000a.DigitalPortInteractionsType.__doc__ = doc
+
 doc = """ PICO_STATUS ps6000aOpenUnit
     (
         int16_t *handle,
@@ -424,7 +504,7 @@ doc = """ PICO_STATUS ps6000aSetDataBuffers
         int16_t    handle,
         PICO_CHANNEL    channel,
         PICO_POINTER    bufferMax,
-        PCIO_POINTER    bufferMin,
+        PICO_POINTER    bufferMin,
         int32_t    nSamples,
         PICO_DATA_TYPE    dataType,
         uint64_t    waveform,
