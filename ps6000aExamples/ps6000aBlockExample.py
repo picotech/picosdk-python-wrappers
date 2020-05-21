@@ -8,6 +8,7 @@
 import ctypes
 import numpy as np
 from picosdk.ps6000a import ps6000a as ps
+#from picosdk.PicoDeviceEnums import PicoDeviceEnums as enums
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok
 
@@ -19,6 +20,16 @@ status = {}
 # returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps6000aOpenUnit(ctypes.byref(chandle), None, 0)
 assert_pico_ok(status["openunit"])
+
+# Set channel A on
+# handle = chandle
+channel = 0 #enums.PICO_CHANNEL["PICO_CHANNEL_A"]
+coupling = 0 #enums.PICO_COUPLING["PICO_DC"]
+range = 7
+# analogueOffset = 0 V
+bandwidth = 0 #enums.PICO_CHANNEL["PICO_BW_FULL"]
+status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channel, coupling, range, 0, bandwidth)
+assert_pico_ok(status["setChannelA"])
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
