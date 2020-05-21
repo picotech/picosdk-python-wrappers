@@ -26,11 +26,17 @@ assert_pico_ok(status["openunit"])
 # handle = chandle
 channelA = 0 #enums.PICO_CHANNEL["PICO_CHANNEL_A"]
 coupling = 0 #enums.PICO_COUPLING["PICO_DC"]
-range = 7
+channelRange = 7
 # analogueOffset = 0 V
 bandwidth = 0 #enums.PICO_CHANNEL["PICO_BW_FULL"]
-status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, range, 0, bandwidth)
+status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
 assert_pico_ok(status["setChannelA"])
+
+# set channel B-H off
+for x in range (1, 7, 1):
+    channel = x
+    status["setChannel",x] = ps.ps6000aSetChannelOff(chandle,channel)
+    assert_pico_ok(status["setChannel",x])
 
 # Set simple trigger on channel A, 1 V rising with 1 s autotrigger
 # handle = chandle
@@ -42,6 +48,16 @@ direction = 2 # PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # autoTriggerMicroSeconds = 1000000 us
 status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 1000, direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
+
+# Get fastest available timebase
+# handle = chandle
+enabledChannelFlags = 1 #PICO_CHANNEL_FLAGS["PICOCHANNEL_A_FLAGS"]
+timebase = ctypes.c_uint32(0)
+timeInterval = ctypes.c_double(0)
+# resolution = resolution
+status["getMinimumTimebaseStateless"] = ps.ps6000aGetMinimumTimebaseStateless(chandle, enabledChannelFlags, ctypes.byref(timebase), ctypes.byref(timeInterval), resolution)
+print("timebase = ", timebase.value)
+print("sample interval =", timeInterval.value, "s")
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
