@@ -494,10 +494,10 @@ doc = """ PICO_STATUS ps6000aSetDataBuffer
         int32_t    nSamples,
         PICO_DATA_TYPE    dataType,
         uint64_t    waveform,
-        PICO_RATIO_MODE    downSampelRationMode,
+        PICO_RATIO_MODE    downSampleRatioMode,
         PICO_ACTION    action
     ); """
-ps6000a.make_symbol("_SetDataBuffer", "ps6000aSetDataBuffer", c_uint32, [c_int16, c_uint32, c_uint32, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
+ps6000a.make_symbol("_SetDataBuffer", "ps6000aSetDataBuffer", c_uint32, [c_int16, c_uint32, c_void_p, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000aSetDataBuffers
     (
@@ -511,7 +511,7 @@ doc = """ PICO_STATUS ps6000aSetDataBuffers
         PICO_RATIO_MODE    downSampleRatioMode,
         PICO_ACTION    action
     ); """
-ps6000a.make_symbol("_SetDataBuffers", "ps6000aSetDataBuffers", c_uint32, [c_int16, c_uint32, c_uint32, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
+ps6000a.make_symbol("_SetDataBuffers", "ps6000aSetDataBuffers", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000aRunBlock
     (
