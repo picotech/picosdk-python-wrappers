@@ -59,10 +59,30 @@ status["getMinimumTimebaseStateless"] = ps.ps6000aGetMinimumTimebaseStateless(ch
 print("timebase = ", timebase.value)
 print("sample interval =", timeInterval.value, "s")
 
+# Set number of samples to be collected
+noOfPreTriggerSamples = 500000
+noOfPostTriggerSamples = 1000000
+nSamples = noOfPostTriggerSamples + noOfPreTriggerSamples
+
+# Create buffers
+bufferAMax = (ctypes.c_int16 * nSamples)()
+bufferAMin = (ctypes.c_int16 * nSamples)() # used for downsampling which isn't in the scope of this example
+
+# Set data buffers
+# handle = chandle
+# channel = channelA
+# bufferMax = bufferAMax
+# bufferMin = bufferAMin
+# nSamples = nSamples
+dataType = 2 # PICO_DATA_TYPE["PICO_INT16_T"]
+waveform = 1
+# downSample = 0
+action = 0x00000001 # PICO_ACTION["PICO_CLEAR_ALL"]
+status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, 0, action)
+assert_pico_ok(status["setDataBuffers"])
+
 # Run block capture
 # handle = chandle
-noOfPreTriggerSamples = 500
-noOfPostTriggerSamples = 1000000
 # timebase = timebase
 timeIndisposedMs = ctypes.c_double(0)
 # segmentIndex = 0
