@@ -18,18 +18,30 @@ status = {}
 
 # Open 6000 A series PicoScope
 # returns handle to chandle for use in future API functions
-status["openunit"] = ps.ps6000aOpenUnit(ctypes.byref(chandle), None, 0)
+resolution = 0 # PICO_DEVICE_RESOLUTION["PICO_DR_8BIT"]
+status["openunit"] = ps.ps6000aOpenUnit(ctypes.byref(chandle), None, resolution)
 assert_pico_ok(status["openunit"])
 
 # Set channel A on
 # handle = chandle
-channel = 0 #enums.PICO_CHANNEL["PICO_CHANNEL_A"]
+channelA = 0 #enums.PICO_CHANNEL["PICO_CHANNEL_A"]
 coupling = 0 #enums.PICO_COUPLING["PICO_DC"]
 range = 7
 # analogueOffset = 0 V
 bandwidth = 0 #enums.PICO_CHANNEL["PICO_BW_FULL"]
-status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channel, coupling, range, 0, bandwidth)
+status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, range, 0, bandwidth)
 assert_pico_ok(status["setChannelA"])
+
+# Set simple trigger on channel A, 1 V rising with 1 s autotrigger
+# handle = chandle
+# enable = 1
+source = channelA
+# threshold = 1000 mV
+direction = 2 # PICO_THRESHOLD_DIRECTION["PICO_RISING"]
+# delay = 0 s
+# autoTriggerMicroSeconds = 1000000 us
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 1000, direction, 0, 1000000)
+assert_pico_ok(status["setSimpleTrigger"])
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
