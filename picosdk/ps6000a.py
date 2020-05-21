@@ -697,7 +697,7 @@ doc = """ PICO_STATUS ps6000aGetMinimumTimebaseStateless
         int16_t    handle,
         PICO_CHANNEL_FLAGS    enabledChannelFlags,
         uint32_t    *timebase,
-        double    *timeInerval,
+        double    *timeInterval,
         PICO_DEVICE_RESOLUTION    resolution
     ); """
 ps6000a.make_symbol("_GetMinimumTimebaseStateless", "ps6000aGetMinimumTimebaseStateless", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)
