@@ -241,7 +241,7 @@ doc = """ PICO_STATUS ps6000aSignGenRange
         double    peakToPeakVolts,
         double    offsetVolts
     ); """
-ps6000a.make_symbol("_SigGenRange", "ps6000aSignGenRange", c_uint32, [c_int16, c_double, c_double], doc)
+ps6000a.make_symbol("_SigGenRange", "ps6000aSigGenRange", c_uint32, [c_int16, c_double, c_double], doc)
 
 doc = """ PICO_STATUS ps6000aSigGenWaveformDutyCycle
     (
@@ -531,7 +531,7 @@ doc = """ PICO_STATUS ps6000aIsReady
         int16_t    handle,
         int16_t    *ready
     ); """
-ps6000a,make_symbol("_IsReady", "ps6000aIsReady", c_uint32, [c_int16, c_void_p], doc)
+ps6000a.make_symbol("_IsReady", "ps6000aIsReady", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000aRunStreaming
     (
@@ -650,7 +650,7 @@ doc = """ PICO_STATUS ps6000aStop
     (
         int16_t    handle,
     ); """
-ps6000a,make_symbol("_Stop", "ps6000aStop", c_uint32, [c_int16], doc)
+ps6000a.make_symbol("_Stop", "ps6000aStop", c_uint32, [c_int16], doc)
 
 doc = """ PICO_STATUS ps6000aSetNoOfCaptures
     (
@@ -810,4 +810,4 @@ doc = """ PICO_STATUS ps6000aSetTemperatureSensorInteractioNCallback
         int16_t    handle,
         PicoTemperatureSensorInteractions    callback
     ); """
-ps6000a.make_symbol("_SetTemperatureSensroInteractionCallback", "ps6000aSetTemperatureSensorInteractioNCallback", c_uint32, [c_int16, c_void_p], doc)
+ps6000a.make_symbol("_SetTemperatureSensroInteractionCallback", "ps6000aSetTemperatureSensorInteractionCallback", c_uint32, [c_int16, c_void_p], doc)
