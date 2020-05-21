@@ -59,6 +59,24 @@ status["getMinimumTimebaseStateless"] = ps.ps6000aGetMinimumTimebaseStateless(ch
 print("timebase = ", timebase.value)
 print("sample interval =", timeInterval.value, "s")
 
+# Run block capture
+# handle = chandle
+noOfPreTriggerSamples = 500
+noOfPostTriggerSamples = 1000000
+# timebase = timebase
+timeIndisposedMs = ctypes.c_double(0)
+# segmentIndex = 0
+# lpReady = None   Using IsReady rather than a callback
+# pParameter = None
+status["runBlock"] = ps.ps6000aRunBlock(chandle, noOfPreTriggerSamples, noOfPostTriggerSamples, timebase, ctypes.byref(timeIndisposedMs), 0, None, None)
+assert_pico_ok(status["runBlock"])
+
+# Check for data collection to finish using ps5000aIsReady
+ready = ctypes.c_int16(0)
+check = ctypes.c_int16(0)
+while ready.value == check.value:
+    status["isReady"] = ps.ps6000aIsReady(chandle, ctypes.byref(ready))
+
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
 assert_pico_ok(status["closeunit"])
