@@ -11,7 +11,7 @@ from ctypes import *
 
 class PicoStructlib(Library):
     def __init__(self):
-        super(PicoStructlib, self).__init__("PicoDeviceStructs")
+        super(PicoStructlib, self).__init__("ps6000a")
 
 
 picoStruct = PicoStructlib()

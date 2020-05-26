@@ -8,13 +8,14 @@ functions.
 """
 
 from picosdk.constants import make_enum
+from picosdk.library import Library
 
 class PicoEnumlib(Library):
     def __init__(self):
-        super(PicoEnumlib, self).__init__("PicoDeviceEnums")
+        super(PicoEnumlib, self).__init__("ps6000a")
 
 
-picoEnum = PicoEnumlib()
+picoEnum  = PicoEnumlib()
 
 def _define_ratio_mode():
     PICO_RATIO_MODE_AGGREGATE = 1,
@@ -179,7 +180,7 @@ picoEnum.PICO_SIGGEN_PARAMETER = make_enum([
     "PICO_SIGGEN_BUFFER_LENGTH"
     ])
     
-picoEnum.PICO_TIME_UNITS([
+picoEnum.PICO_TIME_UNITS = make_enum([
     "PICO_FS",
     "PICO_PS",
     "PICO_NS",
