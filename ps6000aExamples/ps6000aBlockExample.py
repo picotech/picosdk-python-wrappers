@@ -74,11 +74,13 @@ bufferAMin = (ctypes.c_int16 * nSamples)() # used for downsampling which isn't i
 # bufferMax = bufferAMax
 # bufferMin = bufferAMin
 # nSamples = nSamples
-dataType = 2 # PICO_DATA_TYPE["PICO_INT16_T"]
-waveform = 1
-# downSample = 0
-action = 0x00000001 # PICO_ACTION["PICO_CLEAR_ALL"]
-status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, 0, action)
+dataType = 1 # PICO_DATA_TYPE["PICO_INT16_T"]
+waveform = 0
+downSampleMode = 0x80000000 # PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
+clear = 0x00000001 # PICO_ACTION["PICO_CLEAR_ALL"]
+add = 0x00000002 # PICO_ACTION["PICO_ADD"]
+action = clear|add # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] + PICO_ACTION["PICO_ADD"]  
+status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, downSampleMode, action)
 assert_pico_ok(status["setDataBuffers"])
 
 # Run block capture
@@ -96,6 +98,16 @@ ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
 while ready.value == check.value:
     status["isReady"] = ps.ps6000aIsReady(chandle, ctypes.byref(ready))
+    
+# Get data from scope
+# handle = chandle
+# startIndex = 0
+noOfSamples = ctypes.c_uint64(nSamples)
+# downSampleRatio = 1
+# segmentIndex = 0
+overflow = ctypes.c_int16(0)
+status["getValues"] = ps.ps6000aGetValues(chandle, 0, ctypes.byref(noOfSamples), 1, downSampleMode, 0, ctypes.byref(overflow))
+assert_pico_ok(status["getValues"])
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
