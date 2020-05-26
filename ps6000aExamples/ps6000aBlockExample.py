@@ -8,7 +8,7 @@
 import ctypes
 import numpy as np
 from picosdk.ps6000a import ps6000a as ps
-#from picosdk.PicoDeviceEnums import PicoDeviceEnums as enums
+from picosdk.PicoDeviceEnums import picoEnum as enums
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok
 
@@ -18,17 +18,17 @@ status = {}
 
 # Open 6000 A series PicoScope
 # returns handle to chandle for use in future API functions
-resolution = 0 # PICO_DEVICE_RESOLUTION["PICO_DR_8BIT"]
+resolution = enums.PICO_DEVICE_RESOLUTION["PICO_DR_8BIT"]
 status["openunit"] = ps.ps6000aOpenUnit(ctypes.byref(chandle), None, resolution)
 assert_pico_ok(status["openunit"])
 
 # Set channel A on
 # handle = chandle
-channelA = 0 #enums.PICO_CHANNEL["PICO_CHANNEL_A"]
-coupling = 0 #enums.PICO_COUPLING["PICO_DC"]
+channelA = enums.PICO_CHANNEL["PICO_CHANNEL_A"]
+coupling = enums.PICO_COUPLING["PICO_DC"]
 channelRange = 7
 # analogueOffset = 0 V
-bandwidth = 0 #enums.PICO_CHANNEL["PICO_BW_FULL"]
+bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
 status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
 assert_pico_ok(status["setChannelA"])
 
@@ -43,7 +43,7 @@ for x in range (1, 7, 1):
 # enable = 1
 source = channelA
 # threshold = 1000 mV
-direction = 2 # PICO_THRESHOLD_DIRECTION["PICO_RISING"]
+direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
 status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 1000, direction, 0, 1000000)
@@ -51,7 +51,7 @@ assert_pico_ok(status["setSimpleTrigger"])
 
 # Get fastest available timebase
 # handle = chandle
-enabledChannelFlags = 1 #PICO_CHANNEL_FLAGS["PICOCHANNEL_A_FLAGS"]
+enabledChannelFlags = enums.PICO_CHANNEL_FLAGS["PICO_CHANNEL_A_FLAGS"]
 timebase = ctypes.c_uint32(0)
 timeInterval = ctypes.c_double(0)
 # resolution = resolution
@@ -74,12 +74,12 @@ bufferAMin = (ctypes.c_int16 * nSamples)() # used for downsampling which isn't i
 # bufferMax = bufferAMax
 # bufferMin = bufferAMin
 # nSamples = nSamples
-dataType = 1 # PICO_DATA_TYPE["PICO_INT16_T"]
+dataType = enums.PICO_DATA_TYPE["PICO_INT16_T"]
 waveform = 0
-downSampleMode = 0x80000000 # PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
-clear = 0x00000001 # PICO_ACTION["PICO_CLEAR_ALL"]
-add = 0x00000002 # PICO_ACTION["PICO_ADD"]
-action = clear|add # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] + PICO_ACTION["PICO_ADD"]  
+downSampleMode = enums.PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
+clear = enums.PICO_ACTION["PICO_CLEAR_ALL"]
+add = enums.PICO_ACTION["PICO_ADD"]
+action = clear|add # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]  
 status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, downSampleMode, action)
 assert_pico_ok(status["setDataBuffers"])
 

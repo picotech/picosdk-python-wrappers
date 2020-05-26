@@ -105,7 +105,7 @@ picoEnum.PICO_COUPLING = _define_coupling()
 # needs implementing still
 
 def _define_bandwidth_limiter():
-    PICO_BW_FULL = 0,
+    PICO_BW_FULL = 0
     PICO_BW_100KHZ = 100000
     PICO_BW_20KHZ = 20000
     PICO_BW_1MHZ = 1000000
@@ -191,9 +191,9 @@ picoEnum.PICO_TIME_UNITS = make_enum([
     ])
 
 def _define_threshold_direction():
-    PICO_ABOVE= PICO_INSIDE = 0
+    PICO_ABOVE = PICO_INSIDE = 0
     PICO_BELOW = PICO_OUTSIDE = 1
-    PICO_RISING = PICO_ENTER = PICO_NONE = 2
+    PICO_RISING = PICO_ENTER = PICO_NONE = 2 
     PICO_FALLING = PICO_EXIT = 3
     PICO_RISING_OR_FALLING = PICO_ENTER_OR_EXIT = 4
     PICO_ABOVE_LOWER = 5
