@@ -109,6 +109,25 @@ overflow = ctypes.c_int16(0)
 status["getValues"] = ps.ps6000aGetValues(chandle, 0, ctypes.byref(noOfSamples), 1, downSampleMode, 0, ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
+# get max ADC value
+# handle = chandle
+minADC = ctypes.c_int16()
+maxADC = ctypes.c_int16()
+status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
+assert_pico_ok(status["getAdcLimits"])
+
+# convert ADC counts data to mV
+adc2mVChAMax =  adc2mV(bufferAMax, channelRange, maxADC)
+
+# Create time data
+time = np.linspace(0, (nSamples) * timeInterval.value * 1000000000, nSamples)
+
+# plot data from channel A and B
+plt.plot(time, adc2mVChAMax[:])
+plt.xlabel('Time (ns)')
+plt.ylabel('Voltage (mV)')
+plt.show()
+
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
 assert_pico_ok(status["closeunit"])
