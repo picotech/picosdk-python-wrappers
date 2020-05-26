@@ -71,7 +71,7 @@ triggertype = ctypes.c_int32(0)
 triggerSource = ctypes.c_int32(0)
 
 status["SetSigGenBuiltIn"] = ps.ps6000SetSigGenBuiltIn(chandle, 0, 2000000, wavetype, 10000, 10000, 0, 1, sweepType, 0, 0, 0, triggertype, triggerSource, 1)
-assert_pico_ok(status["SetSignGenBuiltIn"])
+assert_pico_ok(status["SetSigGenBuiltIn"])
 
 # Pauses the script to show signal
 time.sleep(10)
