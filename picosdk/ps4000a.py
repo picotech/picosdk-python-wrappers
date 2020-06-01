@@ -310,7 +310,7 @@ doc = """ PICO_STATUS ps4000aIsLedFlashing
         int16_t  handle,
         int16_t *status
     ); """
-ps4000a.make_symbol("_IsLedFlashing", "ps4000aIsLedFlashing", c_uint32, [c_int16, c_void_p, c_uint16], doc)
+ps4000a.make_symbol("_IsLedFlashing", "ps4000aIsLedFlashing", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aCloseUnit
     (
