@@ -233,7 +233,7 @@ doc = """ PICO_STATUS ps6000aSigGenWaveform
         int16_t    *buffer,
         uint16    bufferLength
     ); """
-ps6000a.make_symbol("_SigGenWaveform", "ps6000aSigGenWaveform", c_uint32, [c_int16, c_uint32, c_int16, c_uint16], doc)
+ps6000a.make_symbol("_SigGenWaveform", "ps6000aSigGenWaveform", c_uint32, [c_int16, c_uint32, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps6000aSignGenRange
     (
