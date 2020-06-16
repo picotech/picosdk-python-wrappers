@@ -63,12 +63,12 @@ adcTriggerLevel = mV2adc(500, chARange, maxADC)
 # handle = chandle
 channelProperties = ps.PS3000A_TRIGGER_CHANNEL_PROPERTIES(adcTriggerLevel,
                                                           10,
-                                                          0,
+                                                          adcTriggerLevel,
                                                           10,
                                                           ps.PS3000A_CHANNEL["PS3000A_CHANNEL_A"])
 nChannelProperties = 1
 # auxOutputEnabled = 0
-autoTriggerMilliseconds = 1000
+autoTriggerMilliseconds = 10000
 status["setTrigProp"] = ps.ps3000aSetTriggerChannelProperties(chandle, ctypes.byref(channelProperties), nChannelProperties, 0, autoTriggerMilliseconds)
 assert_pico_ok(status["setTrigProp"])
 
@@ -98,8 +98,8 @@ status["setTrigDir"] = ps.ps3000aSetTriggerChannelDirections(chandle, channelADi
 assert_pico_ok(status["setTrigDir"])
 
 # Setting the number of sample to be collected
-preTriggerSamples = 40000
-postTriggerSamples = 40000
+preTriggerSamples = 00000
+postTriggerSamples = 50000
 maxsamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase innfomation
