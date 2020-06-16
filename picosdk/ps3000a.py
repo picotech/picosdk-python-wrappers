@@ -145,8 +145,8 @@ ps3000a.PS3000A_TRIGGER_STATE = make_enum([
     ])
     
 ps3000a.PS3000A_THRESHOLD_DIRECTION = make_enum([
-    ("PS3000A_ABOVE", PS3000A_INSIDE),
-    ("PS3000A_BELOW",, "PS3000A_OUTSIDE"),
+    ("PS3000A_ABOVE", "PS3000A_INSIDE"),
+    ("PS3000A_BELOW", "PS3000A_OUTSIDE"),
     ("PS3000A_RISING", "PS3000A_ENTER"),
     ("PS3000A_FALLING", "PS3000A_EXIT"),
     ("PS3000A_RISING_OR_FALLING", "PS3000A_ENTER_OR_EXIT"),
@@ -155,7 +155,8 @@ ps3000a.PS3000A_THRESHOLD_DIRECTION = make_enum([
     "PS3000A_RISING_LOWER",
     "PS3000A_FALLING_LOWER"
     "PS3000A_POSITIVE_RUNT",
-    "PS3000A_NEGATIVE_RUNT"
+    "PS3000A_NEGATIVE_RUNT",
+    "PS3000A_NONE"
     ])
     
 ps3000a.PS3000A_THRESHOLD_MODE = make_enum([
@@ -168,6 +169,8 @@ class PS3000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32)]
                 
+ps3000a.PS3000A_DIGITAL_CHANNEL_DIRECTIONS = PS3000A_DIGITAL_CHANNEL_DIRECTIONS
+                
 class PS3000A_TRIGGER_CONDITIONS(Structure):
     _pack_ = 1
     _fields_ = [("channelA", c_uint32),
@@ -177,6 +180,8 @@ class PS3000A_TRIGGER_CONDITIONS(Structure):
                 ("external", c_uint32),
                 ("aux", c_uint32),
                 ("pulseWidthQualifier", c_uint32)]
+
+ps3000a.PS3000A_TRIGGER_CONDITIONS = PS3000A_TRIGGER_CONDITIONS
                 
 class PS3000A_TRIGGER_CONDITIONS_V2(Structure):
     _pack_ = 1
@@ -188,6 +193,7 @@ class PS3000A_TRIGGER_CONDITIONS_V2(Structure):
                 ("aux", c_uint32),
                 ("pulseWidthQualifier", c_uint32),
                 ("digital", c_uint32)]
+ps3000a.PS3000A_TRIGGER_CONDITIONS_V2 = PS3000A_TRIGGER_CONDITIONS_V2
                 
 class PS3000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
     _pack_ = 1
@@ -197,6 +203,7 @@ class PS3000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
                 ("thresholdLowerHysteresis", c_uint16),
                 ("channel", c_uint32),
                 ("thresholdMode", c_uint32)]
+ps3000a.PS3000A_TRIGGER_CHANNEL_PROPERTIES = PS3000A_TRIGGER_CHANNEL_PROPERTIES
                 
 doc = """ PICO_STATUS ps3000aOpenUnit
     (
