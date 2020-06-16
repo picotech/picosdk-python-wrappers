@@ -137,11 +137,67 @@ def _define_digital_port():
 
 ps3000a.PS3000A_DIGITAL_PORT = _define_digital_port()
 
+ps3000a.PS3000A_TRIGGER_STATE = make_enum([
+    "PS3000A_CONDITION_DONT_CARE",
+    "PS3000A_CONDITION_TRUE",
+    "PS3000A_CONDITION_FALSE",
+    "PS3000A_CONDITION_MAX"
+    ])
+    
+ps3000a.PS3000A_THRESHOLD_DIRECTION = make_enum([
+    ("PS3000A_ABOVE", PS3000A_INSIDE),
+    ("PS3000A_BELOW",, "PS3000A_OUTSIDE"),
+    ("PS3000A_RISING", "PS3000A_ENTER"),
+    ("PS3000A_FALLING", "PS3000A_EXIT"),
+    ("PS3000A_RISING_OR_FALLING", "PS3000A_ENTER_OR_EXIT"),
+    "PS3000A_ABOVE_LOWER",
+    "PS3000A_BELOW_LOWER",
+    "PS3000A_RISING_LOWER",
+    "PS3000A_FALLING_LOWER"
+    "PS3000A_POSITIVE_RUNT",
+    "PS3000A_NEGATIVE_RUNT"
+    ])
+    
+ps3000a.PS3000A_THRESHOLD_MODE = make_enum([
+    "PS3000A_LEVEL",
+    "PS3000A_WINDOW"
+    ])
+
 class PS3000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32)]
-
+                
+class PS3000A_TRIGGER_CONDITIONS(Structure):
+    _pack_ = 1
+    _fields_ = [("channelA", c_uint32),
+                ("channelB", c_uint32),
+                ("channelC", c_uint32),
+                ("channelD", c_uint32),
+                ("external", c_uint32),
+                ("aux", c_uint32),
+                ("pulseWidthQualifier", c_uint32)]
+                
+class PS3000A_TRIGGER_CONDITIONS_V2(Structure):
+    _pack_ = 1
+    _fields_ = [("channelA", c_uint32),
+                ("channelB", c_uint32),
+                ("channelC", c_uint32),
+                ("channelD", c_uint32),
+                ("external", c_uint32),
+                ("aux", c_uint32),
+                ("pulseWidthQualifier", c_uint32),
+                ("digital", c_uint32)]
+                
+class PS3000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
+    _pack_ = 1
+    _fields_ = [("thresholdUpper", c_int16),
+                ("thresholdUpperHysteresis", c_uint16),
+                ("thresholdLower", c_int16),
+                ("thresholdLowerHysteresis", c_uint16),
+                ("channel", c_uint32),
+                ("thresholdMode", c_uint32)]
+                
 doc = """ PICO_STATUS ps3000aOpenUnit
     (
         int16_t *handle,
