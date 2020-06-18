@@ -65,7 +65,8 @@ channelProperties = ps.PS3000A_TRIGGER_CHANNEL_PROPERTIES(adcTriggerLevel,
                                                           10,
                                                           adcTriggerLevel,
                                                           10,
-                                                          ps.PS3000A_CHANNEL["PS3000A_CHANNEL_A"])
+                                                          ps.PS3000A_CHANNEL["PS3000A_CHANNEL_A"],
+                                                          ps.PS3000A_THRESHOLD_MODE["PS3000A_LEVEL"])
 nChannelProperties = 1
 # auxOutputEnabled = 0
 autoTriggerMilliseconds = 10000
