@@ -158,6 +158,18 @@ class PS6000_PWQ_CONDITIONS (Structure):
 				("aux", c_uint32)]
 				
 ps6000.PS6000_PWQ_CONDITIONS = PS6000_PWQ_CONDITIONS
+
+class PS6000_TRIGGER_INFO (Structure):
+    _pack_ = 1
+    _fields_ = [("status", c_uint32),
+                ("segmentIndex", c_uint32),
+                ("triggerIndex", c_uint32),
+                ("triggerTime", c_uint32),
+                ("timeUnits", c_uint16),
+                ("reserved0", c_uint16),
+                ("timeStampCounter", c_uint64)]
+                
+ps6000.PS6000_TRIGGER_INFO = PS6000_TRIGGER_INFO
 	
 
 
@@ -822,3 +834,12 @@ doc = """ PICO_STATUS ps6000GetAnalogueOffset
     ); """
 ps6000.make_symbol("_GetAnalogueOffset", "ps6000GetAnalogueOffset", c_uint32,
                    [c_int16, c_int32, c_int32, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS ps6000GetTriggerInfoBulk
+    (
+        int16_t        handle,
+        PS6000_TRIGGER_INFO    *triggerInfo,
+        uint32_t      fromSegmentIndex,
+        uint32_t      toSegmentIndex
+    ); """
+ps6000.make_symbol("_GetTriggerInfoBulk", "ps6000GetTriggerInfoBulk", c_uint16, [c_int16, c_void_p, c_uint32, c_uint32], doc)
