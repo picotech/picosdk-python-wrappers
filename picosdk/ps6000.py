@@ -206,7 +206,7 @@ doc = """ PICO_STATUS ps6000GetUnitInfo
         int16_t   *requiredSize,
         PICO_INFO  info
     ); """
-ps6000.make_symbol("_GetUnitInfo", "ps6000GetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32], doc)
+ps6000.make_symbol("_GetUnitInfo", "ps6000GetUnitInfo", c_uint32, [c_int16, c_void_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000FlashLed
     (
