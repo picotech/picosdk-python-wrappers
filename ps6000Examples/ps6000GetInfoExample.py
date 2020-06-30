@@ -20,9 +20,9 @@ status["openunit"] = ps.ps6000OpenUnit(ctypes.byref(chandle), None)
 assert_pico_ok(status["openunit"])
 
 # Get Info from scope
-string = ctypes.c_int8()
-stringLength = ctypes.c_int16(1)
-requiredSize = ctypes.c_int16()
+string = (ctypes.c_char * 40)()
+stringLength = ctypes.c_int16(40)
+requiredSize = ctypes.c_int16(40)
 info = ps.PICO_INFO["PICO_VARIANT_INFO"]
 status["getInfo"] = ps.ps6000GetUnitInfo(chandle, ctypes.byref(string),stringLength, ctypes.byref(requiredSize), info)
 assert_pico_ok(status["getInfo"])
