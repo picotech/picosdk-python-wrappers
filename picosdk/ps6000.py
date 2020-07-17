@@ -164,7 +164,7 @@ class PS6000_TRIGGER_INFO (Structure):
     _fields_ = [("status", c_uint32),
                 ("segmentIndex", c_uint32),
                 ("triggerIndex", c_uint32),
-                ("triggerTime", c_uint32),
+                ("triggerTime", c_uint64),
                 ("timeUnits", c_uint16),
                 ("reserved0", c_uint16),
                 ("timeStampCounter", c_uint64)]
