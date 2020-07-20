@@ -224,7 +224,7 @@ doc = """ PICO_STATUS ps6000aGetTimebase
         uint64_t    *maxSamples,
         uint64_t    segmentIndex
     ); """
-ps6000a.make_symbol("_GetTimebase", "ps6000aGetTimebase", c_uint32, [c_int16, c_uint32, c_uint64, c_void_p, c_uint64, c_uint64], doc)
+ps6000a.make_symbol("_GetTimebase", "ps6000aGetTimebase", c_uint32, [c_int16, c_uint32, c_uint64, c_void_p, c_void_p, c_uint64], doc)
 
 doc = """ PICO_STATUS ps6000aSigGenWaveform
     (
