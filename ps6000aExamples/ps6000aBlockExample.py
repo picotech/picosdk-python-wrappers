@@ -93,7 +93,7 @@ timeIndisposedMs = ctypes.c_double(0)
 status["runBlock"] = ps.ps6000aRunBlock(chandle, noOfPreTriggerSamples, noOfPostTriggerSamples, timebase, ctypes.byref(timeIndisposedMs), 0, None, None)
 assert_pico_ok(status["runBlock"])
 
-# Check for data collection to finish using ps5000aIsReady
+# Check for data collection to finish using ps6000aIsReady
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
 while ready.value == check.value:
