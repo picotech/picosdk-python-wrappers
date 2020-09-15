@@ -579,12 +579,13 @@ doc = """ PICO_STATUS ps6000aGetValuesBulk
         int16_t    handle,
         uint64_t    startIndex,
         uint64_t    *noOfSamples,
+        uint64_t    fromSegmentIndex,
+        uint64_t    toSegmentIndex,
         uint64_t    downSampleRatio,
         PICO_RATIO_MODE    downSampleRatioMode,
-        uint64_t    segmentIndex,
         int16_t    *overflow
     ); """
-ps6000a.make_symbol("_GetValuesBulk", "ps6000aGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint32, c_uint64, c_void_p], doc)
+ps6000a.make_symbol("_GetValuesBulk", "ps6000aGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000aGetValuesAsync
     (
