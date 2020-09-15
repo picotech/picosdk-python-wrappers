@@ -585,7 +585,7 @@ doc = """ PICO_STATUS ps6000aGetValuesBulk
         PICO_RATIO_MODE    downSampleRatioMode,
         int16_t    *overflow
     ); """
-ps6000a.make_symbol("_GetValuesBulk", "ps6000aGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint32, c_void_p], doc)
+ps6000a.make_symbol("_GetValuesBulk", "ps6000aGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint64, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000aGetValuesAsync
     (
