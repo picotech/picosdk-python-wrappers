@@ -27,6 +27,8 @@ info = ps.PICO_INFO["PICO_VARIANT_INFO"]
 status["getInfo"] = ps.ps6000GetUnitInfo(chandle, ctypes.byref(string),stringLength, ctypes.byref(requiredSize), info)
 assert_pico_ok(status["getInfo"])
 
+print(string.value)
+
 # Close unitDisconnect the scope
 # handle = chandle
 ps.ps6000CloseUnit(chandle)
