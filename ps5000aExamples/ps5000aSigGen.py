@@ -121,7 +121,7 @@ time.sleep(36)
 # Closes the unit
 # Handle = chandle
 status["close"] = ps.ps5000aCloseUnit(chandle)
-assert_pico_ok(status["stop"])
+assert_pico_ok(status["close"])
 
 # Displays the status returns
 print(status)
