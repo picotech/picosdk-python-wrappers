@@ -2,7 +2,7 @@
 # Copyright (C) 2017-2018 Pico Technology Ltd.
 #
 from __future__ import print_function
-from distutils.core import setup
+from setuptools import setup
 
 import ctypes
 from ctypes import *
@@ -25,11 +25,33 @@ if not os.path.exists(signalfile):
         exit(1)
     open(signalfile, 'a').close()
 
+with open("README.md") as f:
+    readme = f.read()
 
-setup(name='PicoSDK',
-      version='1.0',
-      description='PicoSDK Python wrapper',
-      author='Pico Technology Ltd',
-      author_email='support@picotech.com',
-      url='https://www.picotech.com',
-      packages=['picosdk'])
+setup(
+    name='picosdk',
+    packages=['picosdk'],
+    install_requires=["numpy>=1.12.1"],
+    version='1.0',
+    description='PicoSDK Python wrapper',
+    long_description=readme,
+    author='Pico Technology Ltd',
+    author_email='support@picotech.com',
+    license="ISC",
+    url='https://www.picotech.com',
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: ISC License (ISCL)",
+        "Framework :: Matplotlib",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Topic :: Scientific/Engineering",
+    ],
+    universal=True,
+)
