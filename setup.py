@@ -43,7 +43,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: ISC License (ISCL)",
-        "Framework :: Matplotlib",
         "Natural Language :: English",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
@@ -53,5 +52,4 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering",
     ],
-    universal=True,
 )
