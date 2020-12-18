@@ -21,7 +21,7 @@
 % You may copy and distribute this file as long as it remains unmodified.
 % SB
 
-    fprintf('PicoScope 6000Series (A API) MATLAB Instrument Driver');
+    fprintf('PicoScope 6000 Series (A API) MATLAB Instrument Driver');
     fprintf('\n');
     fprintf('\nCopyright © 2020 Pico Technology Ltd.  All rights reserved. \n')
     fprintf('\n');
@@ -46,10 +46,20 @@
     end</Code>
    </CreateInitCode>
    <ConnectInitCode>
-      <Type>InstrumentCommand</Type>
+      <Type>MCode</Type>
+      <Code>function init(obj)
+% This function is called after the object is connected.
+% OBJ is the device object.
+% End of function definition - DO NOT EDIT
+</Code>
    </ConnectInitCode>
    <CleanupCode>
-      <Type>InstrumentCommand</Type>
+      <Type>MCode</Type>
+      <Code>function cleanup(obj)
+% This function is called before the object is disconnected.
+% OBJ is the device object.
+% End of function definition - DO NOT EDIT
+</Code>
    </CleanupCode>
    <GroupInfo>
       <Group>
