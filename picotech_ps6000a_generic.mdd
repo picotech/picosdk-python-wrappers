@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MATLABInstrumentDriver>
+   <FileVersion>2.42</FileVersion>
+   <DriverName>C:\Users\neil.hamilton\Documents\MATLAB\picosdk-ps6000a-matlab-instrument-driver\picotech_ps6000a_generic.mdd</DriverName>
+   <DriverType>MATLAB interface object</DriverType>
+   <InstrumentType>Oscilloscope</InstrumentType>
+   <InstrumentManufacturer>Pico Technology Ltd</InstrumentManufacturer>
+   <InstrumentModel>PicoScope 6000E Series</InstrumentModel>
+   <InstrumentVersion>1.0</InstrumentVersion>
+   <Identify/>
+   <Reset/>
+   <Selftest/>
+   <Error/>
+   <CreateInitCode>
+      <Code>function init(obj)
+% This function is called after the object is created.
+% OBJ is the device object.
+% End of function definition - DO NOT EDIT
+
+% Copyright © 2020 Pico Technology Ltd.  All rights reserved.
+% You may copy and distribute this file as long as it remains unmodified.
+% SB
+
+    fprintf('PicoScope 6000Series (A API) MATLAB Instrument Driver');
+    fprintf('\n');
+    fprintf('\nCopyright © 2020 Pico Technology Ltd.  All rights reserved. \n')
+    fprintf('\n');
+    
+    % Load libraries
+    % ==============
+    
+    % Only load library once
+    
+    if (libisloaded('ps6000a'))
+           % do nothing
+    else
+        if (ismac())
+            [ps6000aNotFound, ps6000aWarnings] = loadlibrary('libps6000a.dylib', @ps6000aMFile, 'alias', 'ps6000a');
+        elseif (isunix())
+            [ps6000aNotFound, ps6000aWarnings] = loadlibrary('libps6000a.so', @ps6000aMFile, 'alias', 'ps6000a');
+        elseif (ispc())
+            [ps6000aNotFound, ps6000aWarnings] = loadlibrary('ps6000a.dll', @ps6000aMFile);
+        else
+            % do nothing
+        end
+    end</Code>
+   </CreateInitCode>
+   <ConnectInitCode>
+      <Type>InstrumentCommand</Type>
+   </ConnectInitCode>
+   <CleanupCode>
+      <Type>InstrumentCommand</Type>
+   </CleanupCode>
+   <GroupInfo>
+      <Group>
+         <Name>parent</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="parent1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo/>
+      </Group>
+   </GroupInfo>
+</MATLABInstrumentDriver>
