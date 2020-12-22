@@ -67,4 +67,17 @@ end
 
 %% Create a device object. 
 % The serial number can be specified as a second input parameter.
+
 ps6000aDeviceObj = icdevice('picotech_ps6000a_generic.mdd','');
+
+%% Connect scope
+
+connect(ps6000aDeviceObj)
+
+%% Disconnect scope
+
+disconnect(ps6000aDeviceObj);
+
+%%
+
+delete(ps6000aDeviceObj);
