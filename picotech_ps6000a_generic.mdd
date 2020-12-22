@@ -2,9 +2,9 @@
 <MATLABInstrumentDriver>
    <FileVersion>2.42</FileVersion>
    <DriverName>C:\Users\neil.hamilton\Documents\MATLAB\picosdk-ps6000a-matlab-instrument-driver\picotech_ps6000a_generic.mdd</DriverName>
-   <DriverType>MATLAB interface object</DriverType>
+   <DriverType>MATLAB generic</DriverType>
    <InstrumentType>Oscilloscope</InstrumentType>
-   <InstrumentManufacturer>Pico Technology Ltd</InstrumentManufacturer>
+   <InstrumentManufacturer>Pico Technology Ltd.</InstrumentManufacturer>
    <InstrumentModel>PicoScope 6000E Series</InstrumentModel>
    <InstrumentVersion>1.0</InstrumentVersion>
    <Identify/>
@@ -32,18 +32,34 @@
     % Only load library once
     
     if (libisloaded('ps6000a'))
+        
            % do nothing
+           
     else
+        
         if (ismac())
+            
             [ps6000aNotFound, ps6000aWarnings] = loadlibrary('libps6000a.dylib', @ps6000aMFile, 'alias', 'ps6000a');
+            
         elseif (isunix())
+            
             [ps6000aNotFound, ps6000aWarnings] = loadlibrary('libps6000a.so', @ps6000aMFile, 'alias', 'ps6000a');
+            
         elseif (ispc())
+            
             [ps6000aNotFound, ps6000aWarnings] = loadlibrary('ps6000a.dll', @ps6000aMFile);
+            
         else
+            
             % do nothing
+            
         end
-    end</Code>
+        
+    end
+    
+    % Load in enums and structures
+    
+    [~, obj.DriverData.structs, obj.DriverData.enums, ~] = ps6000aMFile();</Code>
    </CreateInitCode>
    <ConnectInitCode>
       <Type>MCode</Type>
@@ -51,6 +67,77 @@
 % This function is called after the object is connected.
 % OBJ is the device object.
 % End of function definition - DO NOT EDIT
+
+% Copyright © 2020 Pico Technology Ltd. All rights reserved.
+% You may copy and distribute this file as long as it remains unmodified.
+% SB
+
+    disp('Opening PicoScope 6000 Series (A API) device');
+    
+    % Structure to hold satus values while connectin.
+    connectStatus = [];
+    
+    % Temporary variable to store handle value
+    unitHandle = 0;
+    
+    picoOK = PicoStatus.PICO_OK;
+    
+    % Obtain serial number input
+    serialNum = get(obj, 'RsrcName');
+    
+    % determine if serial number given
+    if length(serialNum) &gt; 0
+        
+        unitSerial = serialNum;
+        
+    else
+        
+        unitSerial = [];
+        
+    end
+    
+    % Open with 8 bit resolution
+    resolution8bit = obj.DriverData.enums.enPicoDeviceResolution.PICO_DR_8BIT;
+    obj.DriverData.resolution = 8;
+    
+    [connectStatus.openUnit, obj.DriverData.unitHandle, ~] = ...
+        calllib('ps6000a','ps6000aOpenUnit',unitHandle, unitSerial,resolution8bit);
+    
+    % Validate handle
+    if (obj.DriverData.unitHandle &gt; 0)
+        
+        unithandle = obj.DriverData.unitHandle;
+%         
+        % Set serial
+        infoLine = blanks(40);
+        reqSize = length(infoLine);
+        
+%         [connectStatus.unitSerial, obj.DriverData.unitSerial, reSize] = ...
+%             calllib('ps6000a','ps6000aGetUnitInfo',unitHandle,infoLine, ...
+%             length(infoLine),reqSize,PicoStatus.PICO_BATCH_AND_SERIAL);
+%         
+%         % Set variant
+        infoLineV = blanks(15);
+        reqSizeV = 15;
+%         
+%         [connectStatus.unitVariant, variant, ~] = calllib('ps6000a', ...
+%             'ps6000aGetUnitInfo', unitHandle, infoLineV, length(infoLineV),...
+%             reqSizeV, PicoStatus.PICO_VARIANT_INFO);
+%         
+%         set(obj, 'InstrumentModel', variant);
+%         
+%         % Set channel count
+%         obj.DriverData.channelCount = str2num(obj.InstrumentModel(2));
+%         
+    elseif (connectStatus.openUnit == PicoStatus.PICO_NOT_FOUND)
+        
+        error('No unit found, please check connections.');
+        
+    else
+        
+        error('Status code: %d\n', connectStatus.openUnit);
+        
+    end
 </Code>
    </ConnectInitCode>
    <CleanupCode>
@@ -59,7 +146,65 @@
 % This function is called before the object is disconnected.
 % OBJ is the device object.
 % End of function definition - DO NOT EDIT
-</Code>
+
+    if (isfield(obj.DriverData, 'unitHandle'))
+        
+        unitHandle = obj.DriverData.unitHandle;
+        
+        if (isempty(unitHandle))
+            return;
+        end
+        
+        if (~libisloaded('ps6000a'))
+            
+            return
+            
+        end
+        
+        % Close scope
+        
+        disconnectStatus = calllib('ps6000a','ps6000aCloseUnit', unitHandle);
+        
+        if (disconnectStatus == PicoStatus.PICO_OK)
+            
+            fprintf(['PicoScope closed successfully.\n']);
+            
+        elseif (disconnectStatus == PicoStatus.PICO_INVALID_HANDLE)
+            
+            return
+            
+        else
+            
+%             if (isfield(obj.DriverData, 'unitSerial'))
+%                 
+%                 error('Disconnect: ConnectionNotClosed',...
+%                     ['Connection to PicoScope not closed. Status code %d\n']...
+%                     ,disconnectStatus);
+%                 
+%             end
+            
+        end
+        
+%         % unload libraries if no other scopes are connected
+%         
+%         firestHandle = 0;
+%         
+%         if (ispc())
+%             
+%             firstHandle = 16384; % Windows PC
+%             
+%         else
+
+    else
+        warning('Disconnect:NoDevicesFound', 'Disconnect: No devices found.');
+    end
+%             
+%             firstHandle = 1; % Mac and Linux
+%             
+%         end
+%         
+%         % test connection to other handles
+%         lastHandle = firstHandle + 63 % obj.DriverData.constants.PICO_MAX_UNITS</Code>
    </CleanupCode>
    <GroupInfo>
       <Group>
@@ -70,7 +215,116 @@
          <Mappings>
             <ChannelMap Command="parent1" Index="1"/>
          </Mappings>
-         <PropertyInfo/>
+         <PropertyInfo>
+            <Property>
+               <Name>channelCount</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>resolution</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>unitHandle</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>unitSerial</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
          <MethodInfo/>
       </Group>
    </GroupInfo>
