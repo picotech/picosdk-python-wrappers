@@ -74,6 +74,117 @@ ps6000aDeviceObj = icdevice('picotech_ps6000a_generic.mdd','');
 
 connect(ps6000aDeviceObj)
 
+%% Set Device Resolution
+
+resolution = ps6000aEnumInfo.enPicoDeviceResolution.PICO_DR_10BIT;
+
+[status.setResolution] = invoke(ps6000aDeviceObj, 'ps6000aSetDeviceResolution', resolution);
+
+disp('Device Resolution set to 10 bits')
+
+%% Enable Channel A + B
+% Enable channels A + B with +-5 V range with DC coupling and full bandwidth
+
+channelA = ps6000aEnumInfo.enPicoChannel.PICO_CHANNEL_A;
+channelB = ps6000aEnumInfo.enPicoChannel.PICO_CHANNEL_B;
+couplingDC = ps6000aEnumInfo.enPicoCoupling.PICO_DC;
+range = ps6000aEnumInfo.enPicoConnectProbeRange.PICO_X1_PROBE_5V;
+bandwidth = ps6000aEnumInfo.enPicoBandwidthLimiter.PICO_BW_FULL;
+
+
+[status.setChannelOn.A] = invoke(ps6000aDeviceObj, 'ps6000aSetChannelOn', channelA, couplingDC, range, 0, bandwidth);
+[status.setChannelOn.B] = invoke(ps6000aDeviceObj, 'ps6000aSetChannelOn', channelB, couplingDC, range, 0, bandwidth);
+
+disp('Channels A and B set')
+
+% Disable all other channels
+for i = (2:7)
+    try
+        [status.setChannelOff] = invoke(ps6000aDeviceObj, 'ps6000aSetChannelOff', i);
+    catch
+        
+    end 
+end
+
+disp('Remaining Channels disabled')
+
+%% Set Simple Trigger
+
+enable = 1;
+source = channelA;
+threshold = 1000; %mV
+direction = ps6000aEnumInfo.enPicoThresholdDirection.PICO_RISING;
+delay = 0;
+autoTriggerMicroSeconds = 1000000; %us
+
+[status.setSimpleTrigger] = invoke(ps6000aDeviceObj, 'ps6000aSetSimpleTrigger', enable, source, threshold, direction,...
+    delay, autoTriggerMicroSeconds);
+
+disp('Simple Trigger set')
+
+
+%% Get Fastest Timebase
+
+enabledChannelFlags= ps6000aEnumInfo.enPicoChannelFlags.PICO_CHANNEL_A_FLAGS + ps6000aEnumInfo.enPicoChannelFlags.PICO_CHANNEL_B_FLAGS;
+pTimebase = libpointer('uint32Ptr',0);
+pTimeInterval = libpointer('doublePtr',0);
+
+[status.getMinimumTimebaseStateless] = invoke(ps6000aDeviceObj, 'ps6000aGetMinimumTimebaseStateless', enabledChannelFlags,...
+    pTimebase, pTimeInterval, resolution);
+
+timebase = pTimebase.Value;
+timeInterval = pTimeInterval.Value;
+
+%% Set number of samples to be collected
+
+numPreTriggerSamples = 10000;
+numPostTriggerSamples = 90000;
+totalSamples = numPreTriggerSamples + numPostTriggerSamples;
+
+%% Create Buffers
+
+pBufferA =libpointer('int16Ptr', zeros(totalSamples, 1, 'int16'));
+pBufferB =libpointer('int16Ptr', zeros(totalSamples, 1, 'int16'));
+
+dataType = ps6000aEnumInfo.enPicoDataType.PICO_INT16_T;
+waveform = 0;
+downSampleRatioMode = ps6000aEnumInfo.enPicoRatioMode.PICO_RATIO_MODE_AVERAGE;
+action = bitor(ps6000aEnumInfo.enPicoAction.PICO_CLEAR_ALL, ps6000aEnumInfo.enPicoAction.PICO_ADD);
+
+[status.setBufferA] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffer', channelA, pBufferA, ...
+    totalSamples, dataType, waveform, downSampleRatioMode, action);
+[status.setBufferB] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffer', channelB, pBufferB, ...
+    totalSamples, dataType, waveform, downSampleRatioMode, action);
+
+%% Run Block Capture
+
+pTimeIndisposedMs = libpointer('doublePtr',0);
+segmentIndex = 0;
+
+disp('Collection starting...')
+
+[status.runBlock] = invoke(ps6000aDeviceObj, 'ps6000aRunBlock', numPreTriggerSamples, numPostTriggerSamples,...
+    timebase, pTimeIndisposedMs, segmentIndex); 
+
+pReady = libpointer('int16Ptr',0);
+
+while pReady.Value == 0
+    [status.IsReady] = invoke(ps6000aDeviceObj,'ps6000aIsReady',pReady);
+end
+
+disp('Collection finished')
+
+%% Retrieve Data
+
+startIndex = 0;
+pSamplesCollected = libpointer('uint64Ptr',totalSamples);
+downSampleRatio = 1;
+segmentIndex = 0;
+pOverflow = libpointer('int16Ptr',0);
+
+[status.getValues] = invoke(ps6000aDeviceObj,'ps6000aGetValues', startIndex,...
+    pSamplesCollected, downSampleRatio, downSampleRatioMode, segmentIndex, pOverflow);
+
 %% Disconnect scope
 
 disconnect(ps6000aDeviceObj);
