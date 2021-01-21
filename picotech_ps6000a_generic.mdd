@@ -98,7 +98,7 @@
     
     % Open with 8 bit resolution
     resolution8bit = obj.DriverData.enums.enPicoDeviceResolution.PICO_DR_8BIT;
-    obj.DriverData.resolution = 8;
+    obj.DriverData.resolution = resolution8bit;
     
     [connectStatus.openUnit, obj.DriverData.unitHandle, ~] = ...
         calllib('ps6000a','ps6000aOpenUnit',unitHandle, unitSerial,resolution8bit);
@@ -325,7 +325,221 @@
                <Description/>
             </Property>
          </PropertyInfo>
-         <MethodInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>ps6000aGetMinimumTimebaseStateless</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetMinimumTimebaseStateless(obj, enabledChannelFlags, timebase, timeInterval, resolution)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+        status = calllib('ps6000a','ps6000aGetMinimumTimebaseStateless', obj.DriverData.unitHandle, enabledChannelFlags,...
+        timebase, timeInterval, resolution);
+    
+        if (status == PicoStatus.PICO_OK)
+        
+        else
+        
+            error('ps6000aGetMinimumTimebaseStateless: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+        end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetValues</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetValues(obj, startIndex, noOfSamples, downSampleRatio, downSampleRatioMode, segmentIndex, overflow)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetValues',obj.DriverData.unitHandle,...
+        startIndex, noOfSamples, downSampleRatio, downSampleRatioMode, segmentIndex, overflow)
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetMinimumTimebaseStateless: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aIsReady</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aIsReady(obj, ready)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aIsReady',obj.DriverData.unitHandle,ready);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetMinimumTimebaseStateless: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aRunBlock</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aRunBlock(obj, noOfPreTriggerSamples, noOfPostTriggerSamples, timebase,timeIndisposedMs, segmentIndex)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+% no inputs for lpReady or pParameter as these are for callbacks that aren't
+% used
+
+    lpReady = [];
+    pParameter = [];
+
+    status = calllib('ps6000a','ps6000aRunBlock',obj.DriverData.unitHandle, noOfPreTriggerSamples,...
+        noOfPostTriggerSamples, timebase, timeIndisposedMs, segmentIndex, lpReady, pParameter);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aRunBlock: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetChannelOff</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetChannelOff(obj, channel)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetChannelOff', obj.DriverData.unitHandle, channel);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetChannelOff: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetChannelOn</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetChannelOn(obj, channel, coupling, range, analogueOffset, bandwidth)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a', 'ps6000aSetChannelOn', obj.DriverData.unitHandle,...
+        channel, coupling, range, analogueOffset, bandwidth);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetChannelOn: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetDataBuffer</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetDataBuffer(obj, channel, buffer, nSamples, dataType, waveform, downSampleRatioMode, action)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+
+    status = calllib('ps6000a','ps6000aSetDataBuffer', obj.DriverData.unitHandle,channel, buffer, nSamples,...
+        dataType, waveform, downSampleRatioMode, action);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetDataBuffer: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetDeviceResolution</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetDeviceResolution(obj, resolution)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetDeviceResolution',obj.DriverData.unitHandle, resolution);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetDeviceResolution: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end
+    
+    obj.DriverData.resolution = resolution;</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetSimpleTrigger</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetSimpleTrigger(obj, enable, source, threshold, direction, delay, autoTriggerMicroSeconds)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetSimpleTrigger', obj.DriverData.unitHandle, enable, source,...
+        threshold, direction, delay, autoTriggerMicroSeconds);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetSimpleTrigger: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
       </Group>
    </GroupInfo>
 </MATLABInstrumentDriver>
