@@ -327,6 +327,28 @@
          </PropertyInfo>
          <MethodInfo>
             <Method>
+               <Name>ps6000aGetAdcLimits</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetAdcLimits(obj, resolution, minValue, maxValue)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetAdcLimits', obj.DriverData.unitHandle, resolution, minValue, maxValue);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetAdcLimits: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
                <Name>ps6000aGetMinimumTimebaseStateless</Name>
                <Location>parent</Location>
                <CapabilityGroup>Base</CapabilityGroup>
@@ -359,14 +381,16 @@
 % For group functions, OBJ is the group object. For
 % base device functions, OBJ is the device object.
 
-    status = calllib('ps6000a','ps6000aGetValues',obj.DriverData.unitHandle,...
-        startIndex, noOfSamples, downSampleRatio, downSampleRatioMode, segmentIndex, overflow)
-    
+
+    [status] = calllib('ps6000a','ps6000aGetValues',obj.DriverData.unitHandle,...
+        startIndex, noOfSamples, downSampleRatio, downSampleRatioMode, segmentIndex, overflow);
+
+   
     if (status == PicoStatus.PICO_OK)
         
     else
         
-        error('ps6000aGetMinimumTimebaseStateless: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        error('ps6000aGetValues: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
         
     end</MCode>
                </Code>
@@ -487,6 +511,29 @@
     else
         
         error('ps6000aSetDataBuffer: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetDataBuffers</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetDataBuffers(obj, channel, bufferMax, bufferMin, nSamples, dataType, waveform, downSampleRatioMode, action)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a', 'ps6000aSetDataBuffers', obj.DriverData.unitHandle, channel, bufferMax,...
+        bufferMin, nSamples, dataType, waveform, downSampleRatioMode, action);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetDataBuffers: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
         
     end</MCode>
                </Code>
