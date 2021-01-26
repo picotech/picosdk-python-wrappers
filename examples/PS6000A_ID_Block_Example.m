@@ -137,24 +137,31 @@ timeInterval = pTimeInterval.Value;
 
 %% Set number of samples to be collected
 
-numPreTriggerSamples = 10000;
-numPostTriggerSamples = 90000;
+numPreTriggerSamples = 1000000;
+numPostTriggerSamples = 9000000;
 totalSamples = numPreTriggerSamples + numPostTriggerSamples;
 
 %% Create Buffers
 
-pBufferA =libpointer('int16Ptr', zeros(totalSamples, 1, 'int16'));
-pBufferB =libpointer('int16Ptr', zeros(totalSamples, 1, 'int16'));
+bufferAMax = zeros(totalSamples, 1, 'int16');
+bufferBMax = zeros(totalSamples, 1, 'int16');
+bufferAMin = zeros(totalSamples, 1, 'int16');
+bufferBMin = zeros(totalSamples, 1, 'int16');
+pBufferAMax =libpointer('int16Ptr', bufferAMax);
+pBufferBMax =libpointer('int16Ptr', bufferBMax);
+pBufferAMin =libpointer('int16Ptr', bufferAMin);
+pBufferBMin =libpointer('int16Ptr', bufferBMin);
 
 dataType = ps6000aEnumInfo.enPicoDataType.PICO_INT16_T;
 waveform = 0;
 downSampleRatioMode = ps6000aEnumInfo.enPicoRatioMode.PICO_RATIO_MODE_AVERAGE;
-action = bitor(ps6000aEnumInfo.enPicoAction.PICO_CLEAR_ALL, ps6000aEnumInfo.enPicoAction.PICO_ADD);
+actionA = bitor(ps6000aEnumInfo.enPicoAction.PICO_CLEAR_ALL, ps6000aEnumInfo.enPicoAction.PICO_ADD);
+actionB = ps6000aEnumInfo.enPicoAction.PICO_ADD;
 
-[status.setBufferA] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffer', channelA, pBufferA, ...
-    totalSamples, dataType, waveform, downSampleRatioMode, action);
-[status.setBufferB] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffer', channelB, pBufferB, ...
-    totalSamples, dataType, waveform, downSampleRatioMode, action);
+[status.setBufferA] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffers', channelA, pBufferAMax, ...
+    pBufferAMin, totalSamples, dataType, waveform, downSampleRatioMode, actionA);
+[status.setBufferB] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffers', channelB, pBufferBMax, ...
+    pBufferBMin, totalSamples, dataType, waveform, downSampleRatioMode, actionB);
 
 %% Run Block Capture
 
@@ -184,6 +191,45 @@ pOverflow = libpointer('int16Ptr',0);
 
 [status.getValues] = invoke(ps6000aDeviceObj,'ps6000aGetValues', startIndex,...
     pSamplesCollected, downSampleRatio, downSampleRatioMode, segmentIndex, pOverflow);
+
+samplesCollected = pSamplesCollected.Value;
+
+disp('Data Retrieved')
+
+%% Convert Data from ADC counts to mV
+
+bufferAMax = pBufferAMax.Value;
+bufferAMin = pBufferAMin.Value;
+bufferBMax = pBufferBMax.Value;
+bufferBMin = pBufferBMin.Value;
+
+pMinValue = libpointer('int16Ptr',0);
+pMaxValue = libpointer('int16Ptr',0);
+
+[status.getAdcLimits] = invoke(ps6000aDeviceObj, 'ps6000aGetAdcLimits', resolution, pMinValue, pMaxValue);
+
+minValue = pMinValue.Value;
+maxValue = pMaxValue.Value;
+
+voltageRange = 5000; %mV
+
+bufferAMax = adc2mv(bufferAMax,voltageRange,double(maxValue));
+bufferBMax = adc2mv(bufferBMax,voltageRange,double(maxValue));
+
+disp('Data converted to mV')
+
+%% Plot Collected Data
+
+maxTime = (double(samplesCollected) * timeInterval);
+time = linspace(0,maxTime,samplesCollected);
+
+figure(1)
+plot(time,bufferAMax);
+hold on
+plot(time,bufferBMax);
+ylabel('Voltage (mV)');
+xlabel('Time (s)');
+hold off
 
 %% Disconnect scope
 
