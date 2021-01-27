@@ -372,6 +372,21 @@
                <Description/>
             </Method>
             <Method>
+               <Name>ps6000aGetStreamingLatestValues</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetStreamingLatestValues(obj, streamingDataInfo, nStreamingDataInfos, triggerInfo)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetStreamingLatestValues',obj.DriverData.unitHandle,...
+        streamingDataInfo, nStreamingDataInfos, triggerInfo);</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
                <Name>ps6000aGetValues</Name>
                <Location>parent</Location>
                <CapabilityGroup>Base</CapabilityGroup>
@@ -442,6 +457,30 @@
     else
         
         error('ps6000aRunBlock: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aRunStreaming</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aRunStreaming(obj, sampleInterval, sampleIntervalTimeUnits, maxPreTriggerSamples, maxPostTriggerSamples, autoStop, downSampleRatio, downSampleRatioMode)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a', 'ps6000aRunStreaming', obj.DriverData.unitHandle, sampleInterval,...
+        sampleIntervalTimeUnits, maxPreTriggerSamples, maxPostTriggerSamples, autoStop,...
+        downSampleRatio, downSampleRatioMode);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aRunStreaming: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
         
     end</MCode>
                </Code>
@@ -560,6 +599,52 @@
     end
     
     obj.DriverData.resolution = resolution;</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetDigitalPortOff</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetDigitalPortOff(obj, port)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+
+    status = calllib('ps6000a', 'ps6000aSetDigitalPortOff', obj.DriverData.unitHandle, port)
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetDigitalPortOff: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetDigitalPortOn</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetDigitalPortOn(obj, port, logicThresholdLevel, logicThresholdLevelLength, hysteresis)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetDigitalPortOn', obj.DriverData.unitHandle, port,...
+        logicThresholdLevel, logicThresholdLevelLength, hysteresis);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetDigitalPortOn: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
                </Code>
                <Description/>
             </Method>
