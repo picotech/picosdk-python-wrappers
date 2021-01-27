@@ -27,7 +27,7 @@
 %
 % *See also:* <matlab:doc('icdevice') |icdevice|> | <matlab:doc('instrument/invoke') |invoke|>
 %
-% *Copyright:* © 2020 Pico Technology Ltd. See LICENSE file for terms.
+% *Copyright:* © 2020-2021 Pico Technology Ltd. See LICENSE file for terms.
 
 %% Suggested Input Settings
 
@@ -83,6 +83,22 @@ resolution = ps6000aEnumInfo.enPicoDeviceResolution.PICO_DR_10BIT;
 disp('Device Resolution set to 10 bits')
 
 %% Enable Channel A + B
+% Disable  other channels
+for i = (0:7)
+    try
+        [status.setChannelOff] = invoke(ps6000aDeviceObj, 'ps6000aSetChannelOff', i);
+    catch
+        
+    end 
+end
+
+for j = (128:1:131)
+    try
+        [status.turnDigitalPortOff] = invoke(ps6000aDeviceObj, 'ps6000aDigitalPortOff',j);
+    catch
+    end
+end
+
 % Enable channels A + B with +-5 V range with DC coupling and full bandwidth
 
 channelA = ps6000aEnumInfo.enPicoChannel.PICO_CHANNEL_A;
@@ -96,17 +112,6 @@ bandwidth = ps6000aEnumInfo.enPicoBandwidthLimiter.PICO_BW_FULL;
 [status.setChannelOn.B] = invoke(ps6000aDeviceObj, 'ps6000aSetChannelOn', channelB, couplingDC, range, 0, bandwidth);
 
 disp('Channels A and B set')
-
-% Disable all other channels
-for i = (2:7)
-    try
-        [status.setChannelOff] = invoke(ps6000aDeviceObj, 'ps6000aSetChannelOff', i);
-    catch
-        
-    end 
-end
-
-disp('Remaining Channels disabled')
 
 %% Set Simple Trigger
 
