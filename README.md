@@ -31,6 +31,8 @@ The driver will work with the following PicoScope models:
 * [Instrument Control Toolbox](http://www.mathworks.co.uk/products/instrument/)
 * The [PicoScope Support Toolbox](http://uk.mathworks.com/matlabcentral/fileexchange/53681-picoscope-support-toolbox)
 
+**Currently with this beta release only 64-bit MATLAB on Windows is supported.  Support for other operation systems will come in further updates.**
+
 **Note:** MATLAB 2015b is recommended for 32-bit versions of MATLAB on Microsoft Windows operating systems.
 
 ### Installing the Instrument Driver files
@@ -57,10 +59,6 @@ Drivers are available for the following platforms. Refer to the subsections belo
 Please visit our [Support page](https://www.picotech.com/tech-support) to contact us directly or visit our [Test and Measurement Forum](https://www.picotech.com/support/forum71.html) to post questions.
 
 Please leave a comment and rating for this submission on our [MATLAB Central File Exchange page]().
-
-## Contributing
-
-Contributions to examples are welcome. Refer to our [guidelines for contributing](.github/CONTRIBUTING.md) for further information.
 
 ## Versioning
 
