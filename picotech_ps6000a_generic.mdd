@@ -327,6 +327,73 @@
          </PropertyInfo>
          <MethodInfo>
             <Method>
+               <Name>ps6000aChannelCombinationsStateless</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aChannelCombinationsStateless(obj,channelFlagsCombinations,nChannelCombinations,resolution,timebase)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aChannelCombinationsStateless',obj.DriverData.unitHandle,...
+        channelFlagsCombinations,nChannelCombinations,resolution,timebase);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aChannelCombinationsStateless: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aEnumerateUnits</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aEnumerateUnits(obj, count, serials, serialLth)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aEnumerateUnits',count,serials,serialLth);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aEnumerateUnits: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aFlashLed</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aFlashLed(obj, start)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aFlashLed',obj.DriverData.unitHandle, start);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aFlashLed: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
                <Name>ps6000aGetAdcLimits</Name>
                <Location>parent</Location>
                <CapabilityGroup>Base</CapabilityGroup>
@@ -343,6 +410,73 @@
     else
         
         error('ps6000aGetAdcLimits: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetAnalogueOffsetLimits</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetAnalogueOffsetLimits(obj,range,coupling,maximumVoltage,minimimVoltage)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetAnalogueOffsetLimits',obj.DriverData.unitHandle,range,coupling,...
+        maximumVoltage,minimumVoltage);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetAnalogueOffsetLimits: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetDeviceResolution</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetDeviceResolution(obj,resolution)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetDevieResolution',obj.DriverData.unitHandle,resolution);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetDeviceResolution: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetMaximumAvailableMemory</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetMaximumAvailableMemory(obj, nMaxSamples, resolution)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetMaximumAvailableMemory',obj.DriverData.unitHandle, nMaxSamples,resolution);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetMaximumAvailableMemory: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
         
     end</MCode>
                </Code>
@@ -372,6 +506,72 @@
                <Description/>
             </Method>
             <Method>
+               <Name>ps6000aGetNoOfCaptures</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetNoOfCaptures(obj,nCaptures)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetNoOfCaptures',obj.DriverData.unitHandle,nCaptures);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetNoOfCaptures: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetNoOfProcessedCaptures</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetNoOfProcessedCaptures(obj,nProcessedCaptures)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetNoOfProcessedCaptures',obj.DriverData.unitHandles,nProcessedCaptures);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetNoOfProcessedCaptures: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetScalingValues</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetScalingValues(obj,scalingValues,nChannels)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetScalingValues',obj.DriverData.unitHandle,scalingValues,nChannels);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetScalingValues: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
                <Name>ps6000aGetStreamingLatestValues</Name>
                <Location>parent</Location>
                <CapabilityGroup>Base</CapabilityGroup>
@@ -383,6 +583,89 @@
 
     status = calllib('ps6000a','ps6000aGetStreamingLatestValues',obj.DriverData.unitHandle,...
         streamingDataInfo, nStreamingDataInfos, triggerInfo);</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetTimebase</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetTimebase(obj,timebase, noSamples, timeIntervalNanoseconds, maxSamples, segmentIndex)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetTimebase',obj.DriverData.unitHandle, timebase, noSamples,...
+        timeIntervalNanoseconds, maxSamples,SegmentIndex);</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetTriggerInfo</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetTriggerInfo(obj,triggerInfo,firstSegmentIndex,segmentCount)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetTriggerInfo',obj.DriverData.unitHandle,triggerInfo,firstSegmentIndex,...
+        segmentCount);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetTriggerInfo: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetTriggerTimeOffset</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetTriggerTimeOffset(obj,time,timeUnits,segmentIndex)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetTriggerTimeOffset',obj.DriverData.unitHandle,time,timeUnits,...
+        segmentIndex);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetTriggerTimeOffset: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetUnitInfo</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetUnitInfo(obj, string, stringLength, requiredSize, info)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetUnitInfo',obj.DriverData.unitHandle, string, stringLength, requiredSize, info);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetUnitInfo: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
                </Code>
                <Description/>
             </Method>
@@ -412,6 +695,125 @@
                <Description/>
             </Method>
             <Method>
+               <Name>ps6000aGetValuesAsync</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetValuesAsync(obj,startIndex,noOfSamples,downSampleRatio,downSampleRatioMode,segmentIndex,...
+    lpDataReady,pParameter)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetValuesAsync',obj.DriverData.unitHandle,startIndex,noOfSamples,...
+        downSampleRatio,downSampleRatioMode,segmentIndex,lpDataReady,pParameter);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetValuesAsync: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetValuesBulk</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetValuesBulk(obj,startIndex,noOfSamples,fromSegmentIndex,toSegmentIndex,...
+    downSampleRatio,downSampleRatioMode,overflow)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetValuesBulk',obj.DriverData.unitHandle,startIndex,noOfSamples,...
+        fromSegmentIndex,toSegmentIndex,downSampleRatio,downSampleRatioMode,overflow);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetValuesBulk: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetValuesBulkAsync</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetValuesBulkAsync(obj,startIndex,noOfSamples,fromSegmentIndex,toSegmentIndex,downSampleRatio,...
+    downSampleRatioMode,lpDataReady,pParameter)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetValuesBulkAsync',obj.DriverData.unitHandle,startIndex,noOfSamples,...
+        fromSegmentIndex,toSegmentIndex,downSampleRatio,downSampleRatioMode,lpDataReady,pParameter);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetValuesBulkAsync: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetValuesOverlapped</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetValuesOverlapped(obj,startIndex,noOfSamples,downSampleRatio,downSampleRatioMode,...
+    fromSegmentIndex,toSegmentIndex,overflow)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetValuesOverlapped',obj.DriverData.unitHandle,startIndex,noOfSamples,...
+        downSampleRatio,downSampleRatioMode,fromSegmentIndex,toSegmentIndex,overflow);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetValuesOverlapped: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aGetValuesTriggerTimeOffsetBulk</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aGetValuesTriggerTimeOffsetBulk(obj,time,timeUnits,fromSegmentIndex,toSegmentIndex)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aGetValuesTriggerTimeOffsetBulk',obj.DriverData.unitHandle,time,...
+        timeUnits,fromSegmentIndex,toSegmentIndex);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aGetValuesTriggerTimeOffsetBulk: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
                <Name>ps6000aIsReady</Name>
                <Location>parent</Location>
                <CapabilityGroup>Base</CapabilityGroup>
@@ -428,6 +830,163 @@
     else
         
         error('ps6000aGetMinimumTimebaseStateless: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aMemorySegments</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aMemorySegments(obj, nSegments, nMaxSamples)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a', 'ps6000aMemorySegments', obj.DriverData.unitHandle, nSegments, nMaxSamples);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aMemorySegments: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aMemorySegmentsBySamples</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aMemorySegmentsBySamples(obj, nSamples, nMaxSegments)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a', 'ps6000aMemorySegmentsBySamples', obj.DriverData.unitHandle, nSamples, nMaxSegments);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aMemorySegmentsBySamples: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aNearestSampleIntervalStateless</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aNearestSampleIntervalStateless(obj,enabledChannelFlags,timeIntervalRequested,resolution,...
+    timebase,timeIntervalAvailable)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aNearestSampleIntervalStateless',obj.DriverData.unitHandle,enabledChannelFlags,...
+        timeIntervalRequested,resolution,timebase,timeIntervalAvailable);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aNearestSampleIntervalStateless: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aNoOfStreamingValues</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aNoOfStreamingValues(obj,noOfValues)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aNoOfStreamingValues',obj.DriverData.unitHandle,noOfValues);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aNoOfStreamingValues: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aPingUnit</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aPingUnit(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aPingUnit',obj.DriverData.unitHandle);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aPingUnit: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aQueryMaxSegmentsBySamples</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aQueryMaxSegmentsBySamples(obj, nSamples, nChannelsEnabled, nMaxSegments, resolution)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aQueryMaxSegmentsBySamples',obj.DriverData.unitHandle, nSamples, nChannelsEnabled,...
+        nMaxSegments, resolution);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aQueryMaxSegmentsBySamples: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aQueryOutputEdgeDetect</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aQueryOutputEdgeDetect(obj, state)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aQueryOutputEdgeDetect',obj.DriverData.unitHandle,state);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aQueryOutputEdgeDetect: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
         
     end</MCode>
                </Code>
@@ -649,6 +1208,142 @@
                <Description/>
             </Method>
             <Method>
+               <Name>ps6000aSetNoOfCaptures</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetNoOfCaptures(obj,nCaptures)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetNoOfCaptures',obj.DriverData.unitHandle,nCaptures);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetNoOfCaptures: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetOutputEdgeDetect</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetOutputEdgeDetect(obj,state)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetOutputEdgeDetect',obj.DriverData.unitHandle,state);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetOutputEdgeDetect: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetPulseWidthDigitalPortProperties</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetPulseWidthDigitalPortProperties(obj,port,directions,nDirections)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetPulseWidthDigitalPortProperties',obj.DriverData.unitHandle,...
+        port,directions,nDirections);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetPulseWidthDigitalPortProperties: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetPulseWidthQualifierConditions</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetPulseWidthQualifierConditions(obj, conditions,nConditions,action)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetPulseWidthQualifierConditions',obj.DriverData.unitHandle,...
+        conditions,nConditions,action);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetPulseWidthQualifierConditions: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetPulseWidthQualifierDirections</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetPulseWidthQualifierDirections(obj,directions,nDirections)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetPulseWidthQualifierDirections',obj.DriverData.unitHandle,directions,...
+        nDirections);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetPulseWidthQualifierDirections: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetPulseWidthQualifierProperties</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetPulseWidthQualifierProperties(obj,lower,upper,type)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetPulseWidthQualifierProperties',obj.DriverData.unitHandle,...
+        lower,upper,type);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetPulseWidthQualifierProperties: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
                <Name>ps6000aSetSimpleTrigger</Name>
                <Location>parent</Location>
                <CapabilityGroup>Base</CapabilityGroup>
@@ -666,6 +1361,548 @@
     else
         
         error('ps6000aSetSimpleTrigger: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetTriggerChannelConditions</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetTriggerChannelConditions(obj,conditions,nConditions,action)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetTriggerChannelConditions',obj.DriverData.unitHandle,conditions,...
+        nConditions,action);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetTriggerChannelConditions: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetTriggerChannelDirections</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetTriggerChannelDirections(obj,directions,nDirections)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetTriggerChannelDirections',obj.DriverData.unitHandle,directions,...
+        nDirections);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetTriggerChannelDirections: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetTriggerChannelProperties</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetTriggerChannelProperties(obj,channelProperties,nChannelProperties,auxOutputEnable,autoTriggerMicroSeconds)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetTriggerChannelProperties',obj.DrvierData.unithandle,channelProperties,...
+        nChannelProperties,auxOutputEnable,autoTriggerMicroSeconds);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetTriggerChannelProperties: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetTriggerDelay</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetTriggerDelay(obj,delay)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetTriggerDelay',obj.DriverData.unitHandle,delay);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetTriggerDelay: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSetTriggerDigitalPortProperties</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSetTriggerDigitalPortProperties(obj,port,directions,nDirections)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSetTriggerDigitalPortProperties',obj.DriverData.unitHandle,port,...
+        directions,nDirections);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSetTriggerDigitalPortProperties: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenApply</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenApply(obj,sigGenEnabled,sweepEnabled,triggerEnabled,automaticClockOptimisationEnabled,...
+    overrideAutomaticClockAndPrescale,frequency,stopFrequency,frequencyIncrement,dwellTime)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenApply',obj.DriverData.unitHandle,signGenEnabled,sweepEnabled,...
+        triggerEnabled,automaticClockOptimisationEnabled,overrideAutomaticClockAndPrescale,frequency,stopFrequency,...
+        frequencyIncrement,dwellTime);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenApply: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenClockManual</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenClockManual(obj,dacClockFrequency,prescaleRatio)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenClockManual',obj,DriverData.unitHandle,dacClockFrequency,prescaleRatio);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenClockManual: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenFilter</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenFilter(obj,filterState)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenFilter',obj.DriverData.unitHandle,filterState);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenFilter: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenFrequency</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenFrequency(obj,frequencyHz)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenFrequency',obj.DriverData.unitHandle,frequencyHz);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenFrequency: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenFrequencyLimits</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenFrequencyLimits(obj,waveType,numSamples,startFrequency,sweepEnabled,manualDacClockFrequency,...
+    manualPrescaleRatio,maxStopFrequencyOut,minFrequencyStepOut,maxFrequencyStepOut,minDwellTimeOut,maxDwellTimeOut)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenFrequencyLimits',obj.DriverData.unitHandle,waveType,numSamples,startFrequency,...
+        sweepFrequency,sweepEnabled,manualDacClockFrequency,manualPrescaleRatio,maxStopFrequencyOut,...
+        minFrequencyStepOut,maxFrequencyStepOut,minDwellTimeOut,maxDwellTimeOut);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenFrequencyLimits: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenFrequencySweep</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenFrequencySweep(obj,stopFrequencyHz,frequencyIncrement,dwellTimeSeconds,sweepType)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenFrequencySweep',obj.DriverData.unitHandle,stopFrequencyHz,...
+        frequencyIncrement,dwellTimeSeconds,sweepType);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenFrequencySweep: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenLimits</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenLimits(obj,parameter,minimumPermissibleValue,maximumPermissibleValue,step)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenLimits',obj.DriverData.unithandle,parameter,minimumPermissibleValue,...
+        maximumPermissibleValue, step);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenLimits: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenPause</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenPause(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenPause',obj.DriverData.unithandle);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenPause: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenPhase</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenPhase(obj,deltaPhase)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenPhase',obj.DriverData.unitHandle,deltaPhase);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenPhase: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenPhaseSweep</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenPhaseSweep(obj,stopDeltaPhase,deltaPhaseIncrement,swellCount,sweepType)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','pa6000aSigGenPhaseSweep',obj.DriverData.unitHandle,stopDeltaPhase,...
+        deltaPhaseIncrement,swellCount,sweepType);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenPhaseSweep: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenRange</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenRange(obj,peakToPeakVolts,offsetVolts)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenRange',obj.DriverData.unitHandle,peakToPeakVolts,offsetVolts);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenRange: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenRestart</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenRestart(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenRestart',obj.DriverData.unitHandle);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenRestart: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenSoftwareTriggerControl</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenSoftwareTriggerControl(obj,triggerState)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenSoftwareTriggerControl',obj.DriverData.unitHandle,triggerState);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenSoftwareTriggerControl: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenTrigger</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenTrigger(obj,triggerType,triggerSource,cycles,autoTriggerPicoSeconds)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenTrigger',obj.DriverData.unitHandle,triggerType,triggerSource,...
+        cycles,autoTriggerPicoSeconds);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenTrigger: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenWaveform</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenWaveform(obj, wavetype, buffer, bufferLength)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenWaveform',obj.DriverData.unitHandle,wavetype,buffer,bufferLength);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenWaveform: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aSigGenWaveformDutyCycle</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aSigGenWaveformDutyCycle(obj,dutyCyclePercent)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aSigGenWaveformDutyCycle',obj.DriverData.unitHandle,dutyCyclePercent)
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aSigGenWaveformDutyCycle: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aStop</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aStop(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aStop',obj.DriverData.unitHandle);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aStop: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aStopUsingGetValuesOverlapped</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aStopUsingGetValuesOverlapped(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps6000a','ps6000aStopUsingGetValuesOverlapped',obj.DriverData.unitHandle);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aStopUsingGetValuesOverlapped: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
+        
+    end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>ps6000aTriggerWithinPreTriggerSamples</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function status = ps6000aTriggerWithinPreTriggerSamples(obj,state)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+    status = calllib('ps600a','ps6000aTriggerWithinPreTriggerSamples',obj.DriverData.unitHandle,state);
+    
+    if (status == PicoStatus.PICO_OK)
+        
+    else
+        
+        error('ps6000aTriggerWithinPreTriggerSamples: status code %d, please refer to the PicoStatus.m file.', dec2hex(status));
         
     end</MCode>
                </Code>
