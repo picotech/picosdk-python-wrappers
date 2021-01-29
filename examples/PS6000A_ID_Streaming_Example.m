@@ -133,9 +133,9 @@ totalSamples = numPreTriggerSamples + numPostTriggerSamples;
 
 %% Create Buffers
 
-bufferA = zeros(totalSamples, 1, 'int16');
-
 maxBuffers = 10;
+
+bufferA = zeros(totalSamples, 1,'int16');
 
 for i =(1:maxBuffers)
     pBufferA(i,1) =libpointer('int16Ptr', bufferA);
@@ -150,14 +150,14 @@ actionB = ps6000aEnumInfo.enPicoAction.PICO_ADD;
 
 
 [status.setBufferA] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffer', channelA, pBufferA(1,1), ...
-    totalSamples, dataType, waveform, downSampleRatioMode, actionA);
+    totalSamples, dataType, waveform, downSampleRatioMode, actionB);
 
 
 %% Run Block Capture
 
 sampleInterval = 1;
 sampleIntervalTimeUnits = ps6000aEnumInfo.enPicoTimeUnits.PICO_US;
-autoStop = 1;
+autoStop = 0;
 downSampleRatio = 1;
 
 disp('Streaming starting...')
@@ -169,12 +169,12 @@ disp('Streaming starting...')
 streamData = ps6000aStructs.tPicoStreamingDataInfo.members;
 
 streamData.bufferIndex_ = 0;
-streamData.channel_ = ps6000aEnumInfo.enPicoChannel.PICO_CHANNEL_A;
-streamData.mode_ = ps6000aEnumInfo.enPicoRatioMode.PICO_RATIO_MODE_AVERAGE;
+streamData.channel_ = channelA;
+streamData.mode_ = downSampleRatio;
 streamData.noOfSamples_ = 0;
 streamData.overflow_ = 0;
 streamData.startIndex_ = 0;
-streamData.type_ = ps6000aEnumInfo.enPicoDataType.PICO_INT16_T;
+streamData.type_ = dataType;
 
 pStreamData = libpointer('tPicoStreamingDataInfoPtr',streamData);
 
@@ -186,17 +186,23 @@ streamTrigger.autoStop_=0;
 pStreamTrigger = libpointer('tPicoStreamingDataTriggerInfoPtr',streamTrigger);
 %%
 i=1
-while i < maxBuffers
+
+needBufferStatus = hex2dec('197');
+
+while i <= maxBuffers
     
-    pause(0.25)
+    pause(1)
 
     [status.getStreamingLatestValues] = invoke(ps6000aDeviceObj, 'ps6000aGetStreamingLatestValues', pStreamData, 1, pStreamTrigger);
     
-    if status.getStreamingLatestValues ~= 0
+    if status.getStreamingLatestValues ~= PicoStatus.PICO_OK
         bufferA(:,i) = pBufferA(i,1).Value;
-        i=i+1
+        i=i+1;
+        if i <= maxBuffers
         [status.setBufferA] = invoke(ps6000aDeviceObj, 'ps6000aSetDataBuffer', channelA, pBufferA(i,1), ...
     totalSamples, dataType, waveform, downSampleRatioMode, actionB);
+        i
+        end
     end
         
 end
@@ -215,8 +221,6 @@ maxValue = pMaxValue.Value;
 
 voltageRange = 5000; %mV
 
-bufferA = pBufferA.Value;
-
 bufferA = adc2mv(bufferA,voltageRange,double(maxValue));
 
 disp('Data converted to mV')
@@ -224,15 +228,34 @@ disp('Data converted to mV')
 %% Plot Collected Data
 
 samplesCollected=length(bufferA(:,1));
-maxTime = (double(samplesCollected) * sampleInterval);
-timeUS = linspace(0,maxTime,samplesCollected);
+maxBufferTime = (double(samplesCollected) * sampleInterval);
+bufferTimeUS = linspace(0,maxBufferTime,samplesCollected);
 
 figure(1)
-plot(timeUS,bufferA(:,1));
+
 hold on
+for i = 1:maxBuffers
+    plot(bufferTimeUS, bufferA(:,i));
+end
+
 ylabel('Voltage (mV)');
 xlabel('Time (us)');
 hold off
+
+totalBuffers = [];
+for i = 1:maxBuffers
+    totalBuffers = vertcat(totalBuffers,bufferA(:,i));
+end
+
+totalSamplesCollected = length(totalBuffers(:,1));
+maxTime = (double(totalSamplesCollected) * sampleInterval);
+totalTimeUS = linspace(0,maxTime,totalSamplesCollected);
+
+figure(2)
+
+plot(totalTimeUS,totalBuffers);
+ylabel('Voltage (mV)');
+xlabel('Time (us)');
 
 %% Disconnect scope
 
