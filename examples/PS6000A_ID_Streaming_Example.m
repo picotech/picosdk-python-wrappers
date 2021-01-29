@@ -153,7 +153,7 @@ actionB = ps6000aEnumInfo.enPicoAction.PICO_ADD;
     totalSamples, dataType, waveform, downSampleRatioMode, actionB);
 
 
-%% Run Block Capture
+%% Run Streaming Capture
 
 sampleInterval = 1;
 sampleIntervalTimeUnits = ps6000aEnumInfo.enPicoTimeUnits.PICO_US;
@@ -164,7 +164,6 @@ disp('Streaming starting...')
 
 [status.runStreaming] = invoke(ps6000aDeviceObj, 'ps6000aRunStreaming', sampleInterval, sampleIntervalTimeUnits,...
     numPreTriggerSamples, numPostTriggerSamples, autoStop, downSampleRatio, downSampleRatioMode);
-%%
 
 streamData = ps6000aStructs.tPicoStreamingDataInfo.members;
 
@@ -184,7 +183,7 @@ streamTrigger.triggered_=0;
 streamTrigger.autoStop_=0;
 
 pStreamTrigger = libpointer('tPicoStreamingDataTriggerInfoPtr',streamTrigger);
-%%
+
 i=1
 
 needBufferStatus = hex2dec('197');
