@@ -18,8 +18,10 @@ The driver can be used with the Test and Measurement Tool to carry out the follo
 ## Supported Models
 
 The driver will work with the following PicoScope models:
+    
+    * 6000E Scopes
 
-**Note:** The driver will not work with the [PicoScope 6000A/B/C/D models](https://uk.mathworks.com/matlabcentral/fileexchange/59657-picoscope-5203-and-5204-examples) devices.
+**Note:** The driver will not work with the [PicoScope 6000A/B/C/D models](https://uk.mathworks.com/matlabcentral/fileexchange/48311-picoscope-6000-series-matlab-generic-instrument-driver) devices.
 
 ## Getting started
 
@@ -77,5 +79,5 @@ are trademarks of The Mathworks, Inc.
 
 *Linux* is the registered trademark of Linus Torvalds in the U.S. and other countries.
 
-Copyright © 2019 Pico Technology Ltd. All rights reserved. 
+Copyright © 2020-2021 Pico Technology Ltd. All rights reserved. 
 
