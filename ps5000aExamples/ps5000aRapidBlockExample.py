@@ -291,6 +291,21 @@ TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps5000aGetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
+# Get and print TriggerInfo for memory segments
+# Create array of ps.PS5000A_TRIGGER_INFO for each memory segment
+Ten_TriggerInfo = (ps.PS5000A_TRIGGER_INFO*10) ()
+
+status["GetTriggerInfoBulk"] = ps.ps5000aGetTriggerInfoBulk(chandle, ctypes.byref(Ten_TriggerInfo), 0, 9)
+assert_pico_ok(status["GetTriggerInfoBulk"])
+
+print("Printing triggerInfo blocks")
+for i in Ten_TriggerInfo:
+    print("PICO_STATUS is ", i.status)
+    print("segmentIndex is ", i.segmentIndex)
+    print("triggerTime is ", i.triggerTime)
+    print("timeUnits is ", i.timeUnits)
+    print("timeStampCounter is ", i.timeStampCounter)
+
 # Converts ADC from channel A to mV
 adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
 adc2mVChAMax1 =  adc2mV(bufferAMax1, chARange, maxADC)
