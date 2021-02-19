@@ -161,7 +161,8 @@ while ready.value == check.value:
 noOfSamples = ctypes.c_uint64(nSamples)
 # downSampleRatio = 1
 # segmentIndex = 0
-overflow = ctypes.c_int16(0)
+# Creates a overflow location for each segment
+overflow = (ctypes.c_int16 * 10)()
 status["getValues"] = ps.ps6000aGetValuesBulk(chandle, 0, ctypes.byref(noOfSamples),0, 9, 1, downSampleMode, ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
