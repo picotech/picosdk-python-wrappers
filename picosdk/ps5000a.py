@@ -182,6 +182,19 @@ ps5000a.PS5000A_TIME_UNITS = make_enum([
 ps5000a.PICO_RATIO_MODE = {k[19:]: v for k, v in ps5000a.PS5000A_RATIO_MODE.items()}
 
 
+
+class PS5000A_TRIGGER_INFO(Structure):
+    _pack_ = 1
+    _fields_ = [("status", c_uint32),
+                ("segmentIndex", c_uint32),
+                ("triggerIndex", c_uint32),
+                ("triggerTime", c_int64),
+                ("timeUnits", c_int16),
+                ("reserved0", c_int16),
+                ("timeStampCounter", c_uint64)]
+
+ps5000a.PS5000A_TRIGGER_INFO = PS5000A_TRIGGER_INFO
+
 class PS5000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
@@ -941,6 +954,7 @@ doc = """ PICO_STATUS ps5000aSetTriggerDigitalPortProperties
     ); """
 ps5000a.make_symbol("_SetTriggerDigitalPortProperties", "ps5000aSetTriggerDigitalPortProperties", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
+<<<<<<< HEAD
                     
 doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierProperties
     (
