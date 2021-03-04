@@ -305,7 +305,7 @@ doc = """ PICO_STATUS ps6000aSigGenClockManual
     (
         int16_t    handle,
         double    dacClockFrequency,
-        uint64_t    prescaleRation
+        uint64_t    prescaleRatio
     ); """
 ps6000a.make_symbol("_SigGenClockManual", "ps6000aSigGenClockManual", c_uint32, [c_int16, c_double, c_uint64], doc)
 
@@ -412,7 +412,7 @@ doc = """ PICO_STATUS ps6000aSetTriggerChannelDirections
     (
         int16_t    handle,
         PICO_DIRECTION    *directions,
-        int16_t    nDurections
+        int16_t    nDirections
     ); """
 ps6000a.make_symbol("_SetTriggerChannelDirections", "ps6000aSetTriggerChannelDirections", c_uint32, [c_int16, c_void_p, c_int16], doc)
 
@@ -542,7 +542,7 @@ doc = """ PICO_STATUS ps6000aRunStreaming
         uint64_t    maxPostTriggerSamples,
         int16_t    autoStop,
         uint64_t    downSampleRatio,
-        PICO_RATIO_MODE    downSampelRationMode
+        PICO_RATIO_MODE    downSampelRatioMode
     ): """
 ps6000a.make_symbol("_RunStreaming", "ps6000aRunStreaming", c_uint32, [c_int16, c_void_p, c_uint32, c_uint64, c_uint64, c_int16, c_uint64, c_uint32], doc)
 
@@ -619,7 +619,7 @@ doc = """ PICO_STATUS ps6000aGetValuesOverlapped
         int16_t    handle,
         uint64_t    startIndex,
         uint64_t    *noOfSamples,
-        uint64_t    downSampleRatioMode,
+        uint64_t    downSampleRatio,
         PICO_RATIO_MODE    downSampleRatioMode,
         uint64_t    fromSegementIndex,
         uint64_t    toSegmentIndex,
