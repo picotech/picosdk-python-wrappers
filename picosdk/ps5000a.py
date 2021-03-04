@@ -215,8 +215,17 @@ class PS5000A_CONDITION (Structure):
 				("condition", c_int16)]
                 
 ps5000a.PS5000A_CONDITION = PS5000A_CONDITION
-				
 
+class PS5000A_PWQ_CONDITIONS (Structure):
+    _pack_ = 1
+    _fields_ = [("channelA", c_int16),
+                ("channelB", c_int16),
+                ("channelC", c_int16),
+                ("channelD", c_int16),
+                ("external", c_int16),
+                ("aux", c_int16)]
+
+ps5000a.PS5000A_PWQ_CONDITIONS = PS5000A_PWQ_CONDITIONS
 
 doc = """ PICO_STATUS (ps5000aOpenUnit)
     (
@@ -931,4 +940,33 @@ doc = """ PICO_STATUS ps5000aSetTriggerDigitalPortProperties
         int16_t                             nDirections
     ); """
 ps5000a.make_symbol("_SetTriggerDigitalPortProperties", "ps5000aSetTriggerDigitalPortProperties", c_uint32,
+                    [c_int16, c_void_p, c_int16], doc)
+                    
+doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierProperties
+    (
+        int16_t                            handle,
+        uint32_t                           lower,
+        uint32_t                           upper,
+        PS5000A_PULSE_WIDTH_TYPE           type
+    ); """
+ps5000a.make_symbol("_SetPulseWidthQualifierProperties", "ps5000aSetPulseWidthQualifierProperties", c_uint32, 
+                    [c_int16, c_uint32, c_uint32, c_int32], doc)
+
+doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierConditions
+    (
+        int16_t                            handle,
+        PS5000A_CONDITION                  *conditions,
+        int16_t                            nConditions,
+        PS5000A_CONDITIONS_INFO            info
+    ); """
+ps5000a.make_symbol("_SetPulseWidthQualifierConditions", "ps5000aSetPulseWidthQualifierConditions", c_uint32,
+                    [c_int16, c_void_p, c_int16, c_int32], doc)
+                    
+doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierDirections
+    (
+        int16_t                             handle,
+        PS5000A_DIRECTION                   *directions,
+        int16_t                             nDirections
+    ); """
+ps5000a.make_symbol("_SetPulseWidthQualifierDirections", "ps5000aSetPulseWidthQualifierDirections", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
