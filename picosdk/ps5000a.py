@@ -954,7 +954,6 @@ doc = """ PICO_STATUS ps5000aSetTriggerDigitalPortProperties
     ); """
 ps5000a.make_symbol("_SetTriggerDigitalPortProperties", "ps5000aSetTriggerDigitalPortProperties", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
-<<<<<<< HEAD
                     
 doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierProperties
     (
