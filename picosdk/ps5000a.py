@@ -489,6 +489,14 @@ doc = """ PICO_STATUS ps5000aSetTriggerChannelPropertiesV2
     ); """
 ps5000a.make_symbol("_SetTriggerChannelPropertiesV2", "ps5000aSetTriggerChannelPropertiesV2", c_uint32,
                     [c_int16, c_void_p, c_int16, c_int16], doc)
+                    
+doc = """ PICO_STATUS ps5000aSetAutoTriggerMicroSeconds
+    (
+        int16_t                             handle,
+        uint64_t                          autoTriggerMicroseconds,
+    ); """
+ps5000a.make_symbol("_SetAutoTriggerMicroSeconds", "ps5000aSetAutoTriggerMicroSeconds", c_uint32,
+                    [c_int16, c_uint64], doc)
 
 doc = """ PICO_STATUS ps5000aSetTriggerChannelConditions
     (
