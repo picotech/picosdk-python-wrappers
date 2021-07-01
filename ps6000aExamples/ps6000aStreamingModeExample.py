@@ -63,7 +63,7 @@ maxBuffers = 10
 for i in range (0,9):
     bufferA(i) = (ctypes.c_int16 * nSamples)()
 
-
+print(bufferA)
 # Set data buffers
 # handle = chandle
 # channel = channelA
@@ -94,18 +94,21 @@ streamTrigger = structs.PICO_STREAMING_DATA_TRIGGER_INFO[0,0,0]
 
 count = 1
 
+actionB = add
+
 picoOk = PICO_STATUS["PICO_OK"]
 
 while count <= maxBuffers:
     
     status["getStreamingLatestValues"] = ps.ps6000aGetStreaminglatestValues(chandle, ctypes.byref(streamData), 1, ctypes.byref(streamTrigger)
     
-    if status["getStreamingLatestValues"] == picoOk:
+    if status["getStreamingLatestValues"] == picoOk
     else
         count = count+1
-        if count <= maxBuffers:
-            status["setDataBuffer"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA(count-1)), nSamples, dataType, waveform, downSampleMode, action)
-            print(count)
+        if count <= maxBuffers
+             status["setDataBuffers"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA(count-1)), nSamples, dataType, waveform, downSampleMode, actionB)
+             assert_pico_ok(status["setDataBuffers"])
+             print(count)
 
 print("streaming finished")
 
