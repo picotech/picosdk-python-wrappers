@@ -24,21 +24,20 @@ libraries.
 ## Installing the python driver bindings
 
 A `distutils` installer is provided. After you have installed the PicoSDK
-driver package (see above), the Python installer can be used as follows:
+driver package (see above), the Python package can be installed using the
+following command in the top-level directory:
 
-    python setup.py install
+    pip install .
 
-On macOS and Linux you will either need to use `sudo` with this command, to
-install into the system folders, or to install for the current user only you
-can use:
+If you are not using a virtualenv or are not elevated, use:
 
-    python setup.py install --user
+    pip install . --user
 
 Within python, the library for `import` is called `picosdk`.
 
 ## Compatibility
 
-This code is written to be compatible with both python 2.7 and python 3 (any version).
+This code is written to be compatible with both Python 2.7 and Python 3 (any version).
 
 If you find a compatibility problem please raise an [Issue](https://www.picotech.com/tech-support), listing all the versions you can find (python, numpy, 
 picosdk commit hash, etc.) and your error message(s).
@@ -68,7 +67,7 @@ The following drivers and devices are not yet supported:
 
 ### Dependencies
 
-As well as depending on the C libraries, the Pythonic wrappers use some python libraries like `numpy`. Many of the
+As well as depending on the C libraries, the Python wrappers use some Python libraries like `numpy`. Many of the
 examples scripts also use the `matplotlib` plotting library. You can install these dependencies with pip as follows:
 
     pip install -r requirements.txt

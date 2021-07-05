@@ -32,4 +32,5 @@ setup(name='PicoSDK',
       author='Pico Technology Ltd',
       author_email='support@picotech.com',
       url='https://www.picotech.com',
-      packages=['picosdk'])
+      packages=['picosdk'],
+      install_requires=['numpy>=1.12.1'])
