@@ -173,7 +173,8 @@ adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
 adc2mVChBMax =  adc2mV(bufferBMax, chBRange, maxADC)
 
 # Create time data
-time = np.linspace(0, (cTotalSamples.value) * timeIntervalns.value, cTotalSamples.value)
+# Last point in time is at (n-1)*deltat for n being the total number of samples, not at n.
+time = np.linspace(0, (cTotalSamples.value-1) * timeIntervalns.value, cTotalSamples.value)
 
 # plot data from channel A and B
 plt.plot(time, adc2mVChAMax[:])
