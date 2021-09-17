@@ -13,6 +13,7 @@ from picosdk.PicoDeviceStructs import picoStruct as structs
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok
 from picosdk.constants import PICO_STATUS
+import time
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -35,10 +36,10 @@ status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, chan
 assert_pico_ok(status["setChannelA"])
 
 # set channel B-H off
-for x in range (1, 7, 1):
+for x in range(1, 7, 1):
     channel = x
-    status["setChannel",x] = ps.ps6000aSetChannelOff(chandle,channel)
-    assert_pico_ok(status["setChannel",x])
+    status["setChannel", x] = ps.ps6000aSetChannelOff(chandle, channel)
+    assert_pico_ok(status["setChannel", x])
     
     
 # Set number of samples to be collected
@@ -60,8 +61,8 @@ assert_pico_ok(status["setSimpleTrigger"])
 # create buffers
 maxBuffers = 10
 
-for i in range (0,9):
-    bufferA(i) = (ctypes.c_int16 * nSamples)()
+
+bufferA = ((ctypes.c_int16 * nSamples)*10)()
 
 print(bufferA)
 # Set data buffers
@@ -75,22 +76,25 @@ waveform = 0
 downSampleMode = enums.PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
 clear = enums.PICO_ACTION["PICO_CLEAR_ALL"]
 add = enums.PICO_ACTION["PICO_ADD"]
-action = clear|add # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]  
-status["setDataBuffers"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA(0)), nSamples, dataType, waveform, downSampleMode, action)
+action = clear | add  # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]
+status["setDataBuffers"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[0]), nSamples, dataType,
+                                                   waveform, downSampleMode, action)
 assert_pico_ok(status["setDataBuffers"])
 
 # Run streaming
-sampleInterval = 1
+sampleInterval = ctypes.c_double(1)
 sampleIntervalTimeUnits = enums.PICO_TIME_UNITS["PICO_US"]
 autoStop = 0
 downSampleRatio = 1
 
-status["runStreaming"] = ps.ps6000aRunStreaming(chandle, ctypes.byref(sampleInterval), sampleIntervalTimeUnits, noOfPreTriggerSamples, noOfPostTriggerSamples, autoStop, downSampleRatio, downSampleMode)
+status["runStreaming"] = ps.ps6000aRunStreaming(chandle, ctypes.byref(sampleInterval), sampleIntervalTimeUnits,
+                                                noOfPreTriggerSamples, noOfPostTriggerSamples, autoStop,
+                                                downSampleRatio, downSampleMode)
 assert_pico_ok(status["runStreaming"])
 
-streamData = structs.PICO_STREAMING_DATA_INFO[channelA, downSampleRatio, dataType, 0, 0, 0, 0]
+streamData = structs.PICO_STREAMING_DATA_INFO(channelA, downSampleRatio, dataType, 0, 0, 0, 0)
 
-streamTrigger = structs.PICO_STREAMING_DATA_TRIGGER_INFO[0,0,0]
+streamTrigger = structs.PICO_STREAMING_DATA_TRIGGER_INFO(0, 0, 0)
 
 count = 1
 
@@ -100,14 +104,18 @@ picoOk = PICO_STATUS["PICO_OK"]
 
 while count <= maxBuffers:
     
-    status["getStreamingLatestValues"] = ps.ps6000aGetStreaminglatestValues(chandle, ctypes.byref(streamData), 1, ctypes.byref(streamTrigger)
+    status["getStreamingLatestValues"] = ps.ps6000aGetStreamingLatestValues(chandle, ctypes.byref(streamData), 1,
+                                                                            ctypes.byref(streamTrigger))
     
-    if status["getStreamingLatestValues"] == picoOk
-    else
+    if status["getStreamingLatestValues"] == picoOk:
+        # do nothing
+        time.sleep(0.01)
+    else:
         count = count+1
-        if count <= maxBuffers
-             status["setDataBuffers"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA(count-1)), nSamples, dataType, waveform, downSampleMode, actionB)
-             assert_pico_ok(status["setDataBuffers"])
+        if count <= maxBuffers:
+             status["setDataBuffer"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count-1]),
+                                                               nSamples, dataType, waveform, downSampleMode, actionB)
+             assert_pico_ok(status["setDataBuffer"])
              print(count)
 
 print("streaming finished")
@@ -120,7 +128,9 @@ status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byre
 assert_pico_ok(status["getAdcLimits"])
 
 # convert ADC counts data to mV
-bufferAmV =  adc2mV(bufferA, channelRange, maxADC)
+bufferAmV=((ctypes.c_int16 * nSamples)*10)()
+for j in range(0, 9):
+    bufferAmV[j] = adc2mV(bufferA[j], channelRange, maxADC)
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
