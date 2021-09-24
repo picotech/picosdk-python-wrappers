@@ -724,13 +724,13 @@
                <CapabilityGroup>Base</CapabilityGroup>
                <Type>MCode</Type>
                <Code>
-                  <MCode>function status = ps6000aGetValuesBulk(obj,startIndex,noOfSamples,fromSegmentIndex,toSegmentIndex,...
-    downSampleRatio,downSampleRatioMode,overflow)
+                  <MCode>function status = ps6000aGetValuesBulk(obj, startIndex, noOfSamples, fromSegmentIndex, toSegmentIndex, downSampleRatio, downSampleRatioMode, overflow)
+
 % For group functions, OBJ is the group object. For
 % base device functions, OBJ is the device object.
 
-    status = calllib('ps6000a','ps6000aGetValuesBulk',obj.DriverData.unitHandle,startIndex,noOfSamples,...
-        fromSegmentIndex,toSegmentIndex,downSampleRatio,downSampleRatioMode,overflow);
+    status = calllib('ps6000a', 'ps6000aGetValuesBulk', obj.DriverData.unitHandle, startIndex, noOfSamples,...
+        fromSegmentIndex, toSegmentIndex, downSampleRatio, downSampleRatioMode, overflow);
     
     if (status == PicoStatus.PICO_OK)
         
