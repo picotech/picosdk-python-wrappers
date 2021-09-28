@@ -537,7 +537,7 @@
 % For group functions, OBJ is the group object. For
 % base device functions, OBJ is the device object.
 
-    status = calllib('ps6000a','ps6000aGetNoOfProcessedCaptures',obj.DriverData.unitHandles,nProcessedCaptures);
+    status = calllib('ps6000a','ps6000aGetNoOfProcessedCaptures',obj.DriverData.unitHandle,nProcessedCaptures);
     
     if (status == PicoStatus.PICO_OK)
         
@@ -1422,7 +1422,7 @@
 % For group functions, OBJ is the group object. For
 % base device functions, OBJ is the device object.
 
-    status = calllib('ps6000a','ps6000aSetTriggerChannelProperties',obj.DrvierData.unithandle,channelProperties,...
+    status = calllib('ps6000a','ps6000aSetTriggerChannelProperties',obj.DriverData.unitHandle,channelProperties,...
         nChannelProperties,auxOutputEnable,autoTriggerMicroSeconds);
     
     if (status == PicoStatus.PICO_OK)
@@ -1629,7 +1629,7 @@
 % For group functions, OBJ is the group object. For
 % base device functions, OBJ is the device object.
 
-    status = calllib('ps6000a','ps6000aSigGenLimits',obj.DriverData.unithandle,parameter,minimumPermissibleValue,...
+    status = calllib('ps6000a','ps6000aSigGenLimits',obj.DriverData.unitHandle,parameter,minimumPermissibleValue,...
         maximumPermissibleValue, step);
     
     if (status == PicoStatus.PICO_OK)
@@ -1652,7 +1652,7 @@
 % For group functions, OBJ is the group object. For
 % base device functions, OBJ is the device object.
 
-    status = calllib('ps6000a','ps6000aSigGenPause',obj.DriverData.unithandle);
+    status = calllib('ps6000a','ps6000aSigGenPause',obj.DriverData.unitHandle);
     
     if (status == PicoStatus.PICO_OK)
         
