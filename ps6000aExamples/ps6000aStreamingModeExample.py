@@ -6,7 +6,7 @@
 # This data is then plotted as mV against time in ns.
 
 import ctypes
-import numpy as np
+# import numpy as np
 from picosdk.ps6000a import ps6000a as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
 from picosdk.PicoDeviceStructs import picoStruct as structs
@@ -40,8 +40,7 @@ for x in range(1, 7, 1):
     channel = x
     status["setChannel", x] = ps.ps6000aSetChannelOff(chandle, channel)
     assert_pico_ok(status["setChannel", x])
-    
-    
+
 # Set number of samples to be collected
 noOfPreTriggerSamples = 100000
 noOfPostTriggerSamples = 900000
@@ -61,8 +60,7 @@ assert_pico_ok(status["setSimpleTrigger"])
 # create buffers
 maxBuffers = 10
 
-
-bufferA = ((ctypes.c_int16 * nSamples)*10)()
+bufferA = ((ctypes.c_int16 * nSamples) * 10)()
 
 print(bufferA)
 # Set data buffers
@@ -103,20 +101,20 @@ actionB = add
 picoOk = PICO_STATUS["PICO_OK"]
 
 while count <= maxBuffers:
-    
+
     status["getStreamingLatestValues"] = ps.ps6000aGetStreamingLatestValues(chandle, ctypes.byref(streamData), 1,
                                                                             ctypes.byref(streamTrigger))
-    
+
     if status["getStreamingLatestValues"] == picoOk:
         # do nothing
         time.sleep(0.01)
     else:
-        count = count+1
+        count = count + 1
         if count <= maxBuffers:
-             status["setDataBuffer"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count-1]),
-                                                               nSamples, dataType, waveform, downSampleMode, actionB)
-             assert_pico_ok(status["setDataBuffer"])
-             print(count)
+            status["setDataBuffer"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count - 1]),
+                                                              nSamples, dataType, waveform, downSampleMode, actionB)
+            assert_pico_ok(status["setDataBuffer"])
+            print(count)
 
 print("streaming finished")
 
@@ -128,9 +126,10 @@ status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byre
 assert_pico_ok(status["getAdcLimits"])
 
 # convert ADC counts data to mV
-bufferAmV=((ctypes.c_int16 * nSamples)*10)()
+bufferAmV = ((ctypes.c_int16 * nSamples) * 10)()
 for j in range(0, 9):
-    bufferAmV[j] = adc2mV(bufferA[j], channelRange, maxADC)
+    A = bufferA[j]
+    bufferAmV[j] = adc2mV(A, channelRange, maxADC)
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
