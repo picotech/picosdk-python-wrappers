@@ -184,9 +184,51 @@ cmaxSamples = ctypes.c_int32(maxSamples)
 status["getValuesBulk"] = ps.ps4000aGetValuesBulk(chandle, ctypes.byref(cmaxSamples), 0, 9, 1, 0, ctypes.byref(overflow))
 assert_pico_ok(status["getValuesBulk"])
 
+# find maximum ADC count value
+# handle = chandle
+# pointer to value = ctypes.byref(maxADC)
+maxADC = ctypes.c_int16(32767)
+
 # convert from adc to mV
+adc2mVChA0 =  adc2mV(bufferA0, chARange, maxADC)
+adc2mVChA1 =  adc2mV(bufferA1, chARange, maxADC)
+adc2mVChA2 =  adc2mV(bufferA2, chARange, maxADC)
+adc2mVChA3 =  adc2mV(bufferA3, chARange, maxADC)
+adc2mVChA4 =  adc2mV(bufferA4, chARange, maxADC)
+adc2mVChA5 =  adc2mV(bufferA5, chARange, maxADC)
+adc2mVChA6 =  adc2mV(bufferA6, chARange, maxADC)
+adc2mVChA7 =  adc2mV(bufferA7, chARange, maxADC)
+adc2mVChA8 =  adc2mV(bufferA8, chARange, maxADC)
+adc2mVChA9 =  adc2mV(bufferA9, chARange, maxADC)
+
+adc2mVChB0 =  adc2mV(bufferB0, chARange, maxADC)
+adc2mVChB1 =  adc2mV(bufferB1, chARange, maxADC)
+adc2mVChB2 =  adc2mV(bufferB2, chARange, maxADC)
+adc2mVChB3 =  adc2mV(bufferB3, chARange, maxADC)
+adc2mVChB4 =  adc2mV(bufferB4, chARange, maxADC)
+adc2mVChB5 =  adc2mV(bufferB5, chARange, maxADC)
+adc2mVChB6 =  adc2mV(bufferB6, chARange, maxADC)
+adc2mVChB7 =  adc2mV(bufferB7, chARange, maxADC)
+adc2mVChB8 =  adc2mV(bufferB8, chARange, maxADC)
+adc2mVChB9 =  adc2mV(bufferB9, chARange, maxADC)
+
+# Create time data
+time = np.linspace(0, ((cmaxSamples.value)-1) * timeIntervalns.value, cmaxSamples.value)
 
 # plot data
+plt.plot(time, adc2mVChA0)
+plt.plot(time, adc2mVChA1)
+plt.plot(time, adc2mVChA2)
+plt.plot(time, adc2mVChA3)
+plt.plot(time, adc2mVChA4)
+plt.plot(time, adc2mVChA5)
+plt.plot(time, adc2mVChA6)
+plt.plot(time, adc2mVChA7)
+plt.plot(time, adc2mVChA8)
+plt.plot(time, adc2mVChA9)
+plt.xlabel('Time (ns)')
+plt.ylabel('Voltage (mV)')
+plt.show()
 
 # Stop the scope
 # handle = chandle
