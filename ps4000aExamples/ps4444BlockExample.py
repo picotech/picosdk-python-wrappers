@@ -55,7 +55,7 @@ assert_pico_ok(status["setChA"])
 # analogOffset = 0 V
 chBRange = 7
 status["setChB"] = ps.ps4000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
-assert_pico_ok(status["setChA"])
+assert_pico_ok(status["setChB"])
 
 # Set up channel C
 # handle = chandle
