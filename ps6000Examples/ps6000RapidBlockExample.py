@@ -289,7 +289,7 @@ adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
 adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
 
 # Creates the time data
-time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value -1) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
 plt.plot(time, adc2mVChAMax[:])

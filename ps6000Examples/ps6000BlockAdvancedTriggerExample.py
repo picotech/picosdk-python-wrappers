@@ -159,7 +159,7 @@ maxADC = ctypes.c_int16(32512)
 adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
 
 # Create time data
-time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value -1) * timeIntervalns.value, cmaxSamples.value)
 
 # plot data from channel A
 plt.plot(time, adc2mVChAMax[:])
