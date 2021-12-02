@@ -150,7 +150,7 @@ print ("Data collection complete.")
 bufferDPort0 = splitMSODataFast(cTotalSamples, bufferDPort0Max)
 
 # Creates the time data
-time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
+time = np.linspace(0, (cTotalSamples.value - 1) * timeIntervalNs.value, cTotalSamples.value)
 
 print ("Plotting data...")
 
