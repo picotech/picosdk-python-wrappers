@@ -114,7 +114,7 @@ adc2mVChA =  adc2mV(bufferA, chARange, maxADC)
 adc2mVChB =  adc2mV(bufferB, chBRange, maxADC)
 
 # Create time data
-time = np.linspace(0, (cmaxSamples.value) * timeInterval.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value -1) * timeInterval.value, cmaxSamples.value)
 
 # plot data from channel A and B
 plt.plot(time, adc2mVChA[:])
