@@ -293,7 +293,7 @@ adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 dPort0BinaryData = splitMSODataFast(cTotalSamples, bufferDPort0)
 
 # Create time data
-time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
+time = np.linspace(0, (cTotalSamples.value - 1) * timeIntervalNs.value, cTotalSamples.value)
 
 # Plot data from channels A, B and D0
 
