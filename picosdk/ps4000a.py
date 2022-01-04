@@ -257,6 +257,56 @@ ps4000a.PS4000A_EXTRA_OPERATIONS = make_enum([
 	'PS4000A_PRBS',
 ])
 
+ps4000a.PS4000A_CONDITIONS_INFO = make_enum([
+    'PS4000A_CLEAR',
+    'PS4000A_ADD',
+])
+
+ps4000a.PS4000A_THRESHOLD_DIRECTION = make_enum([
+    ("PS4000A_ABOVE", "PS4000A_INSIDE"),
+    ("PS4000A_BELOW", "PS4000A_OUTSIDE"),
+    ("PS4000A_RISING", "PS4000A_ENTER", "PS4000A_NONE"),
+    ("PS4000A_FALLING", "PS4000A_EXIT"),
+    ("PS4000A_RISING_OR_FALLING", "PS4000A_ENTER_OR_EXIT"),
+    "PS4000A_ABOVE_LOWER",
+    "PS4000A_BELOW_LOWER",
+    "PS4000A_RISING_LOWER",
+    "PS4000A_FALLING_LOWER",
+    "PS4000A_POSITIVE_RUNT",
+    "PS4000A_NEGATIVE_RUNT",
+])
+
+ps4000a.PS4000A_THRESHOLD_MODE = make_enum([
+    "PS4000A_LEVEL",
+    "PS4000A_WINDOW"
+])
+
+class PS4000A_CONDITION (Structure):
+	_pack_ = 1
+	_fields_ = [("source", c_int32),
+				("condition", c_int16)]
+                
+ps4000a.PS4000A_CONDITION = PS4000A_CONDITION
+
+class PS4000A_DIRECTION(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_int32),
+                ("direction", c_int32),
+                ("mode", c_int32)]
+                
+ps4000a.PS4000A_DIRECTION = PS4000A_DIRECTION
+
+class PS4000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
+    _pack_ = 1
+    _fields_ = [("thresholdUpper", c_int16),
+                ("thresholdUpperHysteresis", c_uint16),
+                ("thresholdLower", c_int16),
+                ("thresholdLowerHysteresis", c_uint16),
+                ("channel", c_int32),
+                ("thresholdMode", c_int32)]
+                
+ps4000a.PS4000A_TRIGGER_CHANNEL_PROPERTIES = PS4000A_TRIGGER_CHANNEL_PROPERTIES
+
 doc = """ PICO_STATUS ps4000aOpenUnit
     (
         int16_t *handle,
