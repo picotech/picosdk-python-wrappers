@@ -281,6 +281,12 @@ ps4000a.PS4000A_THRESHOLD_MODE = make_enum([
     "PS4000A_WINDOW"
 ])
 
+ps4000a.PS4000A_TRIGGER_STATE = make_enum([
+    "PS4000A_DONT_CARE",
+    "PS4000A_TRUE",
+    "PS4000A_FALSE"
+])
+
 class PS4000A_CONDITION (Structure):
 	_pack_ = 1
 	_fields_ = [("source", c_int32),
