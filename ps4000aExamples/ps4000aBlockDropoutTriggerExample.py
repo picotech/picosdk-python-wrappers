@@ -56,8 +56,13 @@ assert_pico_ok(status["setChB"])
 
 # Set up dropout trigger
 # set trigger condtions for channel A and pulse width qualifier
-conditions[1] = ps.PS4000A_CONDITION(ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A"], ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"])
-conditions[2] = ps.PS4000A_CONDITION(ps.PS4000A_CHANNEL["PS4000A__PULSE_WIDTH_SOURCE"],ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"])
+conditions =[ps.PS4000A_CONDITION() for i in range (2)]
+print(conditions)
+conditions[0].source =  ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A"]
+conditions[0].condition = ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"]
+conditions[1].source =  ps.PS4000A_CHANNEL["PS4000A_PULSE_WIDTH_SOURCE"]
+conditions[1].condition = ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"]
+
 nConditions = 2
 info = ps.PS4000A_CONDITIONS_INFO["PS4000A_ADD"]
 status["setTriggerChannelConditions"] = ps.ps4000aSetTriggerChannelConditions(chandle, ctypes.byref(conditions), nConditions, info)
@@ -67,6 +72,7 @@ assert_pico_ok(status["setTriggerChannelConditions"])
 directions = ps.PS4000A_DIRECTION(ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A"], ps.PS4000A_THRESHOLD_DIRECTION["PS4000A_ENTER"])
 nDirections = 1
 status["setTriggerChannelDirections"] = ps.ps4000aSetTriggerChannelDirections(chandle, ctypes.byref(directions), nDirections)
+assert_pico_ok(status["setTriggerChannelDirections"])
 
 # find maximum ADC count value
 # handle = chandle
@@ -79,6 +85,21 @@ channelProperties = ps.PS4000A_TRIGGER_CHANNEL_PROPERTIES(thresholdUpper, (thres
 nChannelProperties = 1
 autoTriggerms = 10000
 status["setTriggerChannelProperties"] = ps.ps4000aSetTriggerChannelProperties(chandle, ctypes.byref(channelProperties), nChannelProperties, 0, autoTriggerms)
+assert_pico_ok(status["setTriggerChannelProperties"])
+
+# set pulse width qualifier conditions
+pwqConditions = conditions[1]
+pwqNConditions = 1
+status["setPulseWidthQualifierConditions"] = ps.ps4000aSetPulseWidthQualifierConditions(chandle, ctypes.byref(pwqConditions), pwqNConditions, info)
+assert_pico_ok(status["setPulseWidthQualifierConditions"])
+
+# set pulse width qualifier properties
+direction = ps.PS4000A_DIRECTION[""]
+lower = 15
+upper = 100
+type = ps.PS4000A_PULSE_WIDTH_TYPE["PW_TYPE_IN_RANGE"]
+status["setPulseWidthQualifierProperties"] = ps.ps4000aSetPulseWidthQualifierProperties(chandle, direction, lower, upper, type)
+assert_pico_ok(status["setPulseWidthQualifierProperties"])
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
