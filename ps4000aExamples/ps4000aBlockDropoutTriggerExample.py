@@ -10,6 +10,7 @@ import numpy as np
 from picosdk.ps4000a import ps4000a as ps
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
+from math import *
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -56,12 +57,19 @@ assert_pico_ok(status["setChB"])
 
 # Set up dropout trigger
 # set trigger condtions for channel A and pulse width qualifier
-conditions =[ps.PS4000A_CONDITION() for i in range (2)]
-print(conditions)
-conditions[0].source =  ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A"]
-conditions[0].condition = ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"]
-conditions[1].source =  ps.PS4000A_CHANNEL["PS4000A_PULSE_WIDTH_SOURCE"]
-conditions[1].condition = ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"]
+class RECT(ctypes.Structure):
+     _fields_ = [("channelA",ps.PS4000A_CONDITION),
+                 ("pwq",ps.PS4000A_CONDITION)]
+
+ #conditions =[ps.PS4000A_CONDITION() for i in range (2)]
+
+channelAConditions =  ps.PS4000A_CONDITION(ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A"],ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"])
+#conditions.channelA.condition = ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"]
+pulseWidthConditions =  ps.PS4000A_CONDITION(ps.PS4000A_CHANNEL["PS4000A_PULSE_WIDTH_SOURCE"],ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"])
+#conditions.pwq.condition = ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"]
+
+conditions = RECT(channelAConditions,pulseWidthConditions)
+
 
 nConditions = 2
 info = ps.PS4000A_CONDITIONS_INFO["PS4000A_ADD"]
@@ -80,21 +88,20 @@ assert_pico_ok(status["setTriggerChannelDirections"])
 maxADC = ctypes.c_int16(32767)
 
 # set trigger properties for channel ADC
-thresholdUpper = mV2adc(500, c, maxADC)
-channelProperties = ps.PS4000A_TRIGGER_CHANNEL_PROPERTIES(thresholdUpper, (thresholdUpper * 0.05), (thresholdUpper * -1), (thresholdUpper * 0.05), ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A"], ps.PS4000A_THRESHOLD_MODE["PS4000A_WINDOW"])
+thresholdUpper = mV2adc(500, 7, maxADC)
+channelProperties = ps.PS4000A_TRIGGER_CHANNEL_PROPERTIES(thresholdUpper, floor(thresholdUpper * 0.05), (thresholdUpper * -1), floor(thresholdUpper * 0.05), ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A"], ps.PS4000A_THRESHOLD_MODE["PS4000A_WINDOW"])
 nChannelProperties = 1
 autoTriggerms = 10000
 status["setTriggerChannelProperties"] = ps.ps4000aSetTriggerChannelProperties(chandle, ctypes.byref(channelProperties), nChannelProperties, 0, autoTriggerms)
 assert_pico_ok(status["setTriggerChannelProperties"])
 
 # set pulse width qualifier conditions
-pwqConditions = conditions[1]
 pwqNConditions = 1
-status["setPulseWidthQualifierConditions"] = ps.ps4000aSetPulseWidthQualifierConditions(chandle, ctypes.byref(pwqConditions), pwqNConditions, info)
+status["setPulseWidthQualifierConditions"] = ps.ps4000aSetPulseWidthQualifierConditions(chandle, ctypes.byref(pulseWidthConditions), pwqNConditions, info)
 assert_pico_ok(status["setPulseWidthQualifierConditions"])
 
 # set pulse width qualifier properties
-direction = ps.PS4000A_DIRECTION[""]
+direction = ps.PS4000A_THRESHOLD_DIRECTION["PS4000A_ENTER"]
 lower = 15
 upper = 100
 type = ps.PS4000A_PULSE_WIDTH_TYPE["PW_TYPE_IN_RANGE"]
