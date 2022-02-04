@@ -101,7 +101,7 @@ status["SetDataBuffers"] = ps.ps5000aSetDataBuffers(chandle,
 assert_pico_ok(status["SetDataBuffers"])
 
 # set the digital trigger for a high bit on digital channel 0
-conditions = ps.PS5000A_CONDITIONS(ps.PS5000A_CHANNEL["PS5000A_DIGITAL_PORT0"], ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+conditions = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_DIGITAL_PORT0"], ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
 nConditions = 1
 clear = 1
 add = 2
@@ -118,6 +118,10 @@ status["setTriggerDigitalPortProperties"] = ps.ps5000aSetTriggerDigitalPortPrope
                                                                                       ctypes.byref(directions),
                                                                                       nDirections)
 assert_pico_ok(status["setTriggerDigitalPortProperties"])
+
+# set autotrigger timeout value
+status["autoTriggerus"] = ps.ps5000aSetAutoTriggerMicroSeconds(chandle, 10000)
+assert_pico_ok(status["autoTriggerus"])
 
 print ("Starting data collection...")
 
