@@ -57,6 +57,8 @@ postTriggerSamples = 2500
 maxSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
+# Warning: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # handle = chandle
 # timebase = 8 = timebase
 # noSamples = maxSamples
