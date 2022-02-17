@@ -1,11 +1,11 @@
 #
 # Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PicoScope 3000 Series (A API) MSO Block Mode Triggered Example
-# This example demonstrates how to use the PicoScope 3000 Series (ps5000a) driver API functions in order to do the
+# PicoScope 5000 Series (A API) MSO Block Mode Triggered Example
+# This example demonstrates how to use the PicoScope 5000 Series (ps5000a) driver API functions in order to do the
 # following:
 #
-# Open a connection to a PicoScope 3000 Series MSO device
+# Open a connection to a PicoScope 5000 Series MSO device
 # Setup a digital port
 # Set up a digital trigger
 # Collect a block of data
@@ -62,6 +62,8 @@ postTriggerSamples = 2500
 totalSamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase information
+# Warning: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # handle = chandle
 # timebase = 1252
 # Nosample = totalSamples

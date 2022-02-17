@@ -1,8 +1,8 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
 #
 # ps5000a RAPID BLOCK MODE EXAMPLE
-# This example opens a 3000a driver device, sets up one channel and a trigger then collects 10 block of data in rapid succession.
+# This example opens a 5000a driver device, sets up one channel and a trigger then collects 10 block of data in rapid succession.
 # This data is then plotted as mV against time in ns.
 
 import ctypes
@@ -71,6 +71,8 @@ postTriggerSamples = 400
 maxsamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase innfomation
+# Warning: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # Handle = chandle
 timebase = 2
 # Nosample = maxsamples

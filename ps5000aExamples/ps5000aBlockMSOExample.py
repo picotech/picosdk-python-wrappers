@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PicoScope 3000 Series (A API) MSO Block Mode Example
-# This example demonstrates how to use the PicoScope 3000 Series (ps5000a) driver API functions in order to do the
+# PicoScope 5000 Series (A API) MSO Block Mode Example
+# This example demonstrates how to use the PicoScope 5000 Series (ps5000a) driver API functions in order to do the
 # following:
 #
-# Open a connection to a PicoScope 3000 Series MSO device
+# Open a connection to a PicoScope 5000 Series MSO device
 # Setup a digital port
 # Collect a block of data
 # Plot data
