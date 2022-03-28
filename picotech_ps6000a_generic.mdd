@@ -597,7 +597,7 @@
 % base device functions, OBJ is the device object.
 
     status = calllib('ps6000a','ps6000aGetTimebase',obj.DriverData.unitHandle, timebase, noSamples,...
-        timeIntervalNanoseconds, maxSamples,SegmentIndex);</MCode>
+        timeIntervalNanoseconds, maxSamples,segmentIndex);</MCode>
                </Code>
                <Description/>
             </Method>
