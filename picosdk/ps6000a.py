@@ -19,6 +19,16 @@ class Ps6000alib(Library):
 
 ps6000a = Ps6000alib()
 
+ps6000a.PS6000A_DEVICE_RESOLUTION = make_enum([
+    "PS6000A_DR_8BIT",
+    "PS6000A_DR_12BIT",
+    "PS6000A_DR_14BIT",
+    "PS6000A_DR_15BIT",
+    "PS6000A_DR_16BIT",
+])
+
+ps6000a.DEFAULT_RESOLUTION = ps6000a.PS6000A_DEVICE_RESOLUTION["PS6000A_DR_8BIT"]
+
 doc = """ void ps6000aBlockReady
     (
         int16_t    handle,
