@@ -1486,14 +1486,11 @@
                <CapabilityGroup>Base</CapabilityGroup>
                <Type>MCode</Type>
                <Code>
-                  <MCode>function status = ps6000aSigGenApply(obj,sigGenEnabled,sweepEnabled,triggerEnabled,automaticClockOptimisationEnabled,...
-    overrideAutomaticClockAndPrescale,frequency,stopFrequency,frequencyIncrement,dwellTime)
+                  <MCode>function status = ps6000aSigGenApply(obj,sigGenEnabled,sweepEnabled,triggerEnabled,automaticClockOptimisationEnabled,overrideAutomaticClockAndPrescale,frequency,stopFrequency,frequencyIncrement,dwellTime)
 % For group functions, OBJ is the group object. For
 % base device functions, OBJ is the device object.
 
-    status = calllib('ps6000a','ps6000aSigGenApply',obj.DriverData.unitHandle,signGenEnabled,sweepEnabled,...
-        triggerEnabled,automaticClockOptimisationEnabled,overrideAutomaticClockAndPrescale,frequency,stopFrequency,...
-        frequencyIncrement,dwellTime);
+    status = calllib('ps6000a','ps6000aSigGenApply',obj.DriverData.unitHandle,sigGenEnabled,sweepEnabled,triggerEnabled,automaticClockOptimisationEnabled,overrideAutomaticClockAndPrescale,frequency,stopFrequency,frequencyIncrement,dwellTime);
     
     if (status == PicoStatus.PICO_OK)
         
