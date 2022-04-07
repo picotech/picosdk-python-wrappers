@@ -137,6 +137,18 @@ pDwellTime = libpointer('doublePtr',dwellTime);
 
 pause(5)
 
+%% change wave type to square and stop sweeping
+
+waveType = ps6000aEnumInfo.enPicoWaveType.PICO_SQUARE;
+
+[status.sigGenWaveform] = invoke(ps6000aDeviceObj,'ps6000aSigGenWaveform',waveType, 0,0);
+
+% apply changes
+sweepEnabled = 0;
+[status.sigGenApply] = invoke(ps6000aDeviceObj, 'ps6000aSigGenApply', sigGenEnabled, sweepEnabled, triggerEnabled, automaticClockOptimisationEnabled, overrideAutomaticClockAndPrescale, pFrequency, pStopFrequency, pFrequencyIncrement, pDwellTime);
+
+pause(5)
+
 %% Disconnect scope
 
 disconnect(ps6000aDeviceObj);
