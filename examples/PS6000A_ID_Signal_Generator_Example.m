@@ -149,6 +149,38 @@ sweepEnabled = 0;
 
 pause(5)
 
+
+%% get max value for arbitrary buffer
+
+maxValue = 0;
+minValue = 0;
+maxValuePtr = libpointer('doublePtr',maxValue);
+minValuePtr = libpointer('doublePtr',minValue);
+step = 0;
+stepPtr = libpointer('doublePtr',step);
+status.sigGenLimits = invoke(ps6000aDeviceObj, 'ps6000aSigGenLimits',ps6000aEnumInfo.enPicoSigGenParameter.PICO_SIGGEN_PARAM_SAMPLE,minValuePtr,maxValuePtr,stepPtr);
+
+maxValue = maxValuePtr.Value;
+
+%% create an arbitary waveform
+
+awgBufferSize = 40000;
+x = 0:(2*pi)/(awgBufferSize - 1):2*pi;
+y = (normalise(sin(x) + sin(2*x)))*maxValue;
+
+yPtr = libpointer('int16Ptr',y);
+
+%% set signal generator output arbitary waveform
+
+waveType = ps6000aEnumInfo.enPicoWaveType.PICO_ARBITRARY;
+
+[status.sigGenWaveform] = invoke(ps6000aDeviceObj,'ps6000aSigGenWaveform',waveType, yPtr,awgBufferSize);
+
+% apply changes
+sweepEnabled = 0;
+[status.sigGenApply] = invoke(ps6000aDeviceObj, 'ps6000aSigGenApply', sigGenEnabled, sweepEnabled, triggerEnabled, automaticClockOptimisationEnabled, overrideAutomaticClockAndPrescale, pFrequency, pStopFrequency, pFrequencyIncrement, pDwellTime);
+
+pause (5)
 %% Disconnect scope
 
 disconnect(ps6000aDeviceObj);
