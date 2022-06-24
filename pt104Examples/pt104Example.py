@@ -9,6 +9,7 @@ from picosdk.usbPT104 import usbPt104 as pt104
 import numpy as np
 from picosdk.functions import assert_pico_ok
 from time import sleep
+import matplotlib.pyplot as plt
 
 # Create chandle and status ready for use
 status = {}
@@ -31,16 +32,32 @@ noOfWires = 4 #wires
 status["setChannel1"] = pt104.UsbPt104SetChannel(chandle, channel, datatype, noOfWires)
 assert_pico_ok(status["setChannel1"])
 
-print(status)
+#collect data
+print("collecting data")
+numSamples = 20
 
-#pause
-sleep(2)
+data = (ctypes.c_int32 * numSamples)()
 
-# Get values
-value = ctypes.c_int32()
-filtered = 1 # true
-status["getValue"] = pt104.UsbPt104GetValue(chandle, channel, ctypes.byref(value), filtered)
-assert_pico_ok(status["getValue"])
+for i in range(numSamples):
+
+    #pause
+    sleep(2)
+
+    # Get values
+    measurement = ctypes.c_int32()
+    filtered = 1 # true
+    status["getValue"] = pt104.UsbPt104GetValue(chandle, channel, ctypes.byref(measurement), filtered)
+    assert_pico_ok(status["getValue"])
+    
+    data[i] = measurement.value
+
+samples = np.linspace(0, numSamples*2, numSamples)
+dataTemp = [x /1000 for x in data]   
+
+plt.plot(samples, dataTemp)
+plt.xlabel('Time (s)')
+plt.ylabel('Temperature ($^o$C)')
+plt.show()
 
 # Close the device
 status["closeUnit"] = pt104.UsbPt104CloseUnit(chandle)
