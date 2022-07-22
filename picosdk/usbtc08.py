@@ -32,7 +32,7 @@ class USBTC08_INFO(Structure):
                 ("PicoppVersion", c_int16),
 				("HardwareVersion", c_int16),
 				("Variant", c_int16),
-				("szSerial[USBTC08_MAX_SERIAL_CHAR}", c_int8),
+				("szSerial[USBTC08_MAX_SERIAL_CHAR]", c_int8),
 				("szCalDate[USBTC08_MAX_DATE_CHARS]", c_int8)]
 
 doc = """ int16_t usb_tc08_open_unit
