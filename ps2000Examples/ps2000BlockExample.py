@@ -60,6 +60,8 @@ postTriggerSamples = 1000
 maxSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
+# WARNING: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # handle = chandle
 # timebase = 8 = timebase
 # no_of_samples = maxSamples
@@ -114,7 +116,7 @@ adc2mVChA =  adc2mV(bufferA, chARange, maxADC)
 adc2mVChB =  adc2mV(bufferB, chBRange, maxADC)
 
 # Create time data
-time = np.linspace(0, (cmaxSamples.value) * timeInterval.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value -1) * timeInterval.value, cmaxSamples.value)
 
 # plot data from channel A and B
 plt.plot(time, adc2mVChA[:])

@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2018-2019 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS2000 Series (A API) STREAMING MODE EXAMPLE
+# PS4000 Series (A API) STREAMING MODE EXAMPLE
 # This example demonstrates how to call the ps4000 driver API functions in order to open a device, setup 2 channels and collects streamed data (1 buffer).
 # This data is then plotted as mV against time in ns.
 
@@ -16,7 +16,7 @@ import time
 chandle = ctypes.c_int16()
 status = {}
 
-# Open PicoScope 2000 Series device
+# Open PicoScope 4000 Series device
 # Returns handle to chandle for use in future API functions
 status["openunit"] = ps.ps4000OpenUnit(ctypes.byref(chandle))
 assert_pico_ok(status["openunit"])
@@ -162,7 +162,7 @@ adc2mVChAMax = adc2mV(bufferCompleteA, channel_range, maxADC)
 adc2mVChBMax = adc2mV(bufferCompleteB, channel_range, maxADC)
 
 # Create time data
-time = np.linspace(0, (totalSamples) * actualSampleIntervalNs, totalSamples)
+time = np.linspace(0, (totalSamples - 1) * actualSampleIntervalNs, totalSamples)
 
 # Plot data from channel A and B
 plt.plot(time, adc2mVChAMax[:])

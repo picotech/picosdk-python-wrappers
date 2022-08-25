@@ -846,3 +846,19 @@ doc = """ PICO_STATUS ps2000aGetMaxSegments
 ps2000a.make_symbol("_GetMaxSegments", "ps2000aGetMaxSegments", c_uint32, [c_int16, c_void_p], doc)
 
 ps2000a.INI_LOGIC_VOLTS = 1.5
+
+doc = """ void *ps2000aBlockReady
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        void    *pParameter
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+    
+ps2000a.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                     c_int16,
+                                                     c_uint32,
+                                                     c_void_p)
+
+ps2000a.BlockReadyType.__doc__ = doc

@@ -55,7 +55,7 @@ assert_pico_ok(status["setChA"])
 # analogOffset = 0 V
 chBRange = 7
 status["setChB"] = ps.ps4000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
-assert_pico_ok(status["setChA"])
+assert_pico_ok(status["setChB"])
 
 # Set up channel C
 # handle = chandle
@@ -96,6 +96,8 @@ postTriggerSamples = 2500
 maxSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
+# WARNING: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # handle = chandle
 # timebase = 8 = timebase
 # noSamples = maxSamples
@@ -181,7 +183,7 @@ adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
 adc2mVChBMax =  adc2mV(bufferBMax, chBRange, maxADC)
 
 # Create time data
-time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value - 1) * timeIntervalns.value, cmaxSamples.value)
 
 # plot data from channel A and B
 plt.plot(time, adc2mVChAMax[:])

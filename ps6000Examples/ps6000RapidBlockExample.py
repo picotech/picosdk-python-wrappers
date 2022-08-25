@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
 #
 # ps6000 RAPID BLOCK MODE EXAMPLE
 # This example opens a 6000 driver device, sets up one channel and a trigger then collects 10 block of data in rapid succession.
@@ -50,6 +50,8 @@ postTriggerSamples = 400
 maxsamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase innfomation
+# Warning: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # Handle = chandle
 # Timebase = 2 = timebase
 # Nosample = maxsamples
@@ -289,7 +291,7 @@ adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
 adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
 
 # Creates the time data
-time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value -1) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
 plt.plot(time, adc2mVChAMax[:])

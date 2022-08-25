@@ -12,6 +12,8 @@ import ctypes
 from picosdk.ps5000a import ps5000a as ps
 import time
 from picosdk.functions import assert_pico_ok
+import numpy as np
+import math
 
 
 status = {}
@@ -118,10 +120,38 @@ assert_pico_ok(status["setSigGenBuiltInV2"])
 # Pauses the script to show signal
 time.sleep(36)
 
+# create a custom waveform
+awgBuffer = np.sin(np.linspace(0,2*math.pi,1024))
+awgbufferPointer = awgBuffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int16))
+
+# output custom waveform with peak-to-peak of 2 V and frequency of 10 kHz
+# handle = chandle
+# offsetVoltage = 0
+# pkToPk = 2000000
+# startDeltaPhase = 0
+# stopDeltaPhase = 0
+# deltaPhaseIncrement = 0
+# dwellCount = 0
+# *arbitaryWaveform = awgbufferPointer
+# arbitaryWaveformSize = 1024
+# sweepType = ctypes.c_int32(1) = PS5000A_UP
+# operation = 0
+# shots = 0
+# sweeps = 0
+# triggerType = ctypes.c_int16(0) = PS5000A_SIGGEN_RISING
+# triggerSource = ctypes.c_int16(0) = PS5000A_SIGGEN_NONE
+# extInThreshold = 0
+
+status["setSigGenArbitrary"] = ps.ps5000aSetSigGenArbitrary(chandle, 0, 2000000, 0, 0, 0, 0, awgbufferPointer, 1024, 0, 0, 0, 0, 0, 0, 0, 0)
+assert_pico_ok(status["setSigGenArbitrary"])
+
+# Pauses the script to show signal
+time.sleep(10)
+
 # Closes the unit
 # Handle = chandle
 status["close"] = ps.ps5000aCloseUnit(chandle)
-assert_pico_ok(status["stop"])
+assert_pico_ok(status["close"])
 
 # Displays the status returns
 print(status)

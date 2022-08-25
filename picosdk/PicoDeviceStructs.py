@@ -8,6 +8,7 @@ functions.
 """
 
 from ctypes import *
+from picosdk.library import Library
 
 class PicoStructlib(Library):
     def __init__(self):

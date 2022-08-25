@@ -139,6 +139,8 @@ postTriggerSamples = 2500
 totalSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
+# WARNING: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # handle = chandle
 # timebase = 1252 = 10000 ns = timebase (see Programmer's guide for more information on timebases)
 # noSamples = totalSamples
@@ -293,7 +295,7 @@ adc2mVChB = adc2mV(bufferB, chBRange, maxADC)
 dPort0BinaryData = splitMSODataFast(cTotalSamples, bufferDPort0)
 
 # Create time data
-time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
+time = np.linspace(0, (cTotalSamples.value - 1) * timeIntervalNs.value, cTotalSamples.value)
 
 # Plot data from channels A, B and D0
 

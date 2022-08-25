@@ -28,24 +28,23 @@ ps4000a.PS4000A_COUPLING = make_enum([
 ps4000a.PICO_COUPLING = {k[-2:]: v for k, v in ps4000a.PS4000A_COUPLING.items()}
 
 # A tuple in an enum like this is 2 names for the same value.
-ps4000a.PS4000A_CHANNEL = make_enum([
-    "PS4000A_CHANNEL_A",
-    "PS4000A_CHANNEL_B",
-    "PS4000A_CHANNEL_C",
-    "PS4000A_CHANNEL_D",
-    ("PS4000A_CHANNEL_E", "PS4000A_MAX_4_CHANNELS"),
-    "PS4000A_CHANNEL_F",
-    "PS4000A_CHANNEL_G",
-    "PS4000A_CHANNEL_H",
-    ("PS4000A_MAX_CHANNELS", "PS4000A_EXTERNAL"),
-    "PS4000A_TRIGGER_AUX",
-    "PS4000A_MAX_TRIGGER_SOURCES",
-])
+ps4000a.PS4000A_CHANNEL = {
+    "PS4000A_CHANNEL_A" : 0,
+    "PS4000A_CHANNEL_B" : 1,
+    "PS4000A_CHANNEL_C" : 2,
+    "PS4000A_CHANNEL_D" : 3,
+    ("PS4000A_CHANNEL_E", "PS4000A_MAX_4_CHANNELS") : 4,
+    "PS4000A_CHANNEL_F" : 5,
+    "PS4000A_CHANNEL_G" : 6 ,
+    "PS4000A_CHANNEL_H" : 7,
+    ("PS4000A_MAX_CHANNELS", "PS4000A_EXTERNAL") : 8,
+    "PS4000A_TRIGGER_AUX" : 9,
+    "PS4000A_MAX_TRIGGER_SOURCES" : 10,
+    "PS4000A_PULSE_WIDTH_SOURCE" : 0x10000000
+}
 
-ps4000a.PS4000A_CHANNEL["PS4000A_PULSE_WIDTH_SOURCE"] = 0x10000000
+ps4000a.PICO_CHANNEL = {k[19:]: v for k, v in ps4000a.PS4000A_CHANNEL.items()}
 
-# only include the normal analog channels for now:
-ps4000a.PICO_CHANNEL = {k[-1]: v for k, v in ps4000a.PS4000A_CHANNEL.items() if "PS4000A_CHANNEL_" in k}
 
 
 # The voltage ranges for this driver are so oddly defined, that it is easier to describe them as a literal than trying
@@ -256,6 +255,70 @@ ps4000a.PS4000A_EXTRA_OPERATIONS = make_enum([
 	'PS4000A_WHITENOISE',
 	'PS4000A_PRBS',
 ])
+
+ps4000a.PS4000A_CONDITIONS_INFO = make_enum([
+    'PS4000A_CLEAR',
+    'PS4000A_ADD',
+])
+
+ps4000a.PS4000A_THRESHOLD_DIRECTION = make_enum([
+    ("PS4000A_ABOVE", "PS4000A_INSIDE"),
+    ("PS4000A_BELOW", "PS4000A_OUTSIDE"),
+    ("PS4000A_RISING", "PS4000A_ENTER", "PS4000A_NONE"),
+    ("PS4000A_FALLING", "PS4000A_EXIT"),
+    ("PS4000A_RISING_OR_FALLING", "PS4000A_ENTER_OR_EXIT"),
+    "PS4000A_ABOVE_LOWER",
+    "PS4000A_BELOW_LOWER",
+    "PS4000A_RISING_LOWER",
+    "PS4000A_FALLING_LOWER",
+    "PS4000A_POSITIVE_RUNT",
+    "PS4000A_NEGATIVE_RUNT",
+])
+
+ps4000a.PS4000A_THRESHOLD_MODE = make_enum([
+    "PS4000A_LEVEL",
+    "PS4000A_WINDOW"
+])
+
+ps4000a.PS4000A_TRIGGER_STATE = make_enum([
+    "PS4000A_DONT_CARE",
+    "PS4000A_TRUE",
+    "PS4000A_FALSE"
+])
+
+ps4000a.PS4000A_PULSE_WIDTH_TYPE = make_enum([
+    "PW_TYPE NONE",
+    "PW_TYPE_LESS_THAN",
+    "PW_TYPE_GREATER_THAN",
+    "PW_TYPE_IN_RANGE",
+    "PW_TYPE_OUT_OF_RANGE"
+])
+
+class PS4000A_CONDITION (Structure):
+	_pack_ = 1
+	_fields_ = [("source", c_int32),
+				("condition", c_int16)]
+                
+ps4000a.PS4000A_CONDITION = PS4000A_CONDITION
+
+class PS4000A_DIRECTION(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_int32),
+                ("direction", c_int32),
+                ("mode", c_int32)]
+                
+ps4000a.PS4000A_DIRECTION = PS4000A_DIRECTION
+
+class PS4000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
+    _pack_ = 1
+    _fields_ = [("thresholdUpper", c_int16),
+                ("thresholdUpperHysteresis", c_uint16),
+                ("thresholdLower", c_int16),
+                ("thresholdLowerHysteresis", c_uint16),
+                ("channel", c_int32),
+                ("thresholdMode", c_int32)]
+                
+ps4000a.PS4000A_TRIGGER_CHANNEL_PROPERTIES = PS4000A_TRIGGER_CHANNEL_PROPERTIES
 
 doc = """ PICO_STATUS ps4000aOpenUnit
     (

@@ -10,6 +10,7 @@ from picosdk.ps4000 import ps4000
 from picosdk.ps4000a import ps4000a
 from picosdk.ps5000a import ps5000a
 from picosdk.ps6000 import ps6000
+from picosdk.ps6000a import ps6000a
 
 
 # the A drivers are faster to enumerate devices, so search them first.
@@ -18,6 +19,7 @@ drivers = [
     ps3000a,
     ps4000a,
     ps5000a,
+    ps6000a,
     ps6000,
     ps2000,
     ps3000,

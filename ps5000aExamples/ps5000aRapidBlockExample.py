@@ -1,8 +1,8 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
 #
 # ps5000a RAPID BLOCK MODE EXAMPLE
-# This example opens a 3000a driver device, sets up one channel and a trigger then collects 10 block of data in rapid succession.
+# This example opens a 5000a driver device, sets up one channel and a trigger then collects 10 block of data in rapid succession.
 # This data is then plotted as mV against time in ns.
 
 import ctypes
@@ -71,6 +71,8 @@ postTriggerSamples = 400
 maxsamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase innfomation
+# Warning: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # Handle = chandle
 timebase = 2
 # Nosample = maxsamples
@@ -291,6 +293,21 @@ TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps5000aGetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
+# Get and print TriggerInfo for memory segments
+# Create array of ps.PS5000A_TRIGGER_INFO for each memory segment
+Ten_TriggerInfo = (ps.PS5000A_TRIGGER_INFO*10) ()
+
+status["GetTriggerInfoBulk"] = ps.ps5000aGetTriggerInfoBulk(chandle, ctypes.byref(Ten_TriggerInfo), 0, 9)
+assert_pico_ok(status["GetTriggerInfoBulk"])
+
+print("Printing triggerInfo blocks")
+for i in Ten_TriggerInfo:
+    print("PICO_STATUS is ", i.status)
+    print("segmentIndex is ", i.segmentIndex)
+    print("triggerTime is ", i.triggerTime)
+    print("timeUnits is ", i.timeUnits)
+    print("timeStampCounter is ", i.timeStampCounter)
+
 # Converts ADC from channel A to mV
 adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
 adc2mVChAMax1 =  adc2mV(bufferAMax1, chARange, maxADC)
@@ -304,7 +321,7 @@ adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
 adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
 
 # Creates the time data
-time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value - 1) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
 plt.plot(time, adc2mVChAMax[:])

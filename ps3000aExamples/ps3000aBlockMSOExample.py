@@ -57,6 +57,8 @@ postTriggerSamples = 2500
 totalSamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase information
+# WARNING: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # handle = chandle
 # timebase = 1252
 # Nosample = totalSamples
@@ -148,7 +150,7 @@ print "Data collection complete."
 bufferDPort0 = splitMSODataFast(cTotalSamples, bufferDPort0Max)
 
 # Creates the time data
-time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
+time = np.linspace(0, (cTotalSamples.value - 1) * timeIntervalNs.value, cTotalSamples.value)
 
 # Plot the data from digital channels onto a graph
 
