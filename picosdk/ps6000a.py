@@ -19,6 +19,16 @@ class Ps6000alib(Library):
 
 ps6000a = Ps6000alib()
 
+ps6000a.PS6000A_DEVICE_RESOLUTION = make_enum([
+    "PS6000A_DR_8BIT",
+    "PS6000A_DR_12BIT",
+    "PS6000A_DR_14BIT",
+    "PS6000A_DR_15BIT",
+    "PS6000A_DR_16BIT",
+])
+
+ps6000a.DEFAULT_RESOLUTION = ps6000a.PS6000A_DEVICE_RESOLUTION["PS6000A_DR_8BIT"]
+
 doc = """ void ps6000aBlockReady
     (
         int16_t    handle,
@@ -131,7 +141,7 @@ doc = """ PICO_STATUS ps6000aGetUnitInfo
         int16_t    *requiredSize,
         PICO_INFO    info
     ); """
-ps6000a.make_symbol("_GetUnitInfo", "ps6000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_int32], doc)
+ps6000a.make_symbol("_GetUnitInfo", "ps6000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000aCloseUnit
     (
