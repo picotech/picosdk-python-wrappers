@@ -34,9 +34,12 @@ channelRange = 7
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
 status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
 assert_pico_ok(status["setChannelA"])
+channelA = enums.PICO_CHANNEL["PICO_CHANNEL_B"]
+status["setChannelB"] = ps.ps6000aSetChannelOn(chandle, channelB, coupling, channelRange, 0, bandwidth)
+assert_pico_ok(status["setChannelB"])
 
-# set channel B-H off
-for x in range(1, 7, 1):
+# set channel C-H off
+for x in range(2, 7, 1):
     channel = x
     status["setChannel", x] = ps.ps6000aSetChannelOff(chandle, channel)
     assert_pico_ok(status["setChannel", x])
@@ -61,6 +64,7 @@ assert_pico_ok(status["setSimpleTrigger"])
 maxBuffers = 10
 
 bufferA = ((ctypes.c_int16 * nSamples) * 10)()
+bufferB = ((ctypes.c_int16 * nSamples) * 10)()
 
 print(bufferA)
 # Set data buffers
@@ -75,9 +79,13 @@ downSampleMode = enums.PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
 clear = enums.PICO_ACTION["PICO_CLEAR_ALL"]
 add = enums.PICO_ACTION["PICO_ADD"]
 action = clear | add  # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]
-status["setDataBuffers"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[0]), nSamples, dataType,
+actionB = add
+status["setDataBuffersA"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[0]), nSamples, dataType,
                                                    waveform, downSampleMode, action)
-assert_pico_ok(status["setDataBuffers"])
+assert_pico_ok(status["setDataBuffersA"])
+status["setDataBuffersB"] = ps.ps6000aSetDataBuffer(chandle, channelB, ctypes.byref(bufferA[0]), nSamples, dataType,
+                                                   waveform, downSampleMode, actionB)
+assert_pico_ok(status["setDataBuffersB"])
 
 # Run streaming
 sampleInterval = ctypes.c_double(1)
@@ -90,13 +98,15 @@ status["runStreaming"] = ps.ps6000aRunStreaming(chandle, ctypes.byref(sampleInte
                                                 downSampleRatio, downSampleMode)
 assert_pico_ok(status["runStreaming"])
 
-streamData = structs.PICO_STREAMING_DATA_INFO(channelA, downSampleRatio, dataType, 0, 0, 0, 0)
+streamData = (structs.PICO_STREAMING_DATA_INFO * 2)()
+streamData[0] = structs.PICO_STREAMING_DATA_INFO(channelA, downSampleRatio, dataType, 0, 0, 0, 0)
+streamData[1] = structs.PICO_STREAMING_DATA_INFO(channelB, downSampleRatio, dataType, 0, 0, 0, 0)
 
 streamTrigger = structs.PICO_STREAMING_DATA_TRIGGER_INFO(0, 0, 0)
 
 count = 1
 
-actionB = add
+
 
 picoOk = PICO_STATUS["PICO_OK"]
 
@@ -111,9 +121,12 @@ while count <= maxBuffers:
     else:
         count = count + 1
         if count <= maxBuffers:
-            status["setDataBuffer"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count - 1]),
+            status["setDataBufferA"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count - 1]),
                                                               nSamples, dataType, waveform, downSampleMode, actionB)
-            assert_pico_ok(status["setDataBuffer"])
+            assert_pico_ok(status["setDataBufferA"])
+            status["setDataBufferB"] = ps.ps6000aSetDataBuffer(chandle, channelB, ctypes.byref(bufferB[count - 1]),
+                                                              nSamples, dataType, waveform, downSampleMode, actionB)
+            assert_pico_ok(status["setDataBufferB"])
             print(count)
 
 print("streaming finished")
@@ -130,6 +143,8 @@ bufferAmV = ((ctypes.c_int16 * nSamples) * 10)()
 for j in range(0, 9):
     A = bufferA[j]
     bufferAmV[j] = adc2mV(A, channelRange, maxADC)
+    B = bufferB[j]
+    bufferBmV[j] = adc2mV(B, channelRange, maxADC)
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
