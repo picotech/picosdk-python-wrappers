@@ -34,7 +34,7 @@ channelRange = 7
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
 status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
 assert_pico_ok(status["setChannelA"])
-channelA = enums.PICO_CHANNEL["PICO_CHANNEL_B"]
+channelB = enums.PICO_CHANNEL["PICO_CHANNEL_B"]
 status["setChannelB"] = ps.ps6000aSetChannelOn(chandle, channelB, coupling, channelRange, 0, bandwidth)
 assert_pico_ok(status["setChannelB"])
 
@@ -66,7 +66,6 @@ maxBuffers = 10
 bufferA = ((ctypes.c_int16 * nSamples) * 10)()
 bufferB = ((ctypes.c_int16 * nSamples) * 10)()
 
-print(bufferA)
 # Set data buffers
 # handle = chandle
 # channel = channelA
@@ -139,12 +138,13 @@ status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byre
 assert_pico_ok(status["getAdcLimits"])
 
 # convert ADC counts data to mV
-bufferAmV = ((ctypes.c_int16 * nSamples) * 10)()
-for j in range(0, 9):
-    A = bufferA[j]
-    bufferAmV[j] = adc2mV(A, channelRange, maxADC)
-    B = bufferB[j]
-    bufferBmV[j] = adc2mV(B, channelRange, maxADC)
+# bufferAmV = ((ctypes.c_int16 * nSamples) * 10)()
+# bufferBmV = ((ctypes.c_int16 * nSamples) * 10)()
+# for j in range(0, 9):
+    # A = bufferA[j]
+    # bufferAmV[j] = adc2mV(A, channelRange, maxADC)
+    # B = bufferB[j]
+    # bufferBmV[j] = adc2mV(B, channelRange, maxADC)
 
 # Close the scope
 status["closeunit"] = ps.ps6000aCloseUnit(chandle)
