@@ -78,12 +78,12 @@ downSampleMode = enums.PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
 clear = enums.PICO_ACTION["PICO_CLEAR_ALL"]
 add = enums.PICO_ACTION["PICO_ADD"]
 action = clear | add  # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]
-actionB = add
+actionAdd = add
 status["setDataBuffersA"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[0]), nSamples, dataType,
                                                    waveform, downSampleMode, action)
 assert_pico_ok(status["setDataBuffersA"])
-status["setDataBuffersB"] = ps.ps6000aSetDataBuffer(chandle, channelB, ctypes.byref(bufferA[0]), nSamples, dataType,
-                                                   waveform, downSampleMode, actionB)
+status["setDataBuffersB"] = ps.ps6000aSetDataBuffer(chandle, channelB, ctypes.byref(bufferB[0]), nSamples, dataType,
+                                                   waveform, downSampleMode, actionAdd)
 assert_pico_ok(status["setDataBuffersB"])
 
 # Run streaming
@@ -98,8 +98,8 @@ status["runStreaming"] = ps.ps6000aRunStreaming(chandle, ctypes.byref(sampleInte
 assert_pico_ok(status["runStreaming"])
 
 streamData = (structs.PICO_STREAMING_DATA_INFO * 2)()
-streamData[0] = structs.PICO_STREAMING_DATA_INFO(channelA, downSampleRatio, dataType, 0, 0, 0, 0)
-streamData[1] = structs.PICO_STREAMING_DATA_INFO(channelB, downSampleRatio, dataType, 0, 0, 0, 0)
+streamData[0] = structs.PICO_STREAMING_DATA_INFO(channelA, downSampleMode, dataType, 0, 0, 0, 0)
+streamData[1] = structs.PICO_STREAMING_DATA_INFO(channelB, downSampleMode, dataType, 0, 0, 0, 0)
 
 streamTrigger = structs.PICO_STREAMING_DATA_TRIGGER_INFO(0, 0, 0)
 
@@ -121,14 +121,18 @@ while count <= maxBuffers:
         count = count + 1
         if count <= maxBuffers:
             status["setDataBufferA"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count - 1]),
-                                                              nSamples, dataType, waveform, downSampleMode, actionB)
+                                                              nSamples, dataType, waveform, downSampleMode, actionAdd)
             assert_pico_ok(status["setDataBufferA"])
             status["setDataBufferB"] = ps.ps6000aSetDataBuffer(chandle, channelB, ctypes.byref(bufferB[count - 1]),
-                                                              nSamples, dataType, waveform, downSampleMode, actionB)
+                                                              nSamples, dataType, waveform, downSampleMode, actionAdd)
             assert_pico_ok(status["setDataBufferB"])
             print(count)
-
+ps.ps6000aStop(chandle)
+noOfStreamedSamples=ctypes.c_uint64()
+ps.ps6000aNoOfStreamingValues(chandle,ctypes.byref(noOfStreamedSamples))
 print("streaming finished")
+print(noOfStreamedSamples.value)
+
 
 # get max ADC value
 # handle = chandle
@@ -138,6 +142,9 @@ status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byre
 assert_pico_ok(status["getAdcLimits"])
 
 # convert ADC counts data to mV
+plt.plot(bufferA[5])
+plt.plot(bufferB[9])
+plt.show()
 # bufferAmV = ((ctypes.c_int16 * nSamples) * 10)()
 # bufferBmV = ((ctypes.c_int16 * nSamples) * 10)()
 # for j in range(0, 9):
