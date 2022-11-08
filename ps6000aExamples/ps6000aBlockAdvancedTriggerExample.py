@@ -71,8 +71,8 @@ status["setTriggerChannelDirections"] = ps.ps6000aSetTriggerChannelDirections(ch
 assert_pico_ok(status["setTriggerChannelDirections"])
 
 channelProperties = (struct.PICO_TRIGGER_CHANNEL_PROPERTIES * 2)()
-channelProperties[0] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(mV2adc(1000,channelRange,maxADC), 0, 0, 0, channelA)
-channelProperties[1] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(mV2adc(1000,channelRange,maxADC), 0, 0, 0, channelB)
+channelProperties[0] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(int(mV2adc(1000,channelRange,maxADC)), 0, 0, 0, channelA)
+channelProperties[1] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(int(mV2adc(1000,channelRange,maxADC)), 0, 0, 0, channelB)
 nChannelProperties = 2
 autoTriggerMicroSeconds = 1000000
 status["setTriggerChannelProperties"] = ps.ps6000aSetTriggerChannelProperties(chandle, ctypes.byref(channelProperties),nChannelProperties,0,autoTriggerMicroSeconds)
