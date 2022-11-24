@@ -57,6 +57,8 @@ postTriggerSamples = 2500
 totalSamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase information
+# WARNING: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # handle = chandle
 # timebase = 1252
 # Nosample = totalSamples
@@ -96,7 +98,7 @@ status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle,
                                                     0)
 assert_pico_ok(status["SetDataBuffers"])
 
-print "Starting data collection..."
+print ("Starting data collection...")
 
 # Starts the block capture
 # handle = chandle
@@ -141,18 +143,18 @@ while ready.value == check.value:
 status["GetValues"] = ps.ps3000aGetValues(chandle, 0, ctypes.byref(cTotalSamples), 1, 0, 0, ctypes.byref(overflow))
 assert_pico_ok(status["GetValues"])
 
-print "Data collection complete."
+print ("Data collection complete.")
 
 # Obtain binary for Digital Port 0
 # The tuple returned contains the channels in order (D7, D6, D5, ... D0).
 bufferDPort0 = splitMSODataFast(cTotalSamples, bufferDPort0Max)
 
 # Creates the time data
-time = np.linspace(0, cTotalSamples.value * timeIntervalNs.value, cTotalSamples.value)
+time = np.linspace(0, (cTotalSamples.value - 1) * timeIntervalNs.value, cTotalSamples.value)
 
 # Plot the data from digital channels onto a graph
 
-print "Plotting data..."
+print ("Plotting data...")
 
 plt.figure(num='PicoScope 3000 Series (A API) MSO Block Capture Example')
 plt.title('Plot of Digital Port 0 digital channels vs. time')
@@ -169,7 +171,7 @@ plt.ylabel('Logic Level')
 plt.legend(loc="upper right")
 plt.show()
 
-print "Close figure to stop the device and close the connection."
+print ("Close figure to stop the device and close the connection.")
 
 # Stops the scope
 # handle = chandle

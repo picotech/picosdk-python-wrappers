@@ -30,6 +30,15 @@ following command in the top-level directory:
     pip install .
 
 If you are not using a virtualenv or are not elevated, use:
+=======
+For using the AS108 you will need to use the following as well:
+
+	python setupPicosynth.py install
+	
+
+On macOS and Linux you will either need to use `sudo` with this command, to
+install into the system folders, or to install for the current user only you
+can use:
 
     pip install . --user
 
@@ -63,7 +72,6 @@ The following drivers and devices are not yet supported:
 
 * `plcm3` - PicoLog CM3 Current Data Logger
 * `ps3000` - PicoScope 3204, 3205, 3206, 3223, 3224, 3423 & 3423
-* `usbpt104` - PT-104 Platinum Resistance Data Logger
 
 ### Dependencies
 
@@ -76,7 +84,8 @@ examples scripts also use the `matplotlib` plotting library. You can install the
 ### Driver-agnostic examples
 
 The `anyScopeExamples` folder contains examples in pure python which do the same thing as the C-style examples, but
-in a driver-generic way.
+in a driver-generic way.  These examples are currently not being developed further but are still avaliable to use 
+and develop futher yourself.
 
 ### Python Classes
 

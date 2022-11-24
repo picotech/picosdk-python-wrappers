@@ -706,20 +706,20 @@ ps5000a.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
 
 ps5000a.StreamingReadyType.__doc__ = doc
 
-# TODO sort out how to make a callback for a C function in ctypes!
-# doc = """ void *ps5000aStreamingReady
-#     (
-#         int16_t   handle,
-#         int32_t   noOfSamples,
-#         uint32_t  startIndex,
-#         int16_t   overflow,
-#         uint32_t  triggerAt,
-#         int16_t   triggered,
-#         int16_t   autoStop,
-#         void     *pParameter
-#     ); """
-# ps5000a.make_symbol("_StreamingReady", "ps5000aStreamingReady", c_void_p,
-#                     [c_int16, c_int32, c_uint32, c_int16, c_uint32, c_int16, c_int16, c_void_p], doc)
+doc = """void *ps5000aBlockReady
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        void    *pParameter
+    );
+    """
+    
+ps5000a.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                     c_int16,
+                                                     c_int32,
+                                                     c_void_p)
+                                                     
+ps5000a.BlockReadyType.__doc__ = doc
 
 doc = """ PICO_STATUS ps5000aNoOfStreamingValues
     (
@@ -991,3 +991,13 @@ doc = """ PICO_STATUS ps5000aSetPulseWidthQualifierDirections
     ); """
 ps5000a.make_symbol("_SetPulseWidthQualifierDirections", "ps5000aSetPulseWidthQualifierDirections", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS ps5000aGetMinimumTimebaseStateless
+    (
+        int16_t                      handle,
+        PS5000A_CHANNEL_FLAGS        enabledChannelOrPortFlags,
+        uint32_t                     *timebase,
+        double                       *timeInterval,
+        PS5000A_DEVICE_RESOLUTION    resolution
+    ); """
+ps5000a.make_symbol("_GetMinimumTimebaseStateless", "ps5000aGetMinimumTimebaseStateless", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)    

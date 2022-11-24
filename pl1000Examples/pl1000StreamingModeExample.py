@@ -51,7 +51,7 @@ mVValues =  adc2mVpl1000(values, inputRange, maxADC)
 # create time data
 interval = (0.01 * usForBlock.value)/(noOfValues.value * 1)
 
-timeMs = np.linspace(0, (len(mVValues)) * interval, len(mVValues))
+timeMs = np.linspace(0, (len(mVValues) -1) * interval, len(mVValues))
 
 # plot data
 

@@ -120,7 +120,7 @@ assert_pico_ok(status["getAdcLimits"])
 adc2mVChAMax =  adc2mV(bufferAMax, channelRange, maxADC)
 
 # Create time data
-time = np.linspace(0, (nSamples) * timeInterval.value * 1000000000, nSamples)
+time = np.linspace(0, (nSamples -1) * timeInterval.value * 1000000000, nSamples)
 
 # plot data from channel A and B
 plt.plot(time, adc2mVChAMax[:])

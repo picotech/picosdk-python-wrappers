@@ -1,8 +1,8 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
 #
 # ps5000a RAPID BLOCK MODE EXAMPLE
-# This example opens a 3000a driver device, sets up one channel and a trigger then collects 10 block of data in rapid succession.
+# This example opens a 5000a driver device, sets up one channel and a trigger then collects 10 block of data in rapid succession.
 # This data is then plotted as mV against time in ns.
 
 import ctypes
@@ -71,6 +71,8 @@ postTriggerSamples = 400
 maxsamples = preTriggerSamples + postTriggerSamples
 
 # Gets timebase innfomation
+# Warning: When using this example it may not be possible to access all Timebases as all channels are enabled by default when opening the scope.  
+# To access these Timebases, set any unused analogue channels to off.
 # Handle = chandle
 timebase = 2
 # Nosample = maxsamples
@@ -78,7 +80,7 @@ timebase = 2
 # MaxSamples = ctypes.byref(returnedMaxSamples)
 # Segement index = 0
 timeIntervalns = ctypes.c_float()
-returnedMaxSamples = ctypes.c_int16()
+returnedMaxSamples = ctypes.c_int32()
 status["GetTimebase"] = ps.ps5000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["GetTimebase"])
 
@@ -286,7 +288,7 @@ assert_pico_ok(status["GetValuesBulk"])
 # Timeunits = TimeUnits = ctypes.c_char() = ctypes.byref(TimeUnits)
 # Fromsegmentindex = 0
 # Tosegementindex = 9
-Times = (ctypes.c_int16*10)()
+Times = (ctypes.c_int64*10)()
 TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps5000aGetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
@@ -319,7 +321,7 @@ adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
 adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
 
 # Creates the time data
-time = np.linspace(0, (cmaxSamples.value) * timeIntervalns.value, cmaxSamples.value)
+time = np.linspace(0, (cmaxSamples.value - 1) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
 plt.plot(time, adc2mVChAMax[:])

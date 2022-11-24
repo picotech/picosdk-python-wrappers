@@ -236,7 +236,7 @@ def _define_action():
     
 picoEnum.PICO_ACTION = _define_action()
 
-picoEnum.Pico_TRIGGER_STATE = make_enum([
+picoEnum.PICO_TRIGGER_STATE = make_enum([
     "PICO_CONDITION_DONT_CARE",
     "PICO_CONDITION_TRUE",
     "PICO_CONDITION_FALSE"
