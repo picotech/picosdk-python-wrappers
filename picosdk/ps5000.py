@@ -395,8 +395,8 @@ doc = """ PICO_STATUS ps5000SetSigGenArbitrary
 		unsigned long  stopDeltaPhase,
 		unsigned long  deltaPhaseIncrement,
 		unsigned long  dwellCount,
-		short  *arbitaryWaveform
-		long  arbitaryWaveformSize,
+		short  *arbitraryWaveform
+		long  arbitraryWaveformSize,
 		SWEEP_TYPE  sweepType,
 		short  whiteNoise,
 		INDEX_MODE  indexMode,

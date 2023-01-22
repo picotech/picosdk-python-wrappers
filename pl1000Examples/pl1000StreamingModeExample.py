@@ -36,9 +36,9 @@ assert_pico_ok(status["run"])
 sleep(usForBlock.value / 1000000)
 
 values = (ctypes.c_uint16 * noOfValues.value)()
-oveflow = ctypes.c_uint16()
+overflow = ctypes.c_uint16()
 
-status["getValues"] = pl.pl1000GetValues(chandle, ctypes.byref(values), ctypes.byref(noOfValues), ctypes.byref(oveflow), None)
+status["getValues"] = pl.pl1000GetValues(chandle, ctypes.byref(values), ctypes.byref(noOfValues), ctypes.byref(overflow), None)
 assert_pico_ok(status["getValues"])
 
 # convert ADC counts data to mV

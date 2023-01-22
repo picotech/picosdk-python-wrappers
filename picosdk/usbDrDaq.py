@@ -131,7 +131,7 @@ doc = """ PICO_STATUS UsbDrDaqGetSingleF
 	); """
 usbDrDaq.make_symbol("_getSingleF", "UsbDrDaqGetSingleF", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p], doc)
 
-doc = """ PICO_STATUS UsbDrDaqGetTriggerTimeOffestNs
+doc = """ PICO_STATUS UsbDrDaqGetTriggerTimeOffsetNs
     (
 	    int16_t    handle,
 		int64_t    *time
@@ -270,16 +270,16 @@ doc = """ PICO_STATUS UsbDrDaqSetScalings
 	); """
 usbDrDaq.make_symbol("_SetScalings", "UsbDrDaqSetScalings", c_uint32, [c_int16, c_uint32, c_int16], doc)
 
-doc = """ PICO_STATUS UsbDrDaqSetSigGenArbitary
+doc = """ PICO_STATUS UsbDrDaqSetSigGenArbitrary
     (
 	    int16_t    handle,
 		int32_t    offsetVoltage,
 		uint32_t    pkToPk,
-		int16_t    *arbitaryWaveform,
-		int16_t    arbitaryWaveformSize,
+		int16_t    *arbitraryWaveform,
+		int16_t    arbitraryWaveformSize,
 		int32_t    updateRate
 	); """
-usbDrDaq.make_symbol("_SetSigGenArbitary", "UsbDrDaqSetSigGenArbitrary", c_uint32, [c_int16, c_int32, c_uint32, c_void_p, c_int16, c_int32], doc)
+usbDrDaq.make_symbol("_SetSigGenArbitrary", "UsbDrDaqSetSigGenArbitrary", c_uint32, [c_int16, c_int32, c_uint32, c_void_p, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS UsbDrDaqSetSigGenBuiltIn
     (

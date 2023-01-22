@@ -111,14 +111,14 @@ maxsamples = preTriggerSamples + postTriggerSamples
 # Nosample = maxsamples
 # TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
 # MaxSamples = ctypes.byref(returnedMaxSamples)
-# Segement index = 0
+# Segment index = 0
 timebase = 2
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int16()
 status["GetTimebase"] = ps.ps3000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), 1, ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["GetTimebase"])
 
-# Creates a overlow location for data
+# Creates a overflow location for data
 overflow = ctypes.c_int16()
 # Creates converted types maxsamples
 cmaxSamples = ctypes.c_int32(maxsamples)
@@ -150,7 +150,7 @@ bufferAMin = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn't
 status["SetDataBuffers"] = ps.ps3000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxsamples, 0, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
-# Creates a overlow location for data
+# Creates a overflow location for data
 overflow = (ctypes.c_int16 * 10)()
 # Creates converted types maxsamples
 cmaxSamples = ctypes.c_int32(maxsamples)
@@ -194,6 +194,6 @@ assert_pico_ok(status["stop"])
 status["close"] = ps.ps3000aCloseUnit(chandle)
 assert_pico_ok(status["close"])
 
-# Displays the staus returns
+# Displays the status returns
 print(status)
 

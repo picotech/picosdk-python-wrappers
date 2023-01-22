@@ -132,8 +132,8 @@ awgbufferPointer = awgBuffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int16))
 # stopDeltaPhase = 0
 # deltaPhaseIncrement = 0
 # dwellCount = 0
-# *arbitaryWaveform = awgbufferPointer
-# arbitaryWaveformSize = 1024
+# *arbitraryWaveform = awgbufferPointer
+# arbitraryWaveformSize = 1024
 # sweepType = ctypes.c_int32(1) = PS5000A_UP
 # operation = 0
 # shots = 0

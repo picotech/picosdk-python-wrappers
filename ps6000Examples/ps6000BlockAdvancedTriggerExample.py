@@ -139,7 +139,7 @@ bufferBMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't
 status["setDataBuffersA"] = ps.ps6000SetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxSamples, 0)
 assert_pico_ok(status["setDataBuffersA"])
 
-# create overflow loaction
+# create overflow location
 overflow = ctypes.c_int16()
 # create converted type maxSamples
 cmaxSamples = ctypes.c_int32(maxSamples)

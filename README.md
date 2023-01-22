@@ -84,8 +84,8 @@ examples scripts also use the `matplotlib` plotting library. You can install the
 ### Driver-agnostic examples
 
 The `anyScopeExamples` folder contains examples in pure python which do the same thing as the C-style examples, but
-in a driver-generic way.  These examples are currently not being developed further but are still avaliable to use 
-and develop futher yourself.
+in a driver-generic way.  These examples are currently not being developed further but are still available to use 
+and develop further yourself.
 
 ### Python Classes
 
