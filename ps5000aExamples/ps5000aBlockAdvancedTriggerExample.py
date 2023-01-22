@@ -155,7 +155,7 @@ source = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"]
 status["setDataBuffersB"] = ps.ps5000aSetDataBuffers(chandle, source, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), maxSamples, 0, 0)
 assert_pico_ok(status["setDataBuffersB"])
 
-# create overflow loaction
+# create overflow location
 overflow = ctypes.c_int16()
 # create converted type maxSamples
 cmaxSamples = ctypes.c_int32(maxSamples)

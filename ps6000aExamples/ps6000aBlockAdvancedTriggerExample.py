@@ -50,7 +50,7 @@ maxADC = ctypes.c_int16()
 status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
 assert_pico_ok(status["getAdcLimits"])
 
-# use the trigger functions seperately
+# use the trigger functions separately
 # set up a simple edge trigger on channel A OR B with a 1 V threshold
 
 conditions = (struct.PICO_CONDITION * 2)()

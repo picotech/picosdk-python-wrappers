@@ -171,7 +171,7 @@ check = ctypes.c_int16(0)
 while ready.value == check.value:
     status["isReady"] = ps.ps4000aIsReady(chandle, ctypes.byref(ready))
 
-# Creates a overlow location for data
+# Creates a overflow location for data
 overflow = (ctypes.c_int16 * 10)()
 # Creates converted types maxsamples
 cmaxSamples = ctypes.c_int32(maxSamples)

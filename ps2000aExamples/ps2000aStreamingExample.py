@@ -153,7 +153,7 @@ cFuncPtr = ps.StreamingReadyType(streaming_callback)
 # Fetch data from the driver in a loop, copying it out of the registered buffers and into our complete one.
 while nextSample < totalSamples and not autoStopOuter:
     wasCalledBack = False
-    status["getStreamingLastestValues"] = ps.ps2000aGetStreamingLatestValues(chandle, cFuncPtr, None)
+    status["getStreamingLatestValues"] = ps.ps2000aGetStreamingLatestValues(chandle, cFuncPtr, None)
     if not wasCalledBack:
         # If we weren't called back by the driver, this means no data is ready. Sleep for a short while before trying
         # again.

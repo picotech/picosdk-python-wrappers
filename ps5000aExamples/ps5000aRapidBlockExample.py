@@ -78,13 +78,13 @@ timebase = 2
 # Nosample = maxsamples
 # TimeIntervalNanoseconds = ctypes.byref(timeIntervalns)
 # MaxSamples = ctypes.byref(returnedMaxSamples)
-# Segement index = 0
+# Segment index = 0
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int32()
 status["GetTimebase"] = ps.ps5000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["GetTimebase"])
 
-# Creates a overlow location for data
+# Creates a overflow location for data
 overflow = ctypes.c_int16()
 # Creates converted types maxsamples
 cmaxSamples = ctypes.c_int32(maxsamples)
@@ -261,7 +261,7 @@ bufferAMin9 = (ctypes.c_int16 * maxsamples)() # used for downsampling which isn'
 status["SetDataBuffers"] = ps.ps5000aSetDataBuffers(chandle, source, ctypes.byref(bufferAMax9), ctypes.byref(bufferAMin9), maxsamples, 9, 0)
 assert_pico_ok(status["SetDataBuffers"])
 
-# Creates a overlow location for data
+# Creates a overflow location for data
 overflow = (ctypes.c_int16 * 10)()
 # Creates converted types maxsamples
 cmaxSamples = ctypes.c_int32(maxsamples)
@@ -287,7 +287,7 @@ assert_pico_ok(status["GetValuesBulk"])
 # Times = Times = (ctypes.c_int16*10)() = ctypes.byref(Times)
 # Timeunits = TimeUnits = ctypes.c_char() = ctypes.byref(TimeUnits)
 # Fromsegmentindex = 0
-# Tosegementindex = 9
+# Tosegmentindex = 9
 Times = (ctypes.c_int64*10)()
 TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps5000aGetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
@@ -348,7 +348,7 @@ assert_pico_ok(status["stop"])
 status["close"] = ps.ps5000aCloseUnit(chandle)
 assert_pico_ok(status["close"])
 
-# Displays the staus returns
+# Displays the status returns
 #print(status)
 
 

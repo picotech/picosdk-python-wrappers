@@ -484,7 +484,7 @@ doc = """ PICO_STATUS ps6000aGetValuesTriggerTimeOffsetBulk
         int16_t    handle,
         int64_t    *time,
         PICO_TIME_UNITS    *timeUnits,
-        uint64_t    fromSegementIndex,
+        uint64_t    fromSegmentIndex,
         uint64_t    toSegmentIndex
     ); """
 ps6000a.make_symbol("_GetValuesTriggerTimeOffsetBulk", "ps6000aGetValuesTriggerTimeOffsetBulk", c_uint32, [c_int16, c_void_p, c_void_p, c_uint64, c_uint64], doc)
@@ -624,7 +624,7 @@ doc = """ PICO_STATUS ps6000aGetValuesOverlapped
         uint64_t    *noOfSamples,
         uint64_t    downSampleRatio,
         PICO_RATIO_MODE    downSampleRatioMode,
-        uint64_t    fromSegementIndex,
+        uint64_t    fromSegmentIndex,
         uint64_t    toSegmentIndex,
         int16_t    *overflow
     ); """
