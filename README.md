@@ -18,8 +18,7 @@ to install the required driver packages for your product.
 
 ### macOS
 
-macOS users should install PicoScope Beta for macOS, and then may find this [forum post](https://www.picotech.com/support/topic22221.html) helpful for installing the C 
-libraries.
+Please visit [our Downloads page](https://www.picotech.com/downloads) to download the PicoSDK C Libraries for MacOS.
 
 ## Installing the python driver bindings
 
@@ -30,6 +29,9 @@ following command in the top-level directory:
     pip install .
 
 If you are not using a virtualenv or are not elevated, use:
+
+    python setup.py install
+	
 =======
 For using the AS108 you will need to use the following as well:
 
