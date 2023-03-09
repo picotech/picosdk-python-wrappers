@@ -111,7 +111,7 @@ downSampleMode = enums.PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
 action = clear|add # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]  
 status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, downSampleMode, action)
 assert_pico_ok(status["setDataBuffers"])
-status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelB, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), nSamples, dataType, waveform, downSampleMode, action)
+status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelB, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), nSamples, dataType, waveform, downSampleMode, add)
 assert_pico_ok(status["setDataBuffers"])
 
 # Run block capture
