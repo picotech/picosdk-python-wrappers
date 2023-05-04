@@ -201,7 +201,7 @@ class Device(object):
             # always force the number of memory segments on the device to 1 before computing timebases for a one-off
             # block capture.
             max_samples_possible = self.driver.memory_segments(self, USE_SEGMENT_ID+1)
-            if timebase_options.no_of_samples is not None and timebase_options.no_of_samples > max_samples_possible:
+            if timebase_options.no_of_samples is not None and timebase_options.no_of_samples > max_samples_possible.value:
                 raise NoValidTimebaseForOptionsError()
         except DeviceCannotSegmentMemoryError:
             pass
