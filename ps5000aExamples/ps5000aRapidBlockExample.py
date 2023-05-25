@@ -80,7 +80,7 @@ timebase = 2
 # MaxSamples = ctypes.byref(returnedMaxSamples)
 # Segement index = 0
 timeIntervalns = ctypes.c_float()
-returnedMaxSamples = ctypes.c_int16()
+returnedMaxSamples = ctypes.c_int32()
 status["GetTimebase"] = ps.ps5000aGetTimebase2(chandle, timebase, maxsamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["GetTimebase"])
 
@@ -288,7 +288,7 @@ assert_pico_ok(status["GetValuesBulk"])
 # Timeunits = TimeUnits = ctypes.c_char() = ctypes.byref(TimeUnits)
 # Fromsegmentindex = 0
 # Tosegementindex = 9
-Times = (ctypes.c_int16*10)()
+Times = (ctypes.c_int64*10)()
 TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps5000aGetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
 assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])

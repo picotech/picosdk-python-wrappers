@@ -11,7 +11,7 @@ from picosdk.library import Library
 from picosdk.errors import ArgumentOutOfRangeError
 from picosdk.constants import make_enum
 
-class Picosynthlib(library):
+class Picosynthlib(Library):
     def __init__(self):
         super(Picosynthlib, self).__init__("picosynth")
         

@@ -8,6 +8,7 @@
 import ctypes
 from picosdk.ps3000a import ps3000a as ps
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok
 
@@ -292,7 +293,9 @@ assert_pico_ok(status["GetValuesBulk"])
 Times = (ctypes.c_int16*10)()
 TimeUnits = ctypes.c_char()
 status["GetValuesTriggerTimeOffsetBulk"] = ps.ps3000aGetValuesTriggerTimeOffsetBulk64(chandle, ctypes.byref(Times), ctypes.byref(TimeUnits), 0, 9)
-assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
+
+print(Times[0:9])
+print(TimeUnits)
 
 # Finds the max ADC count
 # Handle = chandle
@@ -312,21 +315,25 @@ adc2mVChAMax6 =  adc2mV(bufferAMax6, chARange, maxADC)
 adc2mVChAMax7 =  adc2mV(bufferAMax7, chARange, maxADC)
 adc2mVChAMax8 =  adc2mV(bufferAMax8, chARange, maxADC)
 adc2mVChAMax9 =  adc2mV(bufferAMax9, chARange, maxADC)
+assert_pico_ok(status["GetValuesTriggerTimeOffsetBulk"])
 
 # Creates the time data
 time = np.linspace(0, (cmaxSamples.value - 1) * timeIntervalns.value, cmaxSamples.value)
 
 # Plots the data from channel A onto a graph
-plt.plot(time, adc2mVChAMax[:])
-plt.plot(time, adc2mVChAMax1[:])
-plt.plot(time, adc2mVChAMax2[:])
-plt.plot(time, adc2mVChAMax3[:])
-plt.plot(time, adc2mVChAMax4[:])
-plt.plot(time, adc2mVChAMax5[:])
-plt.plot(time, adc2mVChAMax6[:])
-plt.plot(time, adc2mVChAMax7[:])
-plt.plot(time, adc2mVChAMax8[:])
-plt.plot(time, adc2mVChAMax9[:])
+
+plt.plot(time, adc2mVChAMax)
+print('test')
+plt.plot(time, adc2mVChAMax1)
+plt.plot(time, adc2mVChAMax2)
+plt.plot(time, adc2mVChAMax3)
+plt.plot(time, adc2mVChAMax4)
+plt.plot(time, adc2mVChAMax5)
+plt.plot(time, adc2mVChAMax6)
+plt.plot(time, adc2mVChAMax7)
+plt.plot(time, adc2mVChAMax8)
+plt.plot(time, adc2mVChAMax9)
+
 plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
