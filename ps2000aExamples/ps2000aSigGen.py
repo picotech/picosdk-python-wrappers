@@ -125,6 +125,15 @@ assert_pico_ok(status["SetSigGenBuiltIn"])
 # Pauses the script to show signal
 time.sleep(36)
 
+#max and min values and lengths
+minValue = ctypes.c_int16(0)
+maxValue = ctypes.c_int16(0)
+minSize = ctypes.c_int16(0)
+maxSize = ctypes.c_int16(0)
+status["sigGenArbMinMaxValues"] = ps.ps2000aSigGenArbitraryMinMaxValues(chandle, ctypes.byref(minValue), ctypes.byref(maxValue), ctypes.byref(minSize),ctypes.byref(maxSize))
+assert_pico_ok(status["sigGenArbMinMaxValues"])
+a=maxValue
+
 # create a custom waveform
 awgBuffer = np.sin(np.linspace(0,2*math.pi,1024))
 awgbufferPointer = awgBuffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int16))
@@ -139,7 +148,7 @@ assert_pico_ok(status["freq2phase"])
 # offsetVoltage = 0
 # pkToPk = 2000000
 # startDeltaPhase = phase
-# stopDeltaPhase = 0
+# stopDeltaPhase = phase
 # deltaPhaseIncrement = 0
 # dwellCount = 0
 # *arbitaryWaveform = awgbufferPointer
@@ -161,13 +170,16 @@ time.sleep(36)
 
 # output a custom binary sequence from the AWG 
 # create a binary buffer for AWG
-binaryBuffer = [0,1,0,1,0,1,0,1,1,1,1,1,0,1,1,1,0,0,1,1,1,1,0]
+# this buffer can be replaced with whatever binary sequence is wanted to be outputted
+# any 1s should use the a variable which is equal to the maximum value for the awg buffer
+binaryBuffer = [0,a,a,a,0,0,a,a,0,0,0,0,a,a,a,a,a,a,a,a,0,0,a,a,0]  
 cBinaryBuffer = (ctypes.c_int16*len(binaryBuffer))(*binaryBuffer)
 binarybufferPointer = ctypes.byref(cBinaryBuffer)
 
 phase2 = ctypes.c_uint32(0)
 
-status["freq2phase"] = ps.ps2000aSigGenFrequencyToPhase(chandle, 10, 0, 1024, ctypes.byref(phase2))
+# get the phase for 100 kHz 
+status["freq2phase"] = ps.ps2000aSigGenFrequencyToPhase(chandle, 100, 0, len(cBinaryBuffer), ctypes.byref(phase2))
 assert_pico_ok(status["freq2phase"])
 
 
@@ -175,12 +187,12 @@ assert_pico_ok(status["freq2phase"])
 # handle = chandle
 # offsetVoltage = 0
 # pkToPk = 2000000
-# startDeltaPhase = phase
-# stopDeltaPhase = 0
+# startDeltaPhase = phase2
+# stopDeltaPhase = phase2
 # deltaPhaseIncrement = 0
 # dwellCount = 0
-# *arbitaryWaveform = awgbufferPointer
-# arbitaryWaveformSize = 1024
+# *arbitaryWaveform = binarybufferPointer
+# arbitaryWaveformSize = len(binarybufferPointer) 
 # sweepType = ctypes.c_int32(1) = PS5000A_UP
 # operation = 0
 # indexMode = 0 = PS2000A_SINGLE
@@ -192,6 +204,9 @@ assert_pico_ok(status["freq2phase"])
 
 status["setSigGenArbitrary"] = ps.ps2000aSetSigGenArbitrary(chandle, 0, 2000000, phase2, phase2, 0, 0, binarybufferPointer, len(cBinaryBuffer), 0, 0, 0, 0, 0, 0, 0, 0)
 assert_pico_ok(status["setSigGenArbitrary"])
+
+# Pauses the script to show signal
+time.sleep(36)
 
 # Closes the unit
 # Handle = chandle
