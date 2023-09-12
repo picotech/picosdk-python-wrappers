@@ -43,7 +43,7 @@ except:
 # channel = PS3000A_CHANNEL_A = 0
 # enabled = 1
 # coupling type = PS3000A_DC = 1
-# range = PS3000A_10V = 8
+# range = PS3000A_5V = 8
 # analogue offset = 0 V
 chARange = 8
 status["setChA"] = ps.ps3000aSetChannel(chandle, 0, 1, 1, chARange, 0)
@@ -93,7 +93,7 @@ channelADirection = ps.PS3000A_THRESHOLD_DIRECTION["PS3000A_RISING"]
 channelBDirection = ps.PS3000A_THRESHOLD_DIRECTION["PS3000A_NONE"]
 channelCDirection = ps.PS3000A_THRESHOLD_DIRECTION["PS3000A_NONE"]
 channelDDirection = ps.PS3000A_THRESHOLD_DIRECTION["PS3000A_NONE"]
-extDirection = ps.PS3000A_THRESHOLD_DIRECTION["PS3000A_NONE"]
+extDirection = ps.PS3000A_THRESHOLD_DIRECTION["PS3000A_RISING"]
 auxDirection = ps.PS3000A_THRESHOLD_DIRECTION["PS3000A_NONE"]
 status["setTrigDir"] = ps.ps3000aSetTriggerChannelDirections(chandle, channelADirection, channelBDirection, channelCDirection, channelDDirection, extDirection, auxDirection)
 assert_pico_ok(status["setTrigDir"])
