@@ -148,7 +148,7 @@ def _define_conditionsInfo():
 
     return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
 
-PS5000AConditionsInfo = _define_conditionsInfo()
+ps5000a.PS5000AConditionsInfo = _define_conditionsInfo()
 
 ps5000a.PS5000A_THRESHOLD_MODE = make_enum([
     "PS5000A_LEVEL",
@@ -169,6 +169,8 @@ ps5000a.PS5000A_RATIO_MODE = {
     'PS5000A_RATIO_MODE_AVERAGE': 4,
 }
 
+ps5000a.PICO_RATIO_MODE = {k[19:]: v for k, v in ps5000a.PS5000A_RATIO_MODE.items()}
+
 ps5000a.PS5000A_TIME_UNITS = make_enum([
     'PS5000A_FS',
     'PS5000A_PS',
@@ -179,7 +181,13 @@ ps5000a.PS5000A_TIME_UNITS = make_enum([
     'PS5000A_MAX_TIME_UNITS',
 ])
 
-ps5000a.PICO_RATIO_MODE = {k[19:]: v for k, v in ps5000a.PS5000A_RATIO_MODE.items()}
+ps5000a.PS5000A_PULSE_WIDTH_TYPE = make_enum([
+    'PS5000A_PW_TYPE_NONE',
+    'PS5000A_PW_TYPE_LESS_THAN',
+    'PS5000A_PW_TYPE_GREATER_THAN',
+    'PS5000A_PW_TYPE_IN_RANGE',
+    'PS5000A_PW_TYPE_OUT_OF_RANGE',
+])
 
 
 

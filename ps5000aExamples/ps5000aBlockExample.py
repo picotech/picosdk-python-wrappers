@@ -38,22 +38,22 @@ except: # PicoNotOkError:
 
 # Set up channel A
 # handle = chandle
-channel = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
+channelA = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
 # enabled = 1
 coupling_type = ps.PS5000A_COUPLING["PS5000A_DC"]
-chARange = ps.PS5000A_RANGE["PS5000A_20V"]
+chARange = ps.PS5000A_RANGE["PS5000A_2V"]
 # analogue offset = 0 V
-status["setChA"] = ps.ps5000aSetChannel(chandle, channel, 1, coupling_type, chARange, 0)
+status["setChA"] = ps.ps5000aSetChannel(chandle, channelA, 1, coupling_type, chARange, 0)
 assert_pico_ok(status["setChA"])
 
 # Set up channel B
 # handle = chandle
-channel = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"]
+channelB = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"]
 # enabled = 1
 # coupling_type = ps.PS5000A_COUPLING["PS5000A_DC"]
 chBRange = ps.PS5000A_RANGE["PS5000A_2V"]
 # analogue offset = 0 V
-status["setChB"] = ps.ps5000aSetChannel(chandle, channel, 1, coupling_type, chBRange, 0)
+status["setChB"] = ps.ps5000aSetChannel(chandle, channelB, 1, coupling_type, chBRange, 0)
 assert_pico_ok(status["setChB"])
 
 # find maximum ADC count value
@@ -63,16 +63,62 @@ maxADC = ctypes.c_int16()
 status["maximumValue"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
 assert_pico_ok(status["maximumValue"])
 
-# Set up single trigger
-# handle = chandle
-# enabled = 1
-source = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
-threshold = int(mV2adc(500,chARange, maxADC))
-# direction = PS5000A_RISING = 2
-# delay = 0 s
-# auto Trigger = 1000 ms
-status["trigger"] = ps.ps5000aSetSimpleTrigger(chandle, 1, source, threshold, 2, 0, 1000)
-assert_pico_ok(status["trigger"])
+# Parameters
+chA=0 # channel A
+chB=1 # channel B
+maxADC = ctypes.c_int16(32767)
+NB=2 #NB=nConditions=nDirections=nChannelProperties
+rg=2000 # range of voltage in millivolt
+threshold=1000
+thresholdLower=0
+hyteresis=0
+window=False
+direction=2 # Rising
+
+#CONDITIONS
+conditions = (ps.PS5000A_CONDITION * NB)()
+clear=0x00000001
+add=0x00000002
+cond_info=clear|add
+a = ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"]
+conditions[0]= ps.PS5000A_CONDITION(channelA, ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+conditions[1]= ps.PS5000A_CONDITION(channelB, ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+status["maximumValue_"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
+assert_pico_ok(status["maximumValue_"])
+status["setTriggerChannelConditions_"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle,
+                                                                            ctypes.byref(conditions),
+                                                                            NB,
+                                                                            cond_info)
+assert_pico_ok(status["setTriggerChannelConditions_"])
+
+# DIRECTIONS
+if window==True:
+    th_mode=ps.PS5000A_THRESHOLD_MODE["PS5000A_WINDOW"]
+else:
+    th_mode=ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"]
+triggerDirections=(ps.PS5000A_DIRECTION * NB)()
+triggerDirections[0] = ps.PS5000A_DIRECTION(chA, direction, th_mode)
+triggerDirections[1] = ps.PS5000A_DIRECTION(chB, direction, th_mode)
+status["setTriggerChannelDirections_"] = ps.ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), NB)
+assert_pico_ok(status["setTriggerChannelDirections_"])
+
+# PROPERTIES
+thUpper = mV2adc(threshold, chARange, maxADC)
+thLower = mV2adc(thresholdLower, chARange, maxADC)
+hysteresis=0
+triggerProperties = (ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2 * NB)()
+triggerProperties[0] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(thUpper,
+                                                                hysteresis,
+                                                                thLower,
+                                                                hysteresis,
+                                                                0)
+triggerProperties[1] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(thUpper,
+                                                                hysteresis,
+                                                                thLower,
+                                                                hysteresis,
+                                                                1)
+status["setTriggerChannelProperties_"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, ctypes.byref(triggerProperties), NB, 0)
+assert_pico_ok(status["setTriggerChannelProperties_"])
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
