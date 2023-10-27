@@ -318,3 +318,11 @@ def _define_digital_port():
     return {k.upper(): v for k, v in locals().items() if k.startswith("PICO")}
     
 picoEnum.PICO_DIGITAL_PORT = _define_digital_port
+
+picoEnum.PICO_EXTERNAL_FREQUENCY = make_enum([
+    "PICO_FREQUENCY_OFF",
+    "PICO_FREQUENCY_5MHZ",
+    "PICO_FREQUENCY_10MHZ",
+    "PICO_FREQUENCY_20MHZ",
+    "PICO_FREQUENCY_25MHZ"
+    ])
