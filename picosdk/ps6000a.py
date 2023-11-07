@@ -816,10 +816,10 @@ doc = """ PICO_STATUS ps6000aSetTemperatureSensorInteractioNCallback
     ); """
 ps6000a.make_symbol("_SetTemperatureSensroInteractionCallback", "ps6000aSetTemperatureSensorInteractionCallback", c_uint32, [c_int16, c_void_p], doc)
 
-doc = """ PICO_STATUS ps6000aSetExternalClock
-    (
-        int16_t    handle,
-        PICO_EXTERNAL_FREQUENCY    frequency,
-        int16_t    threshold
-    ); """
-ps6000a.make_symbol("_SetExternalClock", "ps6000aSetExternalClock", c_uint32, [c_int16, c_uint32, c_int16], doc)
+# doc = """ PICO_STATUS ps6000aSetExternalClock
+    # (
+        # int16_t    handle,
+        # PICO_EXTERNAL_FREQUENCY    frequency,
+        # int16_t    threshold
+    # ); """
+# ps6000a.make_symbol("_SetExternalClock", "ps6000aSetExternalClock", c_uint32, [c_int16, c_uint32, c_int16], doc)
