@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2023 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS5000A BLOCK MODE EXAMPLE
+# PS5000A BLOCK MODE WINDOW PULSE WIDTH ADVANCED TRIGGER EXAMPLE
 # This example opens a 5000a driver device, sets up two channels and a trigger then collects a block of data.
 # This data is then plotted as mV against time in ns.
 
