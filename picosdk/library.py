@@ -67,6 +67,9 @@ class Library(object):
         library_path = find_library(self.name)
 
         if library_path is None:
+            library_path = find_library(self.name.lower())
+
+        if library_path is None:
             env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
             raise CannotFindPicoSDKError("PicoSDK (%s) not found, check %s" % (self.name, env_var_name))
 
