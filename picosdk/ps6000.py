@@ -649,6 +649,22 @@ ps6000.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
                                                     c_void_p)
 ps6000.BlockReadyType.__doc__ = doc
 
+doc = """ void ps6000DataReadyType
+    (
+        int16_t          handle,
+        PICO_STATUS      status,
+        uint32_t         noOfSamples,
+        int16_t          overflow,
+        void             *pParameter
+    ); """
+ps6000.DataReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                   c_int16,
+                                                   c_uint32,
+                                                   c_uint32,
+                                                   c_int16,
+                                                   c_void_p)
+ps6000.DataReadyType.__doc__ = doc
+
 doc = """ void ps6000StreamingReady
 	(
 		int16_t				handle,
@@ -777,8 +793,8 @@ doc = """ PICO_STATUS ps6000GetValuesBulkAsyc
         uint32_t           toSegmentIndex,
         int16_t           *overflow
     ); """
-ps6000.make_symbol("_GetValuesAsync", "ps6000GetValuesAsync", c_uint32,
-                   [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
+#ps6000.make_symbol("_GetValuesAsync", "ps6000GetValuesAsync", c_uint32,
+#                   [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetNoOfCaptures
     (
