@@ -66,14 +66,20 @@ class Library(object):
     def _load(self):
         library_path = find_library(self.name)
 
-        if library_path is None:
-            env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
-            raise CannotFindPicoSDKError("PicoSDK (%s) not found, check %s" % (self.name, env_var_name))
+        # 'find_library' fails in Cygwin.
+        if not sys.platform == 'cygwin':
+            if library_path is None:
+                env_var_name = "PATH" if sys.platform == 'win32' else "LD_LIBRARY_PATH"
+                raise CannotFindPicoSDKError("PicoSDK (%s) not found, check %s" % (self.name, env_var_name))
 
         try:
             if sys.platform == 'win32':
                 from ctypes import WinDLL
                 result = WinDLL(library_path)
+            elif sys.platform == 'cygwin':
+                from ctypes import CDLL
+                library_path = self.name
+                result = CDLL(library_path + ".dll")
             else:
                 from ctypes import cdll
                 result = cdll.LoadLibrary(library_path)
