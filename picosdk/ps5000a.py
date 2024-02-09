@@ -148,7 +148,7 @@ def _define_conditionsInfo():
 
     return {k.upper(): v for k, v in locals().items() if k.startswith("PS5000A")}
 
-PS5000AConditionsInfo = _define_conditionsInfo()
+ps5000a.PS5000AConditionsInfo = _define_conditionsInfo()
 
 ps5000a.PS5000A_THRESHOLD_MODE = make_enum([
     "PS5000A_LEVEL",

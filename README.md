@@ -1,81 +1,146 @@
-# PicoScope 6000 Series (A API) - MATLAB Generic Instrument Driver
+# picosdk-python-wrappers
 
-This MATLAB<sup>®</sup> Generic Instrument Driver allows you to acquire data from the PicoScope<sup>®</sup> 6000 Series oscilloscopes and control built-in signal generator functionality. The data could be processed in MATLAB using functions from Toolboxes such as [Signal Processing Toolbox](https://www.mathworks.com/products/signal.html). 
-
-The driver has been created using Instrument Control Toolbox (TBC). 
-
-This Instrument Driver package includes the following: 
-
-* The MATLAB Generic Instrument Driver 
-* Example scripts that demonstrate how to call functions in order to capture data in various collection modes, as well as using the signal generator.
-
-The driver can be used with the Test and Measurement Tool to carry out the following: 
-
-  * Acquire data in Block mode 
-  * Acquire data in Rapid Block mode 
-  * Use the Built-in Function/Arbitrary Waveform Generator (model-dependent)
-
-## Supported Models
-
-The driver will work with the following PicoScope models:
-    
-    * 6000E Scopes
-
-**Note:** The driver will not work with the [PicoScope 6000A/B/C/D models](https://uk.mathworks.com/matlabcentral/fileexchange/48311-picoscope-6000-series-matlab-generic-instrument-driver) devices.
+Welcome to the PicoSDK for Python. It allows you to control PicoScope devices in your own Python programs.
 
 ## Getting started
 
-### Prerequisites
+To use this code you will need to install the PicoSDK C libraries.
 
-* [MATLAB](https://uk.mathworks.com/products/matlab.html) for Microsoft Windows or Linux operating systems.
-* [Instrument Control Toolbox](http://www.mathworks.co.uk/products/instrument/)
-* The [PicoScope Support Toolbox](http://uk.mathworks.com/matlabcentral/fileexchange/53681-picoscope-support-toolbox)
+### Microsoft Windows
 
-**Currently with this beta release only 64-bit MATLAB on Windows is supported.  Support for other operation systems will come in further updates.**
+Please visit [our Downloads page](https://www.picotech.com/downloads) to download the 32-bit or 64-bit PicoSDK C Libraries for Windows. 
+Please take care to match the "bitness" of your python to the PicoSDK.
 
-**Note:** MATLAB 2015b is recommended for 32-bit versions of MATLAB on Microsoft Windows operating systems.
+### Linux
 
-### Installing the Instrument Driver files
+Follow the instructions from our [Linux Software & Drivers for Oscilloscopes and Data Loggers page](https://www.picotech.com/downloads/linux) 
+to install the required driver packages for your product.
 
-We recommend using the [Add-Ons Explorer](https://uk.mathworks.com/help/matlab/matlab_env/get-add-ons.html) in MATLAB in order to install these files and obtain updates.
+### macOS
 
-If your version of MATLAB does not have the Add-Ons Explorer, download the zip file from the [MATLAB Central File Exchange page]()
- and add the root and subfolders to the MATLAB path.
+Please visit [our Downloads page](https://www.picotech.com/downloads) to download the PicoSDK C Libraries for MacOS.
 
-### Installing drivers
+## Installing the python driver bindings
 
-Drivers are available for the following platforms. Refer to the subsections below for further information.
+A `distutils` installer is provided. After you have installed the PicoSDK
+driver package (see above), the Python package can be installed using the
+following command in the top-level directory:
 
-#### Windows
+    pip install .
 
-* Download the PicoSDK (32-bit or 64-bit) driver package installer from our [Downloads page](https://www.picotech.com/downloads).
+If you are not using a virtualenv or are not elevated, use:
 
-#### Linux
+    python setup.py install
+	
+=======
+For using the AS108 you will need to use the following as well:
 
-* Follow the instructions on our [Linux Software & Drivers for Oscilloscopes and Data Loggers page](https://www.picotech.com/downloads/linux) to install the required `libps6000a` and `libpswrappers` driver packages.
+	python setupPicosynth.py install
+	
+
+On macOS and Linux you will either need to use `sudo` with this command, to
+install into the system folders, or to install for the current user only you
+can use:
+
+    pip install . --user
+
+Within python, the library for `import` is called `picosdk`.
+
+## Compatibility
+
+This code is written to be compatible with both Python 2.7 and Python 3 (any version).
+
+If you find a compatibility problem please raise an [Issue](https://www.picotech.com/tech-support), listing all the versions you can find (python, numpy, 
+picosdk commit hash, etc.) and your error message(s).
+
+## C interface
+
+You can access C driver functions directly (ctypes calls) by their original C name, following the [Programmer's
+Guides](https://github.com/picotech/picosdk-python-wrappers#programmers-guides) exactly. Examples are provided in the folders like `psX000[a]Examples/`.
+
+### Programmer's Guides
+
+You can download Programmer's Guides providing a description of the API functions for the relevant PicoScope or 
+PicoLog driver from our [Documentation page](https://www.picotech.com/library/documentation).
+
+## Python interface
+
+We are in the process of adding Pythonic wrappers around the C functions. If we haven't got to your feature yet or your device is listed as one of the [unsupported models](https://github.com/picotech/picosdk-python-wrappers#unsupported-models),
+let us know that you're waiting in an [Issue](https://www.picotech.com/tech-support)
+
+### Unsupported models
+
+The following drivers and devices are not yet supported:
+
+* `plcm3` - PicoLog CM3 Current Data Logger
+* `ps3000` - PicoScope 3204, 3205, 3206, 3223, 3224, 3423 & 3423
+
+### Dependencies
+
+As well as depending on the C libraries, the Python wrappers use some Python libraries like `numpy`. Many of the
+examples scripts also use the `matplotlib` plotting library. You can install these dependencies with pip as follows:
+
+    pip install -r requirements.txt
+    pip install -r requirements-for-examples.txt
+
+### Driver-agnostic examples
+
+The `anyScopeExamples` folder contains examples in pure python which do the same thing as the C-style examples, but
+in a driver-generic way.  These examples are currently not being developed further but are still avaliable to use 
+and develop futher yourself.
+
+### Python Classes
+
+#### Library
+
+`picosdk.library.Library` contains a base class for each of the driver classes. It does the job of translating python
+types into C ones, and back again, and some unit conversions to get rid of nano, micro and milli-style prefixes. It also
+handles any differences in programming API between PicoScope driver versions.
+
+#### Device
+
+`picosdk.device.Device` contains the concrete class which represents a PicoScope with a valid handle. It caches some
+information about the device state, like the currently selected voltage ranges of the channels.
+
+It is implemented in terms of the Library class' public interface, and deals almost entirely with python types. The
+main exception is its handling of numpy arrays - it (knowing the voltage ranges) is responsible for converting the raw
+ADC counts that the driver uses for amplitude into physical units.
+
+## Testing this code
+
+Check which device driver your device uses, and check the constants at the top of test/test_helpers.py to enable the 
+relevant drivers for connected-device tests. (most tests use this).
+
+To check which driver your device uses, you can use `picosdk.discover`:
+
+    from picosdk.discover import find_all_units
+    
+    scopes = find_all_units()
+    
+    for scope in scopes:
+        print(scope.info)
+        scope.close()
+
+You should then configure test/test_helpers.py's list of connected devices, so it can run all the tests we have
+on your device.
+
+To run the unit tests, you will need to install nose (e.g. `pip install nose`.) Then, run `nosetests` in the root of 
+the repo. 
 
 ## Obtaining support
 
-Please visit our [Support page](https://www.picotech.com/tech-support) to contact us directly or visit our [Test and Measurement Forum](https://www.picotech.com/support/forum71.html) to post questions.
-
-Please leave a comment and rating for this submission on our [MATLAB Central File Exchange page]().
-
-## Versioning
-
-For the versions available, and release notes, refer to the [Releases](https://github.com/picotech/picosdk-ps6000a-matlab-instrument-driver/releases) page.
+Please visit our [Support page](https://www.picotech.com/tech-support) to contact us directly or visit our [Test and Measurement Forum](https://www.picotech.com/support/forum17.html) to post questions.
 
 ## Copyright and licensing
 
 See [LICENSE.md](LICENSE.md) for license terms. 
 
-*PicoScope* is a registered trademark of Pico Technology Ltd. 
-
-*MATLAB* is a registered trademark of The Mathworks, Inc. *Instrument Control Toolbox* and *Signal Processing Toolbox*
-are trademarks of The Mathworks, Inc.
+*PicoScope*, *PicoLog* and *PicoSDK* are registered trademarks of Pico Technology Ltd. 
 
 *Windows* is a registered trademark of Microsoft Corporation. 
 
+*macOS* is a registered trademark of Apple Inc. 
+
 *Linux* is the registered trademark of Linus Torvalds in the U.S. and other countries.
 
-Copyright © 2020-2021 Pico Technology Ltd. All rights reserved. 
-
+Copyright © 2018-2019 Pico Technology Ltd. All rights reserved. 
