@@ -104,7 +104,7 @@ end
 channelA = ps6000aEnumInfo.enPicoChannel.PICO_CHANNEL_A;
 channelB = ps6000aEnumInfo.enPicoChannel.PICO_CHANNEL_B;
 couplingDC = ps6000aEnumInfo.enPicoCoupling.PICO_DC;
-range = ps6000aEnumInfo.enPicoConnectProbeRange.PICO_X1_PROBE_5V;
+range = ps6000aEnumInfo.enPicoConnectProbeRange.PICO_X1_PROBE_500MV;
 bandwidth = ps6000aEnumInfo.enPicoBandwidthLimiter.PICO_BW_FULL;
 
 
@@ -117,7 +117,7 @@ disp('Channels A and B set')
 
 enable = 1;
 source = channelA;
-threshold = 1000; %mV
+threshold = 100; %mV
 direction = ps6000aEnumInfo.enPicoThresholdDirection.PICO_RISING;
 delay = 0;
 autoTriggerMicroSeconds = 1000000; %us
@@ -216,7 +216,7 @@ pMaxValue = libpointer('int16Ptr',0);
 minValue = pMinValue.Value;
 maxValue = pMaxValue.Value;
 
-voltageRange = 5000; %mV
+voltageRange = 500; %mV
 
 bufferAMax = adc2mv(bufferAMax,voltageRange,double(maxValue));
 bufferBMax = adc2mv(bufferBMax,voltageRange,double(maxValue));
