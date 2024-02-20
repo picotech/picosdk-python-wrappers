@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2024 Pico Technology Ltd. See LICENSE file for terms.
 #
 # PicoScope 5000 (A API) Signal Generator Example
 # This example demonstrates how to use the PicoScope 5000 Series (ps5000a) driver API functions to set up the signal generator to do the following:
@@ -14,6 +14,7 @@ import time
 from picosdk.functions import assert_pico_ok
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 
 status = {}
@@ -118,7 +119,7 @@ status["setSigGenBuiltInV2"] = ps.ps5000aSetSigGenBuiltInV2(chandle, 0, 2000000,
 assert_pico_ok(status["setSigGenBuiltInV2"])
 
 # Pauses the script to show signal
-time.sleep(36)
+time.sleep(6)
 
 # create a custom waveform
 minValue = ctypes.c_int16(0)
@@ -128,8 +129,11 @@ maxSize = ctypes.c_int16(0)
 status["sigGenArbMinMax"] = ps.ps5000aSigGenArbitraryMinMaxValues(chandle, ctypes.byref(minValue), ctypes.byref(maxValue),ctypes.byref(minSize),ctypes.byref(maxSize))
 assert_pico_ok(status["sigGenArbMinMax"])
 
-awgBuffer = (np.sin(np.linspace(0,2*math.pi,1024)))*maxValue.value
+awgBuffer = (np.sin(np.linspace(0,2*math.pi,10000)))*maxValue.value
+awgBuffer = awgBuffer.astype(ctypes.c_int16)
 awgbufferPointer = awgBuffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int16))
+
+
 
 # convert 10 KHZ frequency to phase 
 freq = 10000
@@ -157,7 +161,7 @@ assert_pico_ok(status["freqToPhase"])
 # triggerSource = ctypes.c_int16(0) = PS5000A_SIGGEN_NONE
 # extInThreshold = 0
 
-status["setSigGenArbitrary"] = ps.ps5000aSetSigGenArbitrary(chandle, 0, 2000000, phase.value, phase.value, 0, 0, awgbufferPointer, bufferLength, 0, 0, 0, 0, 0, 0, 0, 0)
+status["setSigGenArbitrary"] = ps.ps5000aSetSigGenArbitrary(chandle, 0, 3600000, phase.value, phase.value, 0, 0, awgbufferPointer, bufferLength, 0, 0, 0, 0, 0, 0, 0, 0)
 assert_pico_ok(status["setSigGenArbitrary"])
 
 # Pauses the script to show signal
