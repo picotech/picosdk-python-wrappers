@@ -121,20 +121,35 @@ assert_pico_ok(status["setSigGenBuiltInV2"])
 time.sleep(36)
 
 # create a custom waveform
-awgBuffer = np.sin(np.linspace(0,2*math.pi,1024))
+minValue = ctypes.c_int16(0)
+maxValue = ctypes.c_int16(0)
+minSize = ctypes.c_int16(0)
+maxSize = ctypes.c_int16(0)
+status["sigGenArbMinMax"] = ps.ps5000aSigGenArbitraryMinMaxValues(chandle, ctypes.byref(minValue), ctypes.byref(maxValue),ctypes.byref(minSize),ctypes.byref(maxSize))
+assert_pico_ok(status["sigGenArbMinMax"])
+
+awgBuffer = (np.sin(np.linspace(0,2*math.pi,1024)))*maxValue.value
 awgbufferPointer = awgBuffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int16))
+
+# convert 10 KHZ frequency to phase 
+freq = 10000
+indexMode = 0
+bufferLength = len(awgBuffer)
+phase = ctypes.c_int16(0)
+status["freqToPhase"] = ps.ps5000aSigGenFrequencyToPhase(chandle, freq, indexMode, bufferLength, ctypes.byref(phase))
+assert_pico_ok(status["freqToPhase"])
 
 # output custom waveform with peak-to-peak of 2 V and frequency of 10 kHz
 # handle = chandle
 # offsetVoltage = 0
 # pkToPk = 2000000
-# startDeltaPhase = 0
-# stopDeltaPhase = 0
+# startDeltaPhase = phase
+# stopDeltaPhase = phase
 # deltaPhaseIncrement = 0
 # dwellCount = 0
 # *arbitaryWaveform = awgbufferPointer
 # arbitaryWaveformSize = 1024
-# sweepType = ctypes.c_int32(1) = PS5000A_UP
+# sweepType = ctypes.c_int32(0) 
 # operation = 0
 # shots = 0
 # sweeps = 0
@@ -142,7 +157,7 @@ awgbufferPointer = awgBuffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int16))
 # triggerSource = ctypes.c_int16(0) = PS5000A_SIGGEN_NONE
 # extInThreshold = 0
 
-status["setSigGenArbitrary"] = ps.ps5000aSetSigGenArbitrary(chandle, 0, 2000000, 0, 0, 0, 0, awgbufferPointer, 1024, 0, 0, 0, 0, 0, 0, 0, 0)
+status["setSigGenArbitrary"] = ps.ps5000aSetSigGenArbitrary(chandle, 0, 2000000, phase.value, phase.value, 0, 0, awgbufferPointer, bufferLength, 0, 0, 0, 0, 0, 0, 0, 0)
 assert_pico_ok(status["setSigGenArbitrary"])
 
 # Pauses the script to show signal
