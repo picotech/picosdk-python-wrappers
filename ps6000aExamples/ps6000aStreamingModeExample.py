@@ -28,8 +28,8 @@ assert_pico_ok(status["openunit"])
 # Set channel A on
 # handle = chandle
 channelA = enums.PICO_CHANNEL["PICO_CHANNEL_A"]
-coupling = enums.PICO_COUPLING["PICO_DC"]
-channelRange = 7
+coupling = enums.PICO_COUPLING["PICO_DC_50OHM"]
+channelRange = 5
 # analogueOffset = 0 V
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
 status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
@@ -53,11 +53,11 @@ nSamples = noOfPostTriggerSamples + noOfPreTriggerSamples
 # handle = chandle
 # enable = 1
 source = channelA
-# threshold = 1000 mV
+# threshold = 100 mV
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 1000, direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 100, direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # create buffers

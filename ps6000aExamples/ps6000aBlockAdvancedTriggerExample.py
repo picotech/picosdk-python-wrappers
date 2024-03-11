@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2020-2024 Pico Technology Ltd. See LICENSE file for terms.
 #
 # PS6000 A BLOCK MODE EXAMPLE
 # This example opens a 6000a driver device, sets up two channels and a trigger then collects a block of data.
@@ -26,8 +26,8 @@ assert_pico_ok(status["openunit"])
 # Set channel A on
 # handle = chandle
 channelA = enums.PICO_CHANNEL["PICO_CHANNEL_A"]
-coupling = enums.PICO_COUPLING["PICO_DC"]
-channelRange = 7
+coupling = enums.PICO_COUPLING["PICO_DC_50OHM"]
+channelRange = 5
 # analogueOffset = 0 V
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
 status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
@@ -51,7 +51,7 @@ status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byre
 assert_pico_ok(status["getAdcLimits"])
 
 # use the trigger functions seperately
-# set up a simple edge trigger on channel A OR B with a 1 V threshold
+# set up a simple edge trigger on channel A OR B with a 100 mV threshold
 
 conditions = (struct.PICO_CONDITION * 2)()
 conditions[0] = struct.PICO_CONDITION(channelA,enums.PICO_TRIGGER_STATE["PICO_CONDITION_TRUE"])
@@ -71,8 +71,8 @@ status["setTriggerChannelDirections"] = ps.ps6000aSetTriggerChannelDirections(ch
 assert_pico_ok(status["setTriggerChannelDirections"])
 
 channelProperties = (struct.PICO_TRIGGER_CHANNEL_PROPERTIES * 2)()
-channelProperties[0] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(mV2adc(1000,channelRange,maxADC), 0, 0, 0, channelA)
-channelProperties[1] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(mV2adc(1000,channelRange,maxADC), 0, 0, 0, channelB)
+channelProperties[0] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(mV2adc(100,channelRange,maxADC), 0, 0, 0, channelA)
+channelProperties[1] = struct.PICO_TRIGGER_CHANNEL_PROPERTIES(mV2adc(100,channelRange,maxADC), 0, 0, 0, channelB)
 nChannelProperties = 2
 autoTriggerMicroSeconds = 1000000
 status["setTriggerChannelProperties"] = ps.ps6000aSetTriggerChannelProperties(chandle, ctypes.byref(channelProperties),nChannelProperties,0,autoTriggerMicroSeconds)

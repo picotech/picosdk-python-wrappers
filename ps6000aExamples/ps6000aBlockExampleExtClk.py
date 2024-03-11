@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2020-2024 Pico Technology Ltd. See LICENSE file for terms.
 #
 # PS6000A Demonstrates external clock callback using block mode.
 # This example opens a 6000a driver device, sets up the External clock callback, and reports its status during a block capture.
@@ -51,8 +51,8 @@ if wasCalledBack == True:
 # Set channel A on
 # handle = chandle
 channelA = enums.PICO_CHANNEL["PICO_CHANNEL_A"]
-coupling = enums.PICO_COUPLING["PICO_DC"]
-channelRange = 7
+coupling = enums.PICO_COUPLING["PICO_DC_50OHM"]
+channelRange = 5
 
 # analogueOffset = 0 V
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
@@ -69,11 +69,11 @@ for x in range (1, 7, 1):
 # handle = chandle
 # enable = 1
 source = channelA
-# threshold = 1000 mV
+# threshold = 100 mV
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 1000, direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 100, direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # Get fastest available timebase
