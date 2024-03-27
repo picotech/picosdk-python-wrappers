@@ -37,6 +37,13 @@ for x in range (1, 7, 1):
     channel = x
     status["setChannel",x] = ps.ps6000aSetChannelOff(chandle,channel)
     assert_pico_ok(status["setChannel",x])
+    
+# get max ADC value
+# handle = chandle
+minADC = ctypes.c_int16()
+maxADC = ctypes.c_int16()
+status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
+assert_pico_ok(status["getAdcLimits"])
 
 # Set simple trigger on channel A, 1 V rising with 1 s autotrigger
 # handle = chandle
@@ -46,7 +53,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 100, direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # Get fastest available timebase
@@ -109,12 +116,7 @@ overflow = ctypes.c_int16(0)
 status["getValues"] = ps.ps6000aGetValues(chandle, 0, ctypes.byref(noOfSamples), 1, downSampleMode, 0, ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
-# get max ADC value
-# handle = chandle
-minADC = ctypes.c_int16()
-maxADC = ctypes.c_int16()
-status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
-assert_pico_ok(status["getAdcLimits"])
+
 
 # convert ADC counts data to mV
 adc2mVChAMax =  adc2mV(bufferAMax, channelRange, maxADC)

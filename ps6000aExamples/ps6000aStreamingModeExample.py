@@ -49,6 +49,13 @@ noOfPreTriggerSamples = 100000
 noOfPostTriggerSamples = 900000
 nSamples = noOfPostTriggerSamples + noOfPreTriggerSamples
 
+# get max ADC value
+# handle = chandle
+minADC = ctypes.c_int16()
+maxADC = ctypes.c_int16()
+status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
+assert_pico_ok(status["getAdcLimits"])
+
 # Set simple trigger on channel A, 1 V rising with 1 s autotrigger
 # handle = chandle
 # enable = 1
@@ -57,7 +64,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, 100, direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # create buffers
@@ -144,12 +151,6 @@ print("Number of samples collected during streaming")
 print(noOfStreamedSamples.value)
 
 
-# get max ADC value
-# handle = chandle
-minADC = ctypes.c_int16()
-maxADC = ctypes.c_int16()
-status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
-assert_pico_ok(status["getAdcLimits"])
 
 # plot ADC data
 plt.plot(bufferA[0])
