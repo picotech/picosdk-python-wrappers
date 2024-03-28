@@ -64,29 +64,69 @@ status["maximumValue"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
 assert_pico_ok(status["maximumValue"])
 
 # Set up an advanced trigger
-adcTriggerLevel = mV2adc(500, chARange, maxADC)
+adcTriggerLevelA = mV2adc(500, chARange, maxADC)
+adcTriggerLevelB = mV2adc(500, chARange, maxADC)
+adcTriggerLevelC = mV2adc(500, chARange, maxADC)
+adcTriggerLevelD = mV2adc(500, chARange, maxADC)
 
-triggerProperties = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevel,
+triggerProperties = (ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2 * 4)()
+triggerProperties[0] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevelA,
 															10,
 															0,
 															10,
 															ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"])
+                                                            
+triggerProperties[1] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevelB,
+															10,
+															0,
+															10,
+															ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"])
+                                                            
+triggerProperties[2] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevelC,
+															10,
+															0,
+															10,
+															ps.PS5000A_CHANNEL["PS5000A_CHANNEL_C"])
+                                                            
+triggerProperties[3] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevelD,
+															10,
+															0,
+															10,
+															ps.PS5000A_CHANNEL["PS5000A_CHANNEL_D"])
+                                                           
 															
-status["setTriggerChannelPropertiesV2"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, ctypes.byref(triggerProperties), 1, 0)
+status["setTriggerChannelPropertiesV2"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, ctypes.byref(triggerProperties), 4, 0)
 
-triggerConditions = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"],
+triggerConditionsA = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"],
                                                            ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
-
+triggerConditionsB = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"],
+                                                           ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+triggerConditionsC = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_C"],
+                                                           ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+triggerConditionsD = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_D"],
+                                                           ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
 clear = 1
 add = 2
 														   
-status["setTriggerChannelConditionsV2"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditions), 1, (clear + add))
+status["setTriggerChannelConditionsV2_A"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsA), 1, (clear + add))
+status["setTriggerChannelConditionsV2_B"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsB), 1, (add))
+status["setTriggerChannelConditionsV2_C"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsC), 1, (add))
+status["setTriggerChannelConditionsV2_D"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsD), 1, (add))
 
-triggerDirections = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"], 
+triggerDirections = (ps.PS5000A_DIRECTION * 4)()
+triggerDirections[0] = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"], 
                                                             ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], 
                                                             ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
-
-status["setTriggerChannelDirections"] = ps.ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), 1)
+triggerDirections[1] = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"], 
+                                                            ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], 
+                                                            ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
+triggerDirections[2] = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_C"], 
+                                                            ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], 
+                                                            ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
+triggerDirections[3] = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_D"], 
+                                                            ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], 
+                                                            ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
+status["setTriggerChannelDirections"] = ps.ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), 4)
 
 
 # Set number of pre and post trigger samples to be collected
