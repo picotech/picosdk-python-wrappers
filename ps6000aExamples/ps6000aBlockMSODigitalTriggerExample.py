@@ -9,6 +9,7 @@ import ctypes
 import numpy as np
 from picosdk.ps6000a import ps6000a as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
+from picosdk.PicoDeviceStructs import picoStruct as struct
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok, splitMSODataFast
 
