@@ -65,7 +65,7 @@ assert_pico_ok(status["getAdcLimits"])
 
 # Set trigger on digital channel 0 Port 1 for rising logic level transition 
 conditions = (struct.PICO_CONDITION * 1)()
-conditions = struct.PICO_CONDITION(enums.PICO_CHANNEL.PICO_PORT0 , enums.PICO_TRIGGER_STATE["PICO_CONDITION_TRUE"])
+conditions = struct.PICO_CONDITION(enums.PICO_CHANNEL["PICO_PORT0"] , enums.PICO_TRIGGER_STATE["PICO_CONDITION_TRUE"])
 nConditions = 1
 clear = enums.PICO_ACTION["PICO_CLEAR_ALL"]
 add = enums.PICO_ACTION["PICO_ADD"]
@@ -74,7 +74,7 @@ status["setTriggerChannelConditions"] = ps.ps6000aSetTriggerChannelConditions(ch
 assert_pico_ok(status["setTriggerChannelConditions"])
 
 directions = (struct.PICO_DIGITAL_CHANNEL_DIRECTIONS * 1)()
-directions = stuct.PICO_DIGITAL_CHANNEL_DIRECTIONS(enums.PICO_PORT_DIGITAL_CHANNEL.PICO_PORT_DIGITAL_CHANNEL0,enums.PICO_DIGITAL_DIRECTION.PICO_DIGITAL_DIRECTION_RISING)
+directions = stuct.PICO_DIGITAL_CHANNEL_DIRECTIONS(enums.PICO_PORT_DIGITAL_CHANNEL["PICO_PORT_DIGITAL_CHANNEL0"],enums.PICO_DIGITAL_DIRECTION["PICO_DIGITAL_DIRECTION_RISING"])
 nDirections = 1
 status["setTriggerDigitalPortProperties"] = ps.ps6000a.SetTriggerDigitalPortProperties(chandle,port,ctypes.byref(directions),nDirections)
 assert_pico_ok(status["setTriggerDigitalPortProperties"])
