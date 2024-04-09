@@ -55,7 +55,7 @@ def _define_communication_type():
     
     return {k.upper(): v for k, v in locals().items() if k.startswith("CT")}
     
-usbPt104.COMMUNICATION_TYPE = _define_communication_type
+usbPt104.COMMUNICATION_TYPE = _define_communication_type()
 
 doc = """ PICO_STATUS UsbPt104CloseUnit
     (
