@@ -75,7 +75,7 @@ oversample = 1
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int32()
 status["getTimebase"] = ps.ps5000GetTimebase(chandle, timebase, maxSamples, ctypes.byref(timeIntervalns), oversample, ctypes.byref(returnedMaxSamples), 0)
-assert_pico_ok(status["getTimebase2"])
+assert_pico_ok(status["getTimebase"])
 
 # Run block capture
 # handle = chandle
