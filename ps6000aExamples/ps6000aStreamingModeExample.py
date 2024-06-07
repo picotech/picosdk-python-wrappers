@@ -64,7 +64,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC), direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC)), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # create buffers
