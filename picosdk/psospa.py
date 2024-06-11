@@ -19,6 +19,34 @@ class Psospalib(Library)
 	
 psospa = Psospalib()
 
+doc = """ void psospaBlockReady
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        PICO_POINTER    pParameter
+    ); """
+psospa.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                    c_int16,
+                                                    c_uint32,
+                                                    c_void_p)
+psospa.BlockReadyType.__doc__ = doc
+
+doc = """ void psospaDataReady
+    (
+        int16_t    handle,
+        PICO_STATUS    status,
+        uint64_t    noOfSamples,
+        int16_t    overflow,
+        PICO_POINTER    pParameter
+    ); """
+psospa.DataReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                    c_int16,
+                                                    c_uint32,
+                                                    c_uint64,
+                                                    c_int16,
+                                                    c_void_p)
+psospa.DataReadyType.__doc__ = doc
+
 doc = """ PICO_STATUS psospaOpenUnit
     (
 	    int16_t*    handle,
@@ -426,7 +454,7 @@ doc = """ PICO_STATUS psospaSetDataBuffers
         int32_t    nSamples,
         PICO_DATA_TYPE    dataType,
         uint64_t    waveform,
-        PICO_RATIO_MODE    downSampleRationMode,
+        PICO_RATIO_MODE    downSampleRatioMode,
         PICO_ACTION    action
     ); """
 psospa.make_symbol("psospaSetDataBuffers", c_uint32, [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
@@ -443,3 +471,281 @@ doc = """ PICO_STATUS psospaRunBlock
         PICO_POINTER    pParameter
     ); """
 psospa.make_symbol("psospaRunBlock", c_uint32, [c_int16, c_uint64, c_uint64, c_uint32, c_void_p, c_uint64, c_void_p, c_uint32], doc)
+
+doc = """ PICO_STATUS psospaIsReady
+    (
+        int16_t    handle,
+        int16_t*    ready
+    ); """
+psospa.make_symbol("psospaIsReady", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaRunStreaming
+    (
+        int16_t    handle,
+        double*    sampleInterval,
+        PICO_TIME_UNITS    sampleIntervalTimeUnits,
+        uint64_t    maxPreTriggerSamples,
+        uint64_t    maxPostPreTriggerSamples,
+        int16_t    autoStop,
+        uint64_t    downSampleRatio,
+        PICO_RATIO_MODE    downSampleRatioMode
+    ); """
+psospa.make_symbol("psospaRunStreaming", c_uint32, [c_int16, c_void_p, c_uint32, c_uint64, c_uint64, c_int16, c_uint64, c_uint32], doc)
+
+doc = """ PICO_STATUS psospaGetStreamingLatestValues
+    (
+        int16_t    handle,
+        PICO_STREAMING_DATA_INFO*    streamingDataInfo,
+        uint64_t    nStreamingDataInfos,
+        PICO_STREAMING_DATA_TRIGGER_INFO*    triggerInfo
+    ); """
+psospa.make_symbol("psospaGetStreamingLatestValues", c_uint32, [c_int16, c_void_p, c_uint64, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaNoOfStreamingValues
+    (
+        int16_t    handle,
+        uint64_t*    noOfValues
+    ); """
+psospa.make_symbol("psospaNoOfStreamingValues", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaGetValues
+    (
+        int16_t    handle,
+        uint64_t    startIndex,
+        uint64_t*    noOfSamples,
+        uint64_t    downSampleRatio,
+        PICO_RATIO_MODE    downSampleRatioMode,
+        uint64_t    segmentIndex,
+        int16_t*    overflow
+    ); """
+psospa.make_symbol("psospaGetValues", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint32, c_uint64, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaGetValuesBulk
+    (
+        int16_t    handle,
+        uint64_t    startIndex,
+        uint64_t*    noOfSamples,
+        uint64_t    fromSegmentIndex,
+        uint64_t    toSegmentIndex,
+        uint64_t    downSampleRatio,
+        PICO_RATIO_MODE    downSampleRatioMode,
+        int16_t*    overflow
+    ); """
+psospa.make_symbol("psospaGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint64, c_uint32, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaGetValuesAsync
+    (
+        int16_t    handle,
+        uint64_t    startIndex,
+        uint64_t    noOfSamples,
+        uint64_t    downSampleRatio,
+        PICO_RATIO_MODE    downSampleRatioMode,
+        uint64_t    segmentIndex,
+        PICO_POINTER    lpDataReady,
+        PICO_POINTER    pParameter
+    ); """
+psospa.make_symbol("psospaGetValuesAsync", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint32, c_uint64, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaGetValuesBulkAsync
+    (
+        int16_t    handle,
+        uint64_t    startIndex,
+        uint64_t    noOfSamples,
+        uint64_t    fromSegmentIndex,
+        uint64_t    toSegmentIndex,
+        uint64_t    downSampleRatio,
+        PICO_RATIO_MODE    downSampleRatioMode,
+        PICO_POINTER    lpDataReady,
+        PICO_POINTER    pParameter
+    ); """
+psospa.make_symbol("psospaGetValuesBulkAsync", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint64, c_uint64, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaGetValuesOverlapped
+    (
+        int16_t    handle,
+        uint64_t    startIndex,
+        uint64_t*    noOfSamples,
+        uint64_t    downSampleRatio,
+        PICO_RATIO_MODE    downSampleRatioMode,
+        uint64_t    fromSegmentIndex,
+        uint64_t    toSegmentIndex,
+        int16_t*    overflow
+    ); """
+psospa.make_symbol("psospaGetValuesOverlapped", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint32, c_uint64, c_uint64, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaStopUsingGetValuesOverlapped
+    (
+        int16_t    handle
+    ); """
+psospa.make_symbol("psospaStopUsingGetValuesOverlapped", c_uint32, [c_int16], doc)
+
+doc = """ PICO_STATUS psospaGetNoOfCaptures
+    (
+        int16_t    handle,
+        uint64_t*    nCaptures
+    ); """
+psospa.make_symbol("psospaGetNoOfCaptures", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaGetNoOfProcessedCaptures
+    (
+        int16_t    handle,
+        uint64_t*    nProcessedCaptures
+    ); """
+psospa.make_symbol("psospaGetNoOfProcessedCaptures", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaStop
+    (
+        int16_t    handle
+    ); """
+psospa.make_symbol("psospaStop", c_uint32, [c_int16], doc)
+
+doc = """ PICO_STATUS psospaSetNoOfCaptures
+    (
+        int16_t    handle,
+        uint64_t    nCaptures
+    ); """
+psospa.make_symbol("psospaSetNoOfCaptures", c_uint32, [c_int16, c_uint64], doc)
+
+doc = """ PICO_STATUS psospaGetTriggerInfo
+    (
+        int16_t    handle,
+        PICO_TRIGGER_INFO*    triggerInfo,
+        uint64_t    firstSegmentIndex,
+        uint64_t     segmentIndex
+    ); """
+psospa.make_symbol("psospaGetTriggerInfo", c_uint32, [c_int16, c_void_p, c_uint64, c_uint64], doc)
+
+doc = """ PICO_STATUS psospaEnumerateUnits
+    (
+        int16_t*    count,
+        int8_t*    serials,
+        int16_t*    serialLth
+    ); """
+psospa.make_symbol("psospaEnumerateUnits", c_uint32, [c_void_p, c_char_p, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaPingUnit
+    (
+        int16_t    handle
+    ); """
+ psospa.make_symbol("psospaPingUnit", c_uint32, [c_int16], doc)
+ 
+ doc = """ PICO_STATUS psospaGetAnalogueOffsetLimits
+    (
+        int16_t     handle,
+        int64_t    rangeMin,
+        int64_t    rangeMax,
+        PICO_PROBE_RANGE_INFO    rangeType,
+        PICO_COUPLING    coupling,
+        double*    maximumVoltage,
+        double*    minimumVoltage
+    ); """
+psospa.make_symbol("psospaGetAnalogueOffsetLimits", c_uint32, [c_int16, c_int64, c_int64, c_uint32, c_uint32, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaGetMinimumTimebaseStateless
+    (
+        int16_t    handle,
+        PICO_CHANNEL_FLAGS    enabledChannelFlags,
+        uint32_t*    timebase,
+        double*    timeInterval,
+        PICO_DEVICE_RESOLUTION    resolution
+    ); """
+psospa.make_symbol("psospaGetMinimumTimebaseStateless", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)
+
+doc = """ PICO_STATUS psospaNearestSampleIntervalStateless
+    (
+        int16_t    handle,
+        PICO_CHANNEL_FLAGS    enabledChannelFlags,
+        double    timeIntervalRequested,
+        uint8_t    roundFaster,
+        PICO_DEVICE_RESOLUTION     resolution,
+        uint32_t*    timebase,
+        double*    timeIntervalAvailable
+    ); """
+psospa.make_symbol("psospaNearestSampleIntervalStateless", c_uint32, [c_int16, c_uint32, c_double, c_char,c_uint32, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaChannelCombinationsStateless
+    (
+        int16_t    handle,
+        PICO_CHANNEL_FLAGS*    channelFlagsCombinations,
+        uint32_t*    nChannelCombinations,
+        PICO_DEVICE_RESOLUTION    resolution,
+        uint32_t    timebase
+    ); """
+psospa.make_symbol("psospaChannelCombinationsStateless", c_uint32, [c_int16, c_void_p, c_void_p, c_uint32, c_uint32], doc)
+
+doc = """ PICO_STATUS psospaSetDeviceResolution
+    (
+        int16_t    handle,
+        PICO_DEVICE_RESOLUTION    resolution
+    ); """
+psospa.make_symbol("psospaSetDeviceResolution", c_uint32, [c_int16, c_uint32], doc)
+
+doc = """ PICO_STATUS psospaGetDeviceResolution
+    (
+        int16_t    handle,
+        PICO_DEVICE_RESOLUTION*    resolution
+    ); """
+psospa.make_symbol("psospaGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaQueryOutputEdgeDetect
+    (
+        int16_t    handle,
+        int16_t*    state
+    ); """
+psospa.make_symbol("psospaQueryOutputEdgeDetect", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaSetOutputEdgeDetect
+    (
+        int16_t    handle
+        int16_t    state
+    ); """
+psospa.make_symbol("psospaSetOutputEdgeDetect", c_uint32, [c_int16, c_int16], doc)
+
+doc = """ PICO_STATUS psospaGetScalingValues
+    (
+        int16_t    handle,
+        PICO_SCALING_FACTORS_FOR_RANGE_TYPES_VALUES*    scalingValues,
+        int16_t    nChannels
+    ); """
+psospa.make_symbol("psospaGetScalingValues", c_uint32, [c_int16, c_void_p, c_int16], doc)
+
+doc = """ PICO_STATUS psospaGetAdcLimits
+   (
+        int16_t    handle,
+        PICO_DEVICE_RESOLUTION    resolution,
+        int16_t*    minValue,
+        int16_t*    maxValue
+    ); """
+psospa.make_symbol("psospaGetAdcLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaCheckForUpdate
+    (
+        int16_t    handle,
+        PICO_FIRMWARE_INFO*    firmwareInfos,
+        int16_t*    nFirmwareInfos,
+        uint16_t*    updatesRequired
+    ); """
+psospa.make_symbol("psospaCheckForUpdate", c_uint32, [c_int16, c_void_p, c_void_p, c_void_p], doc)
+
+doc = """ PICO_STATUS psospaStartFirmwareUpdate
+    (
+        int16_t    handle,
+        PicoUpdateFirmwareProgree    progress
+    ); """
+psospa.make_symbol("psospaStartFirmwareUpdate", c_uint32, [c_int16, c_uint32], doc)
+
+doc = """ PICO_STATUS psospaResetChannelsAndReportAllChannelsOvervoltageTripStatus
+    (
+        int16_t    handle,
+        PICO_CHANNEL_OVERVOLTAGE_TRIPPED*    allChannelsTriggedStatus,
+        uint8_t    nChannelTrippedStatus
+    ); """
+psospa.make_symbol("psospaResetChannelsAndReportAllChannelsOvervoltageTripStatus", c_uint32, [c_int16, c_void_p, c_char], doc)
+
+doc = """ PICO_STATUS psospaReportAllChannelsOvervoltageTripStatus
+    (
+        int16_t    handle,
+        PICO_CHANNEL_OVERVOLTAGE_TRIPPED*    allChannelsTriggedStatus,
+        uint8_t    nChannelTrippedStatus
+    ); """
+psospa.make_symbol("psospaReportAllChannelsOvervoltageTripStatus", c_uint32, [c_int16, c_void_p, c_char], doc)
