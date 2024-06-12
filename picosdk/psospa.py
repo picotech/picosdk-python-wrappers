@@ -13,7 +13,7 @@ from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.constants import make_enum
 from picosdk.PicoDeviceEnums import picoEnum as enums
 
-class Psospalib(Library)
+class Psospalib(Library):
     def __init__(self):
 	    super(Psospalib, self).__init__("psospa")
 	
@@ -54,13 +54,13 @@ doc = """ PICO_STATUS psospaOpenUnit
 		PICO_DEVICE_RESOLUTION    resolution,
 		PICO_USB_POWER_DETAILS*    powerDetails
 	); """
-psospa.make_symbol("psospaOpenUnit", c_uint32, [c_void_p, c_char_p, c_int32, c_void_p], doc)
+psospa.make_symbol("_OpenUnit","psospaOpenUnit", c_uint32, [c_void_p, c_char_p, c_int32, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaCloseUnit
     (
 	    int16_t    handle
 	); """
-psospa.make_symbol("psospaCloseUnit", c_uint32, [c_int16], doc)
+psospa.make_symbol("_CloseUnit", "psospaCloseUnit", c_uint32, [c_int16], doc)
 
 doc = """ PICO_STATUS psospaGetUnitInfo
     (
@@ -70,7 +70,7 @@ doc = """ PICO_STATUS psospaGetUnitInfo
         int16_t*    requiredSize,
         PICO_INFO    info
     ); """
-psospa.make_symbol("psospaGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32], doc)
+psospa.make_symbol("_GetUnitInfo","psospaGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaGetVariantDetails
     (
@@ -79,7 +79,7 @@ doc = """ PICO_STATUS psospaGetVariantDetails
         int8_t*    outputString,
         int32_t*    outputStringLength
     ); """
-psospa.make_symbol("psospaGetVariantDetails", c_uint32, [c_char_p, c_int16, c_char_p, c_void_p], doc)
+psospa.make_symbol("_GetVariantDetails", "psospaGetVariantDetails", c_uint32, [c_char_p, c_int16, c_char_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetAccessoryInfo
     (
@@ -90,7 +90,7 @@ doc = """ PICO_STATUS psospaGetAccessoryInfo
         int16_t*    requiredSize,
         PICO_INFO    info
     ); """
-psospa.make_symbol("psospaGetAccessoryInfo", c_uint32, [c_int16, c_uint32, c_char_p, c_int16, c_void_p, c_uint32], doc
+psospa.make_symbol("_GetAccessoryInfo", "psospaGetAccessoryInfo", c_uint32, [c_int16, c_uint32, c_char_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaMemorySegments
     (
@@ -98,7 +98,7 @@ doc = """ PICO_STATUS psospaMemorySegments
         uint64_t    nSegments,
         uint64_t*    nMaxSamples
     ); """
-psospa.make_symbol("psospaMemorySegments", c_uint32,[c_int16, c_uint64, c_void_p], doc)
+psospa.make_symbol("_MemorySegments","psospaMemorySegments", c_uint32,[c_int16, c_uint64, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaMemorySegmentsBySamples
     (
@@ -106,15 +106,15 @@ doc = """ PICO_STATUS psospaMemorySegmentsBySamples
         uint64_t    nSamples,
         uint64_t*    nMaxSegments
     ); """
-psospa.make_symbol("psospaMemorySegmentsBySamples", c_uint32, [c_int16, c_uint64, c_void_p], doc)
+psospa.make_symbol("_MemorySegmentsBySamples","psospaMemorySegmentsBySamples", c_uint32, [c_int16, c_uint64, c_void_p], doc)
 
-doc = """ PICO_STATUS psospaGetMaximumAvaliableMemory
-    (
-        int16_t    handle,
-        uint64_t*    nMaxSamples,
-        PICO_DEVICE_RESOLUTION    resolution
-    ); """
-psospa.make_symbol("psospaGetMaximumAvaliableMemory", c_uint32, [c_int16, c_void_p, c_uint32], doc)
+# doc = """ PICO_STATUS psospaGetMaximumAvaliableMemory
+    # (
+        # int16_t    handle,
+        # uint64_t*    nMaxSamples,
+        # PICO_DEVICE_RESOLUTION    resolution
+    # ); """
+# psospa.make_symbol("_GetMaximumAvaliableMemory","psospaGetMaximumAvaliableMemory", c_uint32, [c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaQueryMaxSegmentsBySamples
     (
@@ -124,7 +124,7 @@ doc = """ PICO_STATUS psospaQueryMaxSegmentsBySamples
         uint64_t*    nMaxSegments,
         PICO_DEVICE_RESOLUTION    resolution
     ); """
-psospa.make_symbol("psospaQueryMaxSegmentsBySamples", c_uint32, [c_int16, c_uint64, c_uint32, c_void_p, c_uint32], doc)
+psospa.make_symbol("_QUeryMaxSegmentsBySamples","psospaQueryMaxSegmentsBySamples", c_uint32, [c_int16, c_uint64, c_uint32, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetChannelOn
     (
@@ -137,14 +137,14 @@ doc = """ PICO_STATUS psospaSetChannelOn
         double    analogueOffset,
         PICO_BANDWIDTH_LIMITER    bandwidth
     ); """
-psospa.make_symbol("psospaSetChannelOn", c_uint32, [c_int16, c_uint32, c_uint32, c_int64, c_int64, c_uint32, c_double, c_uint32], doc)
+psospa.make_symbol("_SetChannelOn","psospaSetChannelOn", c_uint32, [c_int16, c_uint32, c_uint32, c_int64, c_int64, c_uint32, c_double, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetChannelOff
     (
         int16_t    handle,
         PICO_CHANNEL    channel
     ); """
-psospa.make_symbol("psospaSetChannelOff", c_uint32, [c_int16, c_uint32], doc)
+psospa.make_symbol("_SetChannelOff","psospaSetChannelOff", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetDigitalPortOn
     (
@@ -154,14 +154,14 @@ doc = """ PICO_STATUS psospaSetDigitalPortOn
         int16_t*    logicThresholdLengthLevel,
         PICO_DIGITAL_PORT_HYSTERESIS    hysteresis
     ); """
-psospa.make_symbol("psospaSetDigitalPortOn", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)
+psospa.make_symbol("_SetDigitalPortOn","psospaSetDigitalPortOn", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetDigitalPortOff
     (
         int16_t    handle,
         PICO_CHANNEL    port
     ); """
-psospa.make_symbol("psospaSetDigitalPortOff", c_uint32, [c_int16, c_uint32], doc)
+psospa.make_symbol("_SetDigitalPortOff","psospaSetDigitalPortOff", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaGetTimebase
     (
@@ -172,7 +172,7 @@ doc = """ PICO_STATUS psospaGetTimebase
         uint64_t*    maxSamples,
         uint64_t    segmentIndex
     ); """
-psospa.make_symbol("psospaGetTimebase", c_uint32, [c_int16, c_uint32, c_uint64, c_void_p, c_void_p, c_uint64], doc)
+psospa.make_symbol("_GetTimebase","psospaGetTimebase", c_uint32, [c_int16, c_uint32, c_uint64, c_void_p, c_void_p, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSigGenWaveform
     (
@@ -181,7 +181,7 @@ doc = """ PICO_STATUS psospaSigGenWaveform
         int16_t*    buffer,
         uint64_t    bufferLength
     ); """
-psospa.make_symbol("psospaSigGenWaveform", c_uint32, [c_int16, c_uint32, c_void_p, c_uint64], doc)
+psospa.make_symbol("_SigGenWaveform","psospaSigGenWaveform", c_uint32, [c_int16, c_uint32, c_void_p, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSigGenRange
     (
@@ -189,14 +189,14 @@ doc = """ PICO_STATUS psospaSigGenRange
         double    peakToPeakVolts,
         double    offsetVolts
     ); """
-psospa.make_symbol("psospaSigGenRange", c_uint32, [c_int16, c_double, c_double], doc)
+psospa.make_symbol("_SigGenRange","psospaSigGenRange", c_uint32, [c_int16, c_double, c_double], doc)
 
 doc = """ PICO_STATUS psospaSigGenWaveformDutyCycle
     (
         int16_t    handle,
         double    dutyCyclePercent
     ); """
-psospa.make_symbol("psospaSigGenWaveformDutyCycle", c_uint32, [c_int16, c_double], doc)
+psospa.make_symbol("_SigGenWaveformDutyCycle","psospaSigGenWaveformDutyCycle", c_uint32, [c_int16, c_double], doc)
 
 doc = """ PICO_STATUS psospaSigGenTrigger
     (
@@ -206,21 +206,21 @@ doc = """ PICO_STATUS psospaSigGenTrigger
         uint64_t    cycles,
         uint64_t    autoTriggerPicoSeconds
     ); """
-psospa.make_symbol("psospaSigGenTrigger", c_uint32, [c_int16, c_uint32, c_uint32, c_uint64, c_uint64], doc)
+psospa.make_symbol("_SigGenTrigger","psospaSigGenTrigger", c_uint32, [c_int16, c_uint32, c_uint32, c_uint64, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSigGenFilter
     (
         int16_t    handle,
         PICO_SIGGEN_FILTER_STATE    filterState
     ); """
-psospa.make_symbol("psospaSigGenFilter", c_uint32, [c_int16, c_uint32], doc)
+psospa.make_symbol("_SigGenFilter","psospaSigGenFilter", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSigGenFrequency
     (
         int16_t    handle,
         double    frequencyHz
     ); """
-psospa.make_symbol("psospaSigGenFrequency", c_uint32, [c_int16, c_double], doc)
+psospa.make_symbol("_SigGenFrequency","psospaSigGenFrequency", c_uint32, [c_int16, c_double], doc)
 
 doc = """ PICO_STATUS psospaSigGenFrequencySweep
     (
@@ -230,14 +230,14 @@ doc = """ PICO_STATUS psospaSigGenFrequencySweep
         double    dwellTimeSeconds,
         PICO_SWEEP_TYPE    sweepType
     ); """
-psospa.make_symbol("psospaSigGenFrequencySweep", c_uint32, [c_int16, c_double, c_double, c_double, c_uint32], doc)
+psospa.make_symbol("_SigGenFrequencySweep","psospaSigGenFrequencySweep", c_uint32, [c_int16, c_double, c_double, c_double, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSigGenPhase
     (
         int16_t    handle,
         uint64_t    deltaPhase
     ); """
-psospa.make_symbol("psospaSigGenPhase", c_uint32, [c_int16, c_uint64], doc)
+psospa.make_symbol("_SigGenPhase","psospaSigGenPhase", c_uint32, [c_int16, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSigGenPhaseSweep
     (
@@ -247,7 +247,7 @@ doc = """ PICO_STATUS psospaSigGenPhaseSweep
         uint64_t    dwellCount,
         PICO_SWEEP_TYPE    sweepType
     ); """
-psospa.make_symbol("psospaSigGenPhaseSweep", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint32], doc)
+psospa.make_symbol("_SigGenPhaseSweep","psospaSigGenPhaseSweep", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSigGenClockManual
     (
@@ -255,14 +255,14 @@ doc = """ PICO_STATUS psospaSigGenClockManual
         double    dacClockFrequency,
         uint64_t    prescaleRatio
     ); """
-psospa.make_symbol("psospaSigGenClockManual", c_uint32, [c_int16, c_double, c_uint64], doc)
+psospa.make_symbol("_SigGenClockManual","psospaSigGenClockManual", c_uint32, [c_int16, c_double, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSigGenSoftwareTriggerControl
     (
         int16_t    handle,
         PICO_SIGGEN_TRIG_TYPE    triggerState
     ); """
-psospa.make_symbol("psospaSigGenSoftwareTriggerControl", c_uint32, [c_int16, c_uint32], doc)
+psospa.make_symbol("_SigGenSoftwareTriggerControl","psospaSigGenSoftwareTriggerControl", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSigGenApply
     (
@@ -277,7 +277,7 @@ doc = """ PICO_STATUS psospaSigGenApply
         double*    frequencyIncrement,
         double*    dwellTime,
     ); """
-psospa.make_symbol("psospaSigGenApply", c_uint32, [c_int16, c_int16, c_int16, c_int16, c_int16, c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
+psospa.make_symbol("_SigGenApply","psospaSigGenApply", c_uint32, [c_int16, c_int16, c_int16, c_int16, c_int16, c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaSigGenLimits
     (
@@ -287,7 +287,7 @@ doc = """ PICO_STATUS psospaSigGenLimits
         double*    maximumPermissibleValue,
         double*    step
     ); """
-psospa.make_symbol("psospaSigGenLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p], doc)
+psospa.make_symbol("_SigGenLimits","psospaSigGenLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaSigGenFrequencyLimits
     (
@@ -304,19 +304,19 @@ doc = """ PICO_STATUS psospaSigGenFrequencyLimits
         double*    minDwellTimeOut,
         double*    maxDwellTimeOut
     ); """
-psospa.make_symbol("psospaSigGenFrequencyLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_int16, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p), doc)
+psospa.make_symbol("_SigGenFrequencyLimits","psospaSigGenFrequencyLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_int16, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaSigGenPause
     (
         int16_t    handle,
     ); """
-psospa.make_symbol("psospaSigGenPause", c_uint32, [c_int16], doc)
+psospa.make_symbol("_SigGenPause","psospaSigGenPause", c_uint32, [c_int16], doc)
 
 doc = """ PICO_STATUS psospaSigGenRestart
     (
         int16_t    handle
     ); """
-psospa.make_symbol("psospaSigGenRestart", c_uint32, [c_int16], doc)
+psospa.make_symbol("_SigGenRestart","psospaSigGenRestart", c_uint32, [c_int16], doc)
 
 doc = """ PICO_STATUS psospaSetSimpleTrigger
     (
@@ -328,14 +328,14 @@ doc = """ PICO_STATUS psospaSetSimpleTrigger
         uint64_t    delay,
         uint32_t    autoTriggerMicroSeconds
     ); """
-psospa.make_symbol("psospaSetSimpleTrigger", c_uint32, [c_int16, c_int16, c_uint32, c_int16, c_uint32, c_uint64, c_uint32], doc)
+psospa.make_symbol("_SetSimpleTrigger","psospaSetSimpleTrigger", c_uint32, [c_int16, c_int16, c_uint32, c_int16, c_uint32, c_uint64, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaTriggerWithinPreTriggerSamples
     (
         int16_t    handle,
         PICO_TRIGGER_WITHIN_PRE_TRIGGER    state
     ); """
-psospa.make_symbol("psospaTriggerWithinPreTriggerSamples", c_uint32, [c_int16, c_uint32], doc)
+psospa.make_symbol("_TriggerWithinPreTriggerSamples","psospaTriggerWithinPreTriggerSamples", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetTriggerChannelProperties
     (
@@ -345,7 +345,7 @@ doc = """ PICO_STATUS psospaSetTriggerChannelProperties
         int16_t    auxOutputEnable,
         uint32_t    autoTriggerMicroSeconds
     ); """
-psospa.make_symbol("psospaSetTriggerChannelProperties", c_uint32, [c_int16, c_void_p, c_int16, c_int16, c_uint32], doc)
+psospa.make_symbol("_SetTriggerChannelProperties","psospaSetTriggerChannelProperties", c_uint32, [c_int16, c_void_p, c_int16, c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetTriggerChannelConditions
    (
@@ -354,7 +354,7 @@ doc = """ PICO_STATUS psospaSetTriggerChannelConditions
         int16_t    nConditions,
         PICO_ACTION    action
     ); """
-psospa.make_symbol("psospaSetTriggerChannelConditions", c_uint32, [c_int16, c_void_p, c_int16, c_uint32], doc)
+psospa.make_symbol("_SetTriggerChannelConditions","psospaSetTriggerChannelConditions", c_uint32, [c_int16, c_void_p, c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetTriggerChannelDirections
     (
@@ -362,21 +362,21 @@ doc = """ PICO_STATUS psospaSetTriggerChannelDirections
         PICO_DIRECTION*    directions,
         int16_t    nDirections
     ); """
-psospa.make_symbol("psospaSetTriggerChannelDirections", c_uint32, [c_int16, c_void_p, c_int16], doc)
+psospa.make_symbol("_SetTriggerChannelDirections","psospaSetTriggerChannelDirections", c_uint32, [c_int16, c_void_p, c_int16], doc)
 
 doc = """ PICO_STATUS psospaSetTriggerDelay
     (
         int16_t    handle,
         uint64_t    delay
     ); """
-psospa.make_symbol("psospaSetTriggerDelay", c_uint32, [c_int16, c_uint64], doc)
+psospa.make_symbol("_SetTriggerDelay","psospaSetTriggerDelay", c_uint32, [c_int16, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSetTriggerHoldoffCounterBySamples
     (
         int16_t    handle,
         uint64_t    holdoffSamples
     ); """
-psospa.make_symbol("psospaSetTriggerHoldoffCounterBySamples", c_uint32, [c_int16, c_uint64], doc)
+psospa.make_symbol("_SetTriggerHoldoffCounterBySamples","psospaSetTriggerHoldoffCounterBySamples", c_uint32, [c_int16, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSetPulseWidthQualifierProperties
     (
@@ -385,7 +385,7 @@ doc = """ PICO_STATUS psospaSetPulseWidthQualifierProperties
         uint32_t    upper,
         PICO_PULSE_WIDTH_TYPE    type
     ); """
-psospa.make_symbol("psospaSetPulseWidthQualifierProperties", c_uint32, [c_int16, c_uint32, c_uint32, c_uint32], doc)
+psospa.make_symbol("_SetPulseWidthQualifierProperties","psospaSetPulseWidthQualifierProperties", c_uint32, [c_int16, c_uint32, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetPulseWidthQualifierConditions
    (
@@ -394,7 +394,7 @@ doc = """ PICO_STATUS psospaSetPulseWidthQualifierConditions
         int16_t    nConditions,
         PICO_ACTION    action
     ); """
-psospa.make_symbol("psospaSetPulseWidthQualifierConditions", c_uint32, [c_int16, c_void_p, c_int16, c_uint32], doc)
+psospa.make_symbol("_SetPulseWidthQualifierConditions","psospaSetPulseWidthQualifierConditions", c_uint32, [c_int16, c_void_p, c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetPulseWidthQualifierDirections
     (
@@ -402,7 +402,7 @@ doc = """ PICO_STATUS psospaSetPulseWidthQualifierDirections
         PICO_DIRECTION*    directions,
         int16_t    nDirections
     ); """
-psospa.make_symbol("psospaSetPulseWidthQualifierDirections", c_uint32, [c_int16, c_void_p, c_int16], doc)
+psospa.make_symbol("_SetPulseWidthQualifierDirections","psospaSetPulseWidthQualifierDirections", c_uint32, [c_int16, c_void_p, c_int16], doc)
 
 doc = """ PICO_STATUS psospaSetTriggerDigitalPortProperties
     (
@@ -411,7 +411,7 @@ doc = """ PICO_STATUS psospaSetTriggerDigitalPortProperties
         PICO_DIGITAL_CHANNEL_DIRECTIONS*    directions,
         int16_t    nDirections
     ); """
-psospa.make_symbol("psospaSetTriggerDigitalPortProperties", c_uint32, [c_int16, c_uint32, c_void_p, c_int16], doc)
+psospa.make_symbol("_SetTriggerDigitalPortProperties","psospaSetTriggerDigitalPortProperties", c_uint32, [c_int16, c_uint32, c_void_p, c_int16], doc)
 
 doc = """ PICO_STATUS psospaGetTriggerTimeOffset
     (
@@ -420,7 +420,7 @@ doc = """ PICO_STATUS psospaGetTriggerTimeOffset
         PICO_TIME_UNITS*    timeUnits,
         uint64_t    segmentIndex
     ); """
-psospa.make_symbol("psospaGetTriggerTimeOffset", c_uint32, [c_int16, c_void_p, c_void_p, c_uint64], doc)
+psospa.make_symbol("_GetTriggerTimeOffset","psospaGetTriggerTimeOffset", c_uint32, [c_int16, c_void_p, c_void_p, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaGetValuesTriggerTimeOffsetBulk
     (
@@ -430,7 +430,7 @@ doc = """ PICO_STATUS psospaGetValuesTriggerTimeOffsetBulk
         uint64_t    fromSegmentIndex,
         uint64_t    toSegmentIndex
     ); """
-psospa.make_symbol("psospaGetValuesTriggerTimeOffsetBulk", c_uint32, [c_int16, c_void_p, c_void_p, c_uint64, c_uint64], doc)
+psospa.make_symbol("_GetValuesTriggerTimeOffsetBulk","psospaGetValuesTriggerTimeOffsetBulk", c_uint32, [c_int16, c_void_p, c_void_p, c_uint64, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSetDataBuffer
     (
@@ -443,7 +443,7 @@ doc = """ PICO_STATUS psospaSetDataBuffer
         PICO_RATIO_MODE    downSampleRationMode,
         PICO_ACTION    action
     ); """
-psospa.make_symbol("psospaSetDataBuffer", c_uint32, [c_int16, c_uint32, c_uint32, c_uint32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
+psospa.make_symbol("_SetDataBuffer","psospaSetDataBuffer", c_uint32, [c_int16, c_uint32, c_void_p, c_uint32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetDataBuffers
     (
@@ -457,7 +457,7 @@ doc = """ PICO_STATUS psospaSetDataBuffers
         PICO_RATIO_MODE    downSampleRatioMode,
         PICO_ACTION    action
     ); """
-psospa.make_symbol("psospaSetDataBuffers", c_uint32, [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
+psospa.make_symbol("_SetDataBuffers","psospaSetDataBuffers", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaRunBlock
     (
@@ -470,14 +470,14 @@ doc = """ PICO_STATUS psospaRunBlock
         psospaBlockReady    lpReady,
         PICO_POINTER    pParameter
     ); """
-psospa.make_symbol("psospaRunBlock", c_uint32, [c_int16, c_uint64, c_uint64, c_uint32, c_void_p, c_uint64, c_void_p, c_uint32], doc)
+psospa.make_symbol("_RunBlock","psospaRunBlock", c_uint32, [c_int16, c_uint64, c_uint64, c_uint32, c_void_p, c_uint64, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaIsReady
     (
         int16_t    handle,
         int16_t*    ready
     ); """
-psospa.make_symbol("psospaIsReady", c_uint32, [c_int16, c_void_p], doc)
+psospa.make_symbol("_IsReady","psospaIsReady", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaRunStreaming
     (
@@ -490,7 +490,7 @@ doc = """ PICO_STATUS psospaRunStreaming
         uint64_t    downSampleRatio,
         PICO_RATIO_MODE    downSampleRatioMode
     ); """
-psospa.make_symbol("psospaRunStreaming", c_uint32, [c_int16, c_void_p, c_uint32, c_uint64, c_uint64, c_int16, c_uint64, c_uint32], doc)
+psospa.make_symbol("_RunStreaming","psospaRunStreaming", c_uint32, [c_int16, c_void_p, c_uint32, c_uint64, c_uint64, c_int16, c_uint64, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaGetStreamingLatestValues
     (
@@ -499,14 +499,14 @@ doc = """ PICO_STATUS psospaGetStreamingLatestValues
         uint64_t    nStreamingDataInfos,
         PICO_STREAMING_DATA_TRIGGER_INFO*    triggerInfo
     ); """
-psospa.make_symbol("psospaGetStreamingLatestValues", c_uint32, [c_int16, c_void_p, c_uint64, c_void_p], doc)
+psospa.make_symbol("_GetStreamingLatestValues","psospaGetStreamingLatestValues", c_uint32, [c_int16, c_void_p, c_uint64, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaNoOfStreamingValues
     (
         int16_t    handle,
         uint64_t*    noOfValues
     ); """
-psospa.make_symbol("psospaNoOfStreamingValues", c_uint32, [c_int16, c_void_p], doc)
+psospa.make_symbol("_NoOfStreamingValues","psospaNoOfStreamingValues", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetValues
     (
@@ -518,7 +518,7 @@ doc = """ PICO_STATUS psospaGetValues
         uint64_t    segmentIndex,
         int16_t*    overflow
     ); """
-psospa.make_symbol("psospaGetValues", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint32, c_uint64, c_void_p], doc)
+psospa.make_symbol("_GetValues","psospaGetValues", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint32, c_uint64, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetValuesBulk
     (
@@ -531,7 +531,7 @@ doc = """ PICO_STATUS psospaGetValuesBulk
         PICO_RATIO_MODE    downSampleRatioMode,
         int16_t*    overflow
     ); """
-psospa.make_symbol("psospaGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint64, c_uint32, c_void_p], doc)
+psospa.make_symbol("_GetValuesBulk","psospaGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint64, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetValuesAsync
     (
@@ -544,7 +544,7 @@ doc = """ PICO_STATUS psospaGetValuesAsync
         PICO_POINTER    lpDataReady,
         PICO_POINTER    pParameter
     ); """
-psospa.make_symbol("psospaGetValuesAsync", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint32, c_uint64, c_void_p, c_void_p], doc)
+psospa.make_symbol("_GetValuesAsync","psospaGetValuesAsync", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint32, c_uint64, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetValuesBulkAsync
     (
@@ -558,7 +558,7 @@ doc = """ PICO_STATUS psospaGetValuesBulkAsync
         PICO_POINTER    lpDataReady,
         PICO_POINTER    pParameter
     ); """
-psospa.make_symbol("psospaGetValuesBulkAsync", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint64, c_uint64, c_void_p, c_void_p], doc)
+psospa.make_symbol("_GetValuesBulkAsync","psospaGetValuesBulkAsync", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint64, c_uint64, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetValuesOverlapped
     (
@@ -571,40 +571,40 @@ doc = """ PICO_STATUS psospaGetValuesOverlapped
         uint64_t    toSegmentIndex,
         int16_t*    overflow
     ); """
-psospa.make_symbol("psospaGetValuesOverlapped", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint32, c_uint64, c_uint64, c_void_p], doc)
+psospa.make_symbol("_GetValuesOverlapped","psospaGetValuesOverlapped", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint32, c_uint64, c_uint64, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaStopUsingGetValuesOverlapped
     (
         int16_t    handle
     ); """
-psospa.make_symbol("psospaStopUsingGetValuesOverlapped", c_uint32, [c_int16], doc)
+psospa.make_symbol("_StopUsingGetValuesOverlapped","psospaStopUsingGetValuesOverlapped", c_uint32, [c_int16], doc)
 
 doc = """ PICO_STATUS psospaGetNoOfCaptures
     (
         int16_t    handle,
         uint64_t*    nCaptures
     ); """
-psospa.make_symbol("psospaGetNoOfCaptures", c_uint32, [c_int16, c_void_p], doc)
+psospa.make_symbol("_GetNoOfCaptures","psospaGetNoOfCaptures", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetNoOfProcessedCaptures
     (
         int16_t    handle,
         uint64_t*    nProcessedCaptures
     ); """
-psospa.make_symbol("psospaGetNoOfProcessedCaptures", c_uint32, [c_int16, c_void_p], doc)
+psospa.make_symbol("_GetNoOfProcessedCaptures","psospaGetNoOfProcessedCaptures", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaStop
     (
         int16_t    handle
     ); """
-psospa.make_symbol("psospaStop", c_uint32, [c_int16], doc)
+psospa.make_symbol("_Stop","psospaStop", c_uint32, [c_int16], doc)
 
 doc = """ PICO_STATUS psospaSetNoOfCaptures
     (
         int16_t    handle,
         uint64_t    nCaptures
     ); """
-psospa.make_symbol("psospaSetNoOfCaptures", c_uint32, [c_int16, c_uint64], doc)
+psospa.make_symbol("_SetNoOfCaptures","psospaSetNoOfCaptures", c_uint32, [c_int16, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaGetTriggerInfo
     (
@@ -613,7 +613,7 @@ doc = """ PICO_STATUS psospaGetTriggerInfo
         uint64_t    firstSegmentIndex,
         uint64_t     segmentIndex
     ); """
-psospa.make_symbol("psospaGetTriggerInfo", c_uint32, [c_int16, c_void_p, c_uint64, c_uint64], doc)
+psospa.make_symbol("_GetTriggerInfo","psospaGetTriggerInfo", c_uint32, [c_int16, c_void_p, c_uint64, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaEnumerateUnits
     (
@@ -621,15 +621,15 @@ doc = """ PICO_STATUS psospaEnumerateUnits
         int8_t*    serials,
         int16_t*    serialLth
     ); """
-psospa.make_symbol("psospaEnumerateUnits", c_uint32, [c_void_p, c_char_p, c_void_p], doc)
+psospa.make_symbol("_EnumerateUnits","psospaEnumerateUnits", c_uint32, [c_void_p, c_char_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaPingUnit
     (
         int16_t    handle
     ); """
- psospa.make_symbol("psospaPingUnit", c_uint32, [c_int16], doc)
+psospa.make_symbol("_PingUnit","psospaPingUnit", c_uint32, [c_int16], doc)
  
- doc = """ PICO_STATUS psospaGetAnalogueOffsetLimits
+doc = """ PICO_STATUS psospaGetAnalogueOffsetLimits
     (
         int16_t     handle,
         int64_t    rangeMin,
@@ -639,7 +639,7 @@ doc = """ PICO_STATUS psospaPingUnit
         double*    maximumVoltage,
         double*    minimumVoltage
     ); """
-psospa.make_symbol("psospaGetAnalogueOffsetLimits", c_uint32, [c_int16, c_int64, c_int64, c_uint32, c_uint32, c_void_p, c_void_p], doc)
+psospa.make_symbol("_GetAnalogueOffsetLimits","psospaGetAnalogueOffsetLimits", c_uint32, [c_int16, c_int64, c_int64, c_uint32, c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaGetMinimumTimebaseStateless
     (
@@ -649,7 +649,7 @@ doc = """ PICO_STATUS psospaGetMinimumTimebaseStateless
         double*    timeInterval,
         PICO_DEVICE_RESOLUTION    resolution
     ); """
-psospa.make_symbol("psospaGetMinimumTimebaseStateless", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)
+psospa.make_symbol("_GetMinimumTimebaseStateless","psospaGetMinimumTimebaseStateless", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaNearestSampleIntervalStateless
     (
@@ -661,7 +661,7 @@ doc = """ PICO_STATUS psospaNearestSampleIntervalStateless
         uint32_t*    timebase,
         double*    timeIntervalAvailable
     ); """
-psospa.make_symbol("psospaNearestSampleIntervalStateless", c_uint32, [c_int16, c_uint32, c_double, c_char,c_uint32, c_void_p, c_void_p], doc)
+psospa.make_symbol("_NearestSampleIntervalStateless","psospaNearestSampleIntervalStateless", c_uint32, [c_int16, c_uint32, c_double, c_char,c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaChannelCombinationsStateless
     (
@@ -671,35 +671,35 @@ doc = """ PICO_STATUS psospaChannelCombinationsStateless
         PICO_DEVICE_RESOLUTION    resolution,
         uint32_t    timebase
     ); """
-psospa.make_symbol("psospaChannelCombinationsStateless", c_uint32, [c_int16, c_void_p, c_void_p, c_uint32, c_uint32], doc)
+psospa.make_symbol("_ChannelCombinationsStateless","psospaChannelCombinationsStateless", c_uint32, [c_int16, c_void_p, c_void_p, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetDeviceResolution
     (
         int16_t    handle,
         PICO_DEVICE_RESOLUTION    resolution
     ); """
-psospa.make_symbol("psospaSetDeviceResolution", c_uint32, [c_int16, c_uint32], doc)
+psospa.make_symbol("_SetDeviceResolution","psospaSetDeviceResolution", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaGetDeviceResolution
     (
         int16_t    handle,
         PICO_DEVICE_RESOLUTION*    resolution
     ); """
-psospa.make_symbol("psospaGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
+psospa.make_symbol("_GetDeviceResolution","psospaGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaQueryOutputEdgeDetect
     (
         int16_t    handle,
         int16_t*    state
     ); """
-psospa.make_symbol("psospaQueryOutputEdgeDetect", c_uint32, [c_int16, c_void_p], doc)
+psospa.make_symbol("_QueryOutputEdgeDetect","psospaQueryOutputEdgeDetect", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaSetOutputEdgeDetect
     (
         int16_t    handle
         int16_t    state
     ); """
-psospa.make_symbol("psospaSetOutputEdgeDetect", c_uint32, [c_int16, c_int16], doc)
+psospa.make_symbol("_SetOutputEdgeDetect","psospaSetOutputEdgeDetect", c_uint32, [c_int16, c_int16], doc)
 
 doc = """ PICO_STATUS psospaGetScalingValues
     (
@@ -707,7 +707,7 @@ doc = """ PICO_STATUS psospaGetScalingValues
         PICO_SCALING_FACTORS_FOR_RANGE_TYPES_VALUES*    scalingValues,
         int16_t    nChannels
     ); """
-psospa.make_symbol("psospaGetScalingValues", c_uint32, [c_int16, c_void_p, c_int16], doc)
+psospa.make_symbol("_GetScalingValues","psospaGetScalingValues", c_uint32, [c_int16, c_void_p, c_int16], doc)
 
 doc = """ PICO_STATUS psospaGetAdcLimits
    (
@@ -716,7 +716,7 @@ doc = """ PICO_STATUS psospaGetAdcLimits
         int16_t*    minValue,
         int16_t*    maxValue
     ); """
-psospa.make_symbol("psospaGetAdcLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p], doc)
+psospa.make_symbol("_GetAdcLimits","psospaGetAdcLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaCheckForUpdate
     (
@@ -725,14 +725,14 @@ doc = """ PICO_STATUS psospaCheckForUpdate
         int16_t*    nFirmwareInfos,
         uint16_t*    updatesRequired
     ); """
-psospa.make_symbol("psospaCheckForUpdate", c_uint32, [c_int16, c_void_p, c_void_p, c_void_p], doc)
+psospa.make_symbol("_CheckForUpdate","psospaCheckForUpdate", c_uint32, [c_int16, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaStartFirmwareUpdate
     (
         int16_t    handle,
         PicoUpdateFirmwareProgree    progress
     ); """
-psospa.make_symbol("psospaStartFirmwareUpdate", c_uint32, [c_int16, c_uint32], doc)
+psospa.make_symbol("_StartFirmwareUpdate","psospaStartFirmwareUpdate", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaResetChannelsAndReportAllChannelsOvervoltageTripStatus
     (
@@ -740,7 +740,7 @@ doc = """ PICO_STATUS psospaResetChannelsAndReportAllChannelsOvervoltageTripStat
         PICO_CHANNEL_OVERVOLTAGE_TRIPPED*    allChannelsTriggedStatus,
         uint8_t    nChannelTrippedStatus
     ); """
-psospa.make_symbol("psospaResetChannelsAndReportAllChannelsOvervoltageTripStatus", c_uint32, [c_int16, c_void_p, c_char], doc)
+psospa.make_symbol("_ResetChannelsAndReportAllChannelsOVervoltageTripStatus","psospaResetChannelsAndReportAllChannelsOvervoltageTripStatus", c_uint32, [c_int16, c_void_p, c_char], doc)
 
 doc = """ PICO_STATUS psospaReportAllChannelsOvervoltageTripStatus
     (
@@ -748,4 +748,4 @@ doc = """ PICO_STATUS psospaReportAllChannelsOvervoltageTripStatus
         PICO_CHANNEL_OVERVOLTAGE_TRIPPED*    allChannelsTriggedStatus,
         uint8_t    nChannelTrippedStatus
     ); """
-psospa.make_symbol("psospaReportAllChannelsOvervoltageTripStatus", c_uint32, [c_int16, c_void_p, c_char], doc)
+psospa.make_symbol("_ReportAllChannelsOvervoltageTripStatus","psospaReportAllChannelsOvervoltageTripStatus", c_uint32, [c_int16, c_void_p, c_char], doc)
