@@ -172,3 +172,30 @@ def assert_pico2000_ok(status):
     else:
         errorCheck = False
         raise PicoSDKCtypesError("Unsuccessful API call")
+        
+def mV2adcV2(millivolts, rangeMax, maxADC):
+    """
+        mV2adcV2(
+                float                   millivolts
+				int                     rangeMax
+                c_int32                 maxADC
+                )
+        Takes a voltage value and converts it into adc counts for psospa driver scopes
+    """
+    adcValue = round((millivolts * maxADC.value)/rangeMax)
+
+    return adcValue
+    
+def adc2mVV2(bufferADC, rangeMax, maxADC):
+    """ 
+        adc2mVV2(
+                c_short_Array           bufferADC
+                int                     rangeMax
+                c_int32                 maxADC
+                )
+               
+        Takes a buffer of raw adc count values and converts it into millivolts for psospa driver scopes
+    """
+    bufferV = [(x * rangeMax) / maxADC.value for x in bufferADC]
+    
+    return bufferV
