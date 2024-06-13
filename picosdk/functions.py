@@ -182,7 +182,7 @@ def mV2adcV2(millivolts, rangeMax, maxADC):
                 )
         Takes a voltage value and converts it into adc counts for psospa driver scopes
     """
-    adcValue = round((millivolts * maxADC.value)/rangeMax)
+    adcValue = round((millivolts * maxADC.value)/(rangeMax/1000000))
 
     return adcValue
     
@@ -196,6 +196,6 @@ def adc2mVV2(bufferADC, rangeMax, maxADC):
                
         Takes a buffer of raw adc count values and converts it into millivolts for psospa driver scopes
     """
-    bufferV = [(x * rangeMax) / maxADC.value for x in bufferADC]
+    buffermV = [(x * (rangeMax/1000000)) / maxADC.value for x in bufferADC]
     
-    return bufferV
+    return buffermV
