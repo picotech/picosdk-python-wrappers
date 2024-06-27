@@ -20,6 +20,8 @@ class Ps6000alib(Library):
 
 ps6000a = Ps6000alib()
 
+ps6000a.DEFAULT_RESOLUTION = enums.PICO_DEVICE_RESOLUTION("PICO_DR_8BIT")
+
 doc = """ void ps6000aExternalReferenceInteractions
     (
         int16_t    handle,
