@@ -793,7 +793,7 @@ doc = """ PICO_STATUS ps6000GetValuesBulkAsyc
         uint32_t           toSegmentIndex,
         int16_t           *overflow
     ); """
-ps6000.make_symbol("_GetValuesBulkAsync", "ps6000GetValuesBulkAsync", c_uint32,
+ps6000.make_symbol("_GetValuesBulkAsyc", "ps6000GetValuesBulkAsyc", c_uint32,
                    [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000GetNoOfCaptures
