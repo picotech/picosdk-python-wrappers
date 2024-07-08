@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2018-2022 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2023 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS5000A BLOCK MODE EXAMPLE
+# PS5000A BLOCK MODE WINDOW PULSE WIDTH ADVANCED TRIGGER EXAMPLE
 # This example opens a 5000a driver device, sets up two channels and a trigger then collects a block of data.
 # This data is then plotted as mV against time in ns.
 
@@ -10,6 +10,7 @@ import numpy as np
 from picosdk.ps5000a import ps5000a as ps
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
+import math
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -38,22 +39,22 @@ except: # PicoNotOkError:
 
 # Set up channel A
 # handle = chandle
-channelA = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
+channel = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"]
 # enabled = 1
 coupling_type = ps.PS5000A_COUPLING["PS5000A_DC"]
-chARange = ps.PS5000A_RANGE["PS5000A_2V"]
+chARange = ps.PS5000A_RANGE["PS5000A_20V"]
 # analogue offset = 0 V
-status["setChA"] = ps.ps5000aSetChannel(chandle, channelA, 1, coupling_type, chARange, 0)
+status["setChA"] = ps.ps5000aSetChannel(chandle, channel, 1, coupling_type, chARange, 0)
 assert_pico_ok(status["setChA"])
 
 # Set up channel B
 # handle = chandle
-channelB = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"]
+channel = ps.PS5000A_CHANNEL["PS5000A_CHANNEL_B"]
 # enabled = 1
 # coupling_type = ps.PS5000A_COUPLING["PS5000A_DC"]
 chBRange = ps.PS5000A_RANGE["PS5000A_2V"]
 # analogue offset = 0 V
-status["setChB"] = ps.ps5000aSetChannel(chandle, channelB, 1, coupling_type, chBRange, 0)
+status["setChB"] = ps.ps5000aSetChannel(chandle, channel, 1, coupling_type, chBRange, 0)
 assert_pico_ok(status["setChB"])
 
 # find maximum ADC count value
@@ -62,63 +63,6 @@ assert_pico_ok(status["setChB"])
 maxADC = ctypes.c_int16()
 status["maximumValue"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
 assert_pico_ok(status["maximumValue"])
-
-# Parameters
-chA=0 # channel A
-chB=1 # channel B
-maxADC = ctypes.c_int16(32767)
-NB=2 #NB=nConditions=nDirections=nChannelProperties
-rg=2000 # range of voltage in millivolt
-threshold=1000
-thresholdLower=0
-hyteresis=0
-window=False
-direction=2 # Rising
-
-#CONDITIONS
-conditions = (ps.PS5000A_CONDITION * NB)()
-clear=0x00000001
-add=0x00000002
-cond_info=clear|add
-a = ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"]
-conditions[0]= ps.PS5000A_CONDITION(channelA, ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
-conditions[1]= ps.PS5000A_CONDITION(channelB, ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
-status["maximumValue_"] = ps.ps5000aMaximumValue(chandle, ctypes.byref(maxADC))
-assert_pico_ok(status["maximumValue_"])
-status["setTriggerChannelConditions_"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle,
-                                                                            ctypes.byref(conditions),
-                                                                            NB,
-                                                                            cond_info)
-assert_pico_ok(status["setTriggerChannelConditions_"])
-
-# DIRECTIONS
-if window==True:
-    th_mode=ps.PS5000A_THRESHOLD_MODE["PS5000A_WINDOW"]
-else:
-    th_mode=ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"]
-triggerDirections=(ps.PS5000A_DIRECTION * NB)()
-triggerDirections[0] = ps.PS5000A_DIRECTION(chA, direction, th_mode)
-triggerDirections[1] = ps.PS5000A_DIRECTION(chB, direction, th_mode)
-status["setTriggerChannelDirections_"] = ps.ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), NB)
-assert_pico_ok(status["setTriggerChannelDirections_"])
-
-# PROPERTIES
-thUpper = mV2adc(threshold, chARange, maxADC)
-thLower = mV2adc(thresholdLower, chARange, maxADC)
-hysteresis=0
-triggerProperties = (ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2 * NB)()
-triggerProperties[0] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(thUpper,
-                                                                hysteresis,
-                                                                thLower,
-                                                                hysteresis,
-                                                                0)
-triggerProperties[1] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(thUpper,
-                                                                hysteresis,
-                                                                thLower,
-                                                                hysteresis,
-                                                                1)
-status["setTriggerChannelProperties_"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, ctypes.byref(triggerProperties), NB, 0)
-assert_pico_ok(status["setTriggerChannelProperties_"])
 
 # Set number of pre and post trigger samples to be collected
 preTriggerSamples = 2500
@@ -134,10 +78,64 @@ timebase = 8
 # pointer to timeIntervalNanoseconds = ctypes.byref(timeIntervalns)
 # pointer to maxSamples = ctypes.byref(returnedMaxSamples)
 # segment index = 0
+
 timeIntervalns = ctypes.c_float()
 returnedMaxSamples = ctypes.c_int32()
 status["getTimebase2"] = ps.ps5000aGetTimebase2(chandle, timebase, maxSamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["getTimebase2"])
+
+# Set up an advanced trigger
+adcTriggerLevel = mV2adc(500, chARange, maxADC)
+
+triggerProperties = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevel,
+															10,
+															0,
+															10,
+															ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"])
+															
+status["setTriggerChannelPropertiesV2"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, ctypes.byref(triggerProperties), 1, 0)
+assert_pico_ok(status["setTriggerChannelPropertiesV2"])
+
+triggerConditions = (ps.PS5000A_CONDITION * 2)()
+# triggerConditions[0] = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"],
+                                                           # ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+triggerConditions = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_PULSE_WIDTH_SOURCE"],
+                                                           ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+
+clear = 1
+add = 2
+														   
+status["setTriggerChannelConditionsV2"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditions), 1, (clear|add))
+assert_pico_ok(status["setTriggerChannelConditionsV2"])
+
+triggerDirections = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"], 
+                                                            ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_OUTSIDE"], 
+                                                            ps.PS5000A_THRESHOLD_MODE["PS5000A_WINDOW"])
+
+status["setTriggerChannelDirections"] = ps.ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), 1)
+assert_pico_ok(status["setTriggerChannelDirections"])
+
+# pulse width setup
+# pulse width conditions
+PWQConditions = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"], ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
+
+status["setPWQualifierConditions"] = ps.ps5000aSetPulseWidthQualifierConditions(chandle, ctypes.byref(PWQConditions), 1, add)
+assert_pico_ok(status["setPWQualifierConditions"])
+
+
+#set pulse width counter 
+timeWidthNs = 3000 
+counterSamples = math.ceil(timeWidthNs / timeIntervalns.value)
+
+# pulse width properties
+PWtype = 2 #ps.PS5000A_PULSE_WIDTH_TYPE["PS5000A_PW_TYPE_GREATER_THAN"]
+status["setPWQualifierProperties"] = ps.ps5000aSetPulseWidthQualifierProperties(chandle, counterSamples, counterSamples, PWtype)
+assert_pico_ok(status["setPWQualifierProperties"])
+
+#pulse width directions
+PWQDirections = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_PULSE_WIDTH_SOURCE"], ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_ENTER"], ps.PS5000A_THRESHOLD_MODE["PS5000A_WINDOW"])
+status["setPWQualifierDirections"] = ps.ps5000aSetPulseWidthQualifierDirections(chandle, ctypes.byref(PWQDirections), 1)
+assert_pico_ok(status["setPWQualifierDirections"])
 
 # Run block capture
 # handle = chandle
