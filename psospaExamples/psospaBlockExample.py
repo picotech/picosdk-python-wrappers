@@ -57,7 +57,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.psospaSetSimpleTrigger(chandle, 1, source, (mV2adcV2(100,rangeMax,maxADC), direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.psospaSetSimpleTrigger(chandle, 1, source, mV2adcV2(100,rangeMax,maxADC), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # Get fastest available timebase
