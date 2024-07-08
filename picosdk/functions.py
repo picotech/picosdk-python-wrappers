@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2018-2024 Pico Technology Ltd. See LICENSE file for terms.
 #
 from __future__ import division
 import numpy as np
