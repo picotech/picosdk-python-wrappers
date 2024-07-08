@@ -151,10 +151,22 @@ print("Number of samples collected during streaming")
 print(noOfStreamedSamples.value)
 
 
+# convert ADC counts data to mV
+bufferAmV = []
+for k in range (0, maxBuffers, 1):
+    mvValues =  adc2mV(bufferA[k], channelRange, maxADC)
+    bufferAmV.append(mvValues)
 
+time = np.linspace(0, ((nSamples -1)*maxBuffers) * sampleInterval.value * 1000000, (nSamples*maxBuffers))
+startTime = 0
+endTime = nSamples
 # plot ADC data
-plt.plot(bufferA[0])
-plt.plot(bufferB[0])
+for h in range (0, maxBuffers, 1):
+    plt.plot(time[startTime:endTime],bufferAmV[h])
+    startTime += nSamples
+    endTime += nSamples
+plt.xlabel('Time (us)')
+plt.ylabel('Voltage (mV)')
 plt.show()
 
 
