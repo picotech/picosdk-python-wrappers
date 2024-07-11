@@ -1,12 +1,12 @@
 #
-# Copyright (C) 2020 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2020-2024 Pico Technology Ltd. See LICENSE file for terms.
 #
 # PS6000 A STREAMING MODE EXAMPLE
 # This example opens a 6000a driver device, sets up one channel then collects a streamed set of data.
 # This data is then plotted as mV against time in ns.
 
 import ctypes
-# import numpy as np
+import numpy as np
 from picosdk.ps6000a import ps6000a as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
 from picosdk.PicoDeviceStructs import picoStruct as structs
