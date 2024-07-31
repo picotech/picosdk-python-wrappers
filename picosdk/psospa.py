@@ -81,17 +81,6 @@ doc = """ PICO_STATUS psospaGetVariantDetails
     ); """
 psospa.make_symbol("_GetVariantDetails", "psospaGetVariantDetails", c_uint32, [c_char_p, c_int16, c_char_p, c_void_p], doc)
 
-doc = """ PICO_STATUS psospaGetAccessoryInfo
-    (
-        int16_t    handle,
-        PICO_CHANNEL    channel,
-        int8_t*    string,
-        int16_t    stringLength,
-        int16_t*    requiredSize,
-        PICO_INFO    info
-    ); """
-psospa.make_symbol("_GetAccessoryInfo", "psospaGetAccessoryInfo", c_uint32, [c_int16, c_uint32, c_char_p, c_int16, c_void_p, c_uint32], doc)
-
 doc = """ PICO_STATUS psospaMemorySegments
     (
         int16_t    handle,
@@ -208,13 +197,6 @@ doc = """ PICO_STATUS psospaSigGenTrigger
     ); """
 psospa.make_symbol("_SigGenTrigger","psospaSigGenTrigger", c_uint32, [c_int16, c_uint32, c_uint32, c_uint64, c_uint64], doc)
 
-doc = """ PICO_STATUS psospaSigGenFilter
-    (
-        int16_t    handle,
-        PICO_SIGGEN_FILTER_STATE    filterState
-    ); """
-psospa.make_symbol("_SigGenFilter","psospaSigGenFilter", c_uint32, [c_int16, c_uint32], doc)
-
 doc = """ PICO_STATUS psospaSigGenFrequency
     (
         int16_t    handle,
@@ -248,14 +230,6 @@ doc = """ PICO_STATUS psospaSigGenPhaseSweep
         PICO_SWEEP_TYPE    sweepType
     ); """
 psospa.make_symbol("_SigGenPhaseSweep","psospaSigGenPhaseSweep", c_uint32, [c_int16, c_uint64, c_uint64, c_uint64, c_uint32], doc)
-
-doc = """ PICO_STATUS psospaSigGenClockManual
-    (
-        int16_t    handle,
-        double    dacClockFrequency,
-        uint64_t    prescaleRatio
-    ); """
-psospa.make_symbol("_SigGenClockManual","psospaSigGenClockManual", c_uint32, [c_int16, c_double, c_uint64], doc)
 
 doc = """ PICO_STATUS psospaSigGenSoftwareTriggerControl
     (
@@ -437,13 +411,13 @@ doc = """ PICO_STATUS psospaSetDataBuffer
         int16_t    handle,
         PICO_CHANNEL    channel,
         PICO_POINTER    buffer,
-        int32_t    nSamples,
+        int64_t    nSamples,
         PICO_DATA_TYPE    dataType,
         uint64_t    waveform,
         PICO_RATIO_MODE    downSampleRationMode,
         PICO_ACTION    action
     ); """
-psospa.make_symbol("_SetDataBuffer","psospaSetDataBuffer", c_uint32, [c_int16, c_uint32, c_void_p, c_uint32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
+psospa.make_symbol("_SetDataBuffer","psospaSetDataBuffer", c_uint32, [c_int16, c_uint32, c_void_p, c_uint64, c_uint32, c_uint64, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetDataBuffers
     (
@@ -451,13 +425,13 @@ doc = """ PICO_STATUS psospaSetDataBuffers
         PICO_CHANNEL    channel,
         PICO_POINTER    bufferMax,
         PICO_POINTER    bufferMin,
-        int32_t    nSamples,
+        int64_t    nSamples,
         PICO_DATA_TYPE    dataType,
         uint64_t    waveform,
         PICO_RATIO_MODE    downSampleRatioMode,
         PICO_ACTION    action
     ); """
-psospa.make_symbol("_SetDataBuffers","psospaSetDataBuffers", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_int32, c_uint32, c_uint64, c_uint32, c_uint32], doc)
+psospa.make_symbol("_SetDataBuffers","psospaSetDataBuffers", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_int64, c_uint32, c_uint64, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaRunBlock
     (
@@ -662,16 +636,6 @@ doc = """ PICO_STATUS psospaNearestSampleIntervalStateless
         double*    timeIntervalAvailable
     ); """
 psospa.make_symbol("_NearestSampleIntervalStateless","psospaNearestSampleIntervalStateless", c_uint32, [c_int16, c_uint32, c_double, c_char,c_uint32, c_void_p, c_void_p], doc)
-
-doc = """ PICO_STATUS psospaChannelCombinationsStateless
-    (
-        int16_t    handle,
-        PICO_CHANNEL_FLAGS*    channelFlagsCombinations,
-        uint32_t*    nChannelCombinations,
-        PICO_DEVICE_RESOLUTION    resolution,
-        uint32_t    timebase
-    ); """
-psospa.make_symbol("_ChannelCombinationsStateless","psospaChannelCombinationsStateless", c_uint32, [c_int16, c_void_p, c_void_p, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetDeviceResolution
     (
