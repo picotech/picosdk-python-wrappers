@@ -10,7 +10,7 @@ import numpy as np
 from picosdk.ps6000a import ps6000a as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, assert_pico_ok
+from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -53,7 +53,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC), direction, 0, 1000000))
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC)), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # Get fastest available timebase

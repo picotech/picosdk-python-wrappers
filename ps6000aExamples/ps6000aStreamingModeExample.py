@@ -11,7 +11,7 @@ from picosdk.ps6000a import ps6000a as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
 from picosdk.PicoDeviceStructs import picoStruct as structs
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, assert_pico_ok
+from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
 from picosdk.constants import PICO_STATUS
 import time
 

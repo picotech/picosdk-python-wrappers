@@ -316,10 +316,9 @@ doc = """ PICO_STATUS psospaSetTriggerChannelProperties
         int16_t    handle,
         PICO_TRIGGER_CHANNEL_PROPERTIES*    channelProperties,
         int16_t    nChannelProperties,
-        int16_t    auxOutputEnable,
         uint32_t    autoTriggerMicroSeconds
     ); """
-psospa.make_symbol("_SetTriggerChannelProperties","psospaSetTriggerChannelProperties", c_uint32, [c_int16, c_void_p, c_int16, c_int16, c_uint32], doc)
+psospa.make_symbol("_SetTriggerChannelProperties","psospaSetTriggerChannelProperties", c_uint32, [c_int16, c_void_p, c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaSetTriggerChannelConditions
    (
