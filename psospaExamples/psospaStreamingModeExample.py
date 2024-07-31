@@ -1,17 +1,17 @@
 #
-# Copyright (C) 2020-2024 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2024 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS6000 A STREAMING MODE EXAMPLE
-# This example opens a 6000a driver device, sets up one channel then collects a streamed set of data.
-# This data is then plotted as mV against time in ns.
+# PSOSPA STREAMING MODE EXAMPLE
+# This example opens a psospa driver device, sets up two channels then collects a streamed set of data.
+# The data from channel A is then plotted as mV against time in ns.
 
 import ctypes
 import numpy as np
-from picosdk.ps6000a import ps6000a as ps
+from picosdk.psospa import psospa as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
 from picosdk.PicoDeviceStructs import picoStruct as structs
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
+from picosdk.functions import adc2mVV2, assert_pico_ok, mV2adcV2
 from picosdk.constants import PICO_STATUS
 import time
 
@@ -19,29 +19,32 @@ import time
 chandle = ctypes.c_int16()
 status = {}
 
-# Open 6000 A series PicoScope
-# returns handle to chandle for use in future API functions
+# Open a psospa driver device
+# returns handle for future API functions
 resolution = enums.PICO_DEVICE_RESOLUTION["PICO_DR_8BIT"]
-status["openunit"] = ps.ps6000aOpenUnit(ctypes.byref(chandle), None, resolution)
-assert_pico_ok(status["openunit"])
+status["openUnit"] = ps.psospaOpenUnit(ctypes.byref(chandle), None, resolution, None)
+assert_pico_ok(status["openUnit"])
 
 # Set channel A on
 # handle = chandle
 channelA = enums.PICO_CHANNEL["PICO_CHANNEL_A"]
-coupling = enums.PICO_COUPLING["PICO_DC_50OHM"]
-channelRange = 5
-# analogueOffset = 0 V
+coupling = enums.PICO_COUPLING["PICO_DC"]
+rangeMax = 2000000000 #nV
+rangeMin = -rangeMax #nV
+rangeType = 0 #probes.PICO_PROBE_RANGE_INFO["PICO_PROBE_NONE_NV"]
+analogueOffset = 0
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
-status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
+status["setChannelA"] = ps.psospaSetChannelOn(chandle, channelA, coupling, rangeMin, rangeMax, rangeType, analogueOffset, bandwidth)
 assert_pico_ok(status["setChannelA"])
+
 channelB = enums.PICO_CHANNEL["PICO_CHANNEL_B"]
-status["setChannelB"] = ps.ps6000aSetChannelOn(chandle, channelB, coupling, channelRange, 0, bandwidth)
+status["setChannelB"] = ps.psospaSetChannelOn(chandle, channelB, coupling, rangeMin, rangeMax, rangeType, analogueOffset, bandwidth)
 assert_pico_ok(status["setChannelB"])
 
-# set channel C-H off
-for x in range(2, 7, 1):
+# set channel C-D off
+for x in range(2, 3, 1):
     channel = x
-    status["setChannel", x] = ps.ps6000aSetChannelOff(chandle, channel)
+    status["setChannel", x] = ps.psospaSetChannelOff(chandle, channel)
     assert_pico_ok(status["setChannel", x])
 
 # Set number of samples to be collected
@@ -53,7 +56,7 @@ nSamples = noOfPostTriggerSamples + noOfPreTriggerSamples
 # handle = chandle
 minADC = ctypes.c_int16()
 maxADC = ctypes.c_int16()
-status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
+status["getAdcLimits"] = ps.psospaGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
 assert_pico_ok(status["getAdcLimits"])
 
 # Set simple trigger on channel A, 1 V rising with 1 s autotrigger
@@ -64,7 +67,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC)), direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.psospaSetSimpleTrigger(chandle, 1, source, (mV2adcV2(100,rangeMax,maxADC)), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # create buffers
@@ -86,10 +89,10 @@ clear = enums.PICO_ACTION["PICO_CLEAR_ALL"]
 add = enums.PICO_ACTION["PICO_ADD"]
 action = clear | add  # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]
 actionAdd = add
-status["setDataBuffersA"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[0]), nSamples, dataType,
+status["setDataBuffersA"] = ps.psospaSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[0]), nSamples, dataType,
                                                    waveform, downSampleMode, action)
 assert_pico_ok(status["setDataBuffersA"])
-status["setDataBuffersB"] = ps.ps6000aSetDataBuffer(chandle, channelB, ctypes.byref(bufferB[0]), nSamples, dataType,
+status["setDataBuffersB"] = ps.psospaSetDataBuffer(chandle, channelB, ctypes.byref(bufferB[0]), nSamples, dataType,
                                                    waveform, downSampleMode, actionAdd)
 assert_pico_ok(status["setDataBuffersB"])
 
@@ -99,7 +102,7 @@ sampleIntervalTimeUnits = enums.PICO_TIME_UNITS["PICO_US"]
 autoStop = 0
 downSampleRatio = 1
 
-status["runStreaming"] = ps.ps6000aRunStreaming(chandle, ctypes.byref(sampleInterval), sampleIntervalTimeUnits,
+status["runStreaming"] = ps.psospaRunStreaming(chandle, ctypes.byref(sampleInterval), sampleIntervalTimeUnits,
                                                 noOfPreTriggerSamples, noOfPostTriggerSamples, autoStop,
                                                 downSampleRatio, downSampleMode)
 assert_pico_ok(status["runStreaming"])
@@ -118,7 +121,7 @@ collectedSamples = 0
 
 while collectedSamples < (maxBuffers*nSamples):
 
-    status["getStreamingLatestValues"] = ps.ps6000aGetStreamingLatestValues(chandle, ctypes.byref(streamData), 1,
+    status["getStreamingLatestValues"] = ps.psospaGetStreamingLatestValues(chandle, ctypes.byref(streamData), 1,
                                                                             ctypes.byref(streamTrigger))
 
     if status["getStreamingLatestValues"] == picoOk:
@@ -127,10 +130,10 @@ while collectedSamples < (maxBuffers*nSamples):
     else:
         count = count + 1
         if count < maxBuffers:
-            status["setDataBufferA"] = ps.ps6000aSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count]),
+            status["setDataBufferA"] = ps.psospaSetDataBuffer(chandle, channelA, ctypes.byref(bufferA[count]),
                                                               nSamples, dataType, waveform, downSampleMode, actionAdd)
             assert_pico_ok(status["setDataBufferA"])
-            status["setDataBufferB"] = ps.ps6000aSetDataBuffer(chandle, channelB, ctypes.byref(bufferB[count]),
+            status["setDataBufferB"] = ps.psospaSetDataBuffer(chandle, channelB, ctypes.byref(bufferB[count]),
                                                               nSamples, dataType, waveform, downSampleMode, actionAdd)
             assert_pico_ok(status["setDataBufferB"])
             print(count)
@@ -138,12 +141,12 @@ while collectedSamples < (maxBuffers*nSamples):
     collectedSamples = collectedSamples + streamData[0].noOfSamples
 
 # stop scope streaming
-status["stop"] = ps.ps6000aStop(chandle)
+status["stop"] = ps.psospaStop(chandle)
 assert_pico_ok(status["stop"])
 
 # get total number of streamed data points
 noOfStreamedSamples=ctypes.c_uint64()
-status["noOfStreamedSamples"] = ps.ps6000aNoOfStreamingValues(chandle, ctypes.byref(noOfStreamedSamples))
+status["noOfStreamedSamples"] = ps.psospaNoOfStreamingValues(chandle, ctypes.byref(noOfStreamedSamples))
 assert_pico_ok(status["noOfStreamedSamples"])
 
 print("streaming finished")
@@ -154,13 +157,13 @@ print(noOfStreamedSamples.value)
 # convert ADC counts data to mV
 bufferAmV = []
 for k in range (0, maxBuffers, 1):
-    mvValues =  adc2mV(bufferA[k], channelRange, maxADC)
+    mvValues =  adc2mVV2(bufferA[k], rangeMax, maxADC)
     bufferAmV.append(mvValues)
 
 time = np.linspace(0, ((nSamples -1)*maxBuffers) * sampleInterval.value * 1000000, (nSamples*maxBuffers))
 startTime = 0
 endTime = nSamples
-# plot ADC data
+# plot data
 for h in range (0, maxBuffers, 1):
     plt.plot(time[startTime:endTime],bufferAmV[h])
     startTime += nSamples
@@ -171,7 +174,7 @@ plt.show()
 
 
 # Close the scope
-status["closeunit"] = ps.ps6000aCloseUnit(chandle)
+status["closeunit"] = ps.psospaCloseUnit(chandle)
 assert_pico_ok(status["closeunit"])
 
 print(status)

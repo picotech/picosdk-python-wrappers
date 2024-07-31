@@ -6,6 +6,7 @@
 **/*.obj
 **/*.lib
 **/*.exp
+**/*.bak
 
 # All platforms
 

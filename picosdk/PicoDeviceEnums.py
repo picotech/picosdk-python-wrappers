@@ -217,7 +217,8 @@ picoEnum.PICO_THRESHOLD_MODE = make_enum([
     
 picoEnum.PICO_ETS_MODE = make_enum([
     "PICO_ETS_OFF",
-    "PICO_WINDOW",
+    "PICO_ETS_FAST",
+    "PICO_ETS_SLOW"
     ])
     
 picoEnum.PICO_INDEX_MODE = make_enum([
@@ -250,6 +251,7 @@ def _define_resolution():
     PICO_DR_15BIT = 3
     PICO_DR_16BIT = 4
     PICO_DR_10BIT = 10
+    PICO_DR_10BIT_TURBO = 0x1A
     
     return {k.upper(): v for k, v in locals().items() if k.startswith("PICO")}
     
@@ -312,7 +314,7 @@ picoEnum.PICO_TEMPERATURE_REFERENCE = make_enum([
     ])
     
 def _define_digital_port():
-    Pico_DIGITAL_PORT_NONE = 0
+    PICO_DIGITAL_PORT_NONE = 0
     PICO_DIGITAL_PORT_MSO_POD = 1000
     PICO_DIGITAL_PORT_UNKNOWN_DEVICE = -2
     
@@ -327,3 +329,12 @@ picoEnum.PICO_EXTERNAL_FREQUENCY = make_enum([
     "PICO_FREQUENCY_20MHZ",
     "PICO_FREQUENCY_25MHZ"
     ])
+    
+def _define_power_delivery_device_type():
+    PICO_USB_POWER_DELIEVRY_DEVICE_TYPE_NOTHING = 0
+    PICO_USB_POWER_DELIEVRY_DEVICE_TYPE_SOURCE = 2
+    PICO_USB_POWER_DELIEVRY_DEVICE_TYPE_DEBUG = 3
+    
+    return {k.upper(): v for k, v in locals().items() if k.startswith("PICO")}
+    
+picoEnum.PICO_USB_POWER_DELIEVRY_DEVICE_TYPE = _define_power_delivery_device_type

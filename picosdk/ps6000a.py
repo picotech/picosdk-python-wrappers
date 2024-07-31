@@ -20,6 +20,8 @@ class Ps6000alib(Library):
 
 ps6000a = Ps6000alib()
 
+ps6000a.DEFAULT_RESOLUTION = enums.PICO_DEVICE_RESOLUTION["PICO_DR_8BIT"]
+
 doc = """ void ps6000aExternalReferenceInteractions
     (
         int16_t    handle,
@@ -144,7 +146,7 @@ doc = """ PICO_STATUS ps6000aGetUnitInfo
         int16_t    *requiredSize,
         PICO_INFO    info
     ); """
-ps6000a.make_symbol("_GetUnitInfo", "ps6000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_int32], doc)
+ps6000a.make_symbol("_GetUnitInfo", "ps6000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000aCloseUnit
     (
