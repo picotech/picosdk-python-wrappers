@@ -354,7 +354,7 @@ doc = """ PICO_STATUS ps6000aSigGenLimits
         double    *maximumPermissibleValue,
         double    *step
     ); """
-ps6000a.make_symbol("_SigGenLimits", "ps6000aSigGenLimits", c_uint32, [c_int16, c_uint32, c_double, c_double, c_double], doc)
+ps6000a.make_symbol("_SigGenLimits", "ps6000aSigGenLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000aSigGenFrequencyLimits
     (
