@@ -244,14 +244,12 @@ doc = """ PICO_STATUS psospaSigGenApply
         int16_t    sigGenEnabled,
         int16_t    sweepEnabled,
         int16_t    triggerEnabled,
-        int16_t    automaticClockOptimisationEnabled,
-        int16_t    overrideAutomaticClockAndPrescale,
         double*    frequency
         double*    stopFrequency,
         double*    frequencyIncrement,
         double*    dwellTime,
     ); """
-psospa.make_symbol("_SigGenApply","psospaSigGenApply", c_uint32, [c_int16, c_int16, c_int16, c_int16, c_int16, c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
+psospa.make_symbol("_SigGenApply","psospaSigGenApply", c_uint32, [c_int16, c_int16, c_int16, c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaSigGenLimits
     (
@@ -261,7 +259,7 @@ doc = """ PICO_STATUS psospaSigGenLimits
         double*    maximumPermissibleValue,
         double*    step
     ); """
-psospa.make_symbol("_SigGenLimits","psospaSigGenLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p], doc)
+psospa.make_symbol("_SigGenLimits","psospaSigGenLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaSigGenFrequencyLimits
     (
