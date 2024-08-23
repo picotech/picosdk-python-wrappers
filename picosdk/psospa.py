@@ -266,17 +266,14 @@ doc = """ PICO_STATUS psospaSigGenFrequencyLimits
         int16_t    handle,
         PICO_WAVE_TYPE    waveType,
         uint64_t*    numSamples,
-        double*    startFrequency,
-        int16_t    sweepEnabled,
-        double*    manualDacClockFrequency,
-        uint64_t*    manualPrescaleRatio,
-        double*    maxStopFrequencyOut,
+        double*    minFrequencyOut,
+        double*    maxFrequencyOut,
         double*    minFrequencyStepOut,
         double*    maxFrequencyStepOut,
-        double*    minDwellTimeOut,
+        double*    mindDwellTimeOut,
         double*    maxDwellTimeOut
     ); """
-psospa.make_symbol("_SigGenFrequencyLimits","psospaSigGenFrequencyLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_int16, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p], doc)
+psospa.make_symbol("_SigGenFrequencyLimits","psospaSigGenFrequencyLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS psospaSigGenPause
     (
