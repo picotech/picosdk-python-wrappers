@@ -187,6 +187,36 @@ def process_enum(enum):
 
 ps4000a.PICO_VOLTAGE_RANGE = process_enum(ps4000a.PICO_CONNECT_PROBE_RANGE)
 
+class PS4000A_USER_PROBE_INTERACTIONS(Structure):
+    _pack_ = 1
+    _fields_ = [    ("connected", c_uint16),
+                
+                    ("channel", c_int32),
+                    ("enabled", c_uint16),
+
+                    ("probeName", c_uint32),
+
+                    ("requiresPower_", c_uint8),
+                    ("isPowered_", c_uint8),  
+
+                    ("status", c_uint32),
+
+                    ("probeOff", c_uint32),
+
+                    ("rangeFirst_", c_uint32),
+                    ("rangeLast_", c_uint32),
+                    ("rangeCurrent_", c_uint32),
+
+                    ("couplingFirst_", c_uint32),
+                    ("couplingLast_", c_uint32),
+                    ("couplingCurrent_", c_uint32),
+                    ("couplingLast_", c_uint32),
+
+                    ("filterFlags_", c_uint32),
+                    ("filterCurrent_", c_uint32),
+                    ("defaultFilter_", c_uint32)]
+ps4000a.PS4000A_USER_PROBE_INTERACTIONS = PS4000A_USER_PROBE_INTERACTIONS
+
 ps4000a.PS4000A_RATIO_MODE = {
     'PS4000A_RATIO_MODE_NONE': 0,
     'PS4000A_RATIO_MODE_AGGREGATE': 1,
@@ -1058,3 +1088,29 @@ doc = """ PICO_STATUS ps4000aSetDeviceResolution
 		PS4000A_DEVICE_RESOLUTION    resolution
 	); """
 ps4000a.make_symbol("_SetResolution", "ps4000aSetDeviceResolution", c_uint32, [c_int16, c_int32], doc)
+
+doc = """ PICO_STATUS ps4000aSetProbeInteractionCallback
+    (
+	    int16_t    handle,
+		ps4000aProbeInteractions callback
+	); """
+ps4000a.make_symbol("_SetProbeInteractionCallback", "ps4000aSetProbeInteractionCallback", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ void *ps4000aProbeInteractions
+    (
+		int16_t    												handle,
+		PICO_STATUS												status,
+		PS4000A_USER_PROBE_INTERACTIONS * probes,
+		uint32_t													nProbes
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps4000a.ps4000aProbeInteractions = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_int16,
+                                                        c_uint32,
+                                                        c_void_p,
+                                                        c_uint32
+                                                        )
+
+ps4000a.ps4000aProbeInteractions.__doc__ = doc
