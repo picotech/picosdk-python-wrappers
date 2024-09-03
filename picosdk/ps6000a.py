@@ -602,6 +602,15 @@ doc = """ PICO_STATUS ps6000aGetValuesBulk
     ); """
 ps6000a.make_symbol("_GetValuesBulk", "ps6000aGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint64, c_uint32, c_void_p], doc)
 
+doc = """ PICO_STATUS ps6000aGetTriggerInfo
+    (
+        int16_t    handle,
+        PICO_TRIGGER_INFO    *startIndex,
+        uint64_t    firstSegmentIndex,
+        uint64_t    segmentCount,
+    ); """
+ps6000a.make_symbol("_GetTriggerInfo", "ps6000aGetTriggerInfo", c_uint32, [c_int16, c_void_p, c_uint64, c_uint64], doc)
+
 doc = """ PICO_STATUS ps6000aGetValuesAsync
     (
         int16_t    handle,
