@@ -9,8 +9,9 @@ import ctypes
 import numpy as np
 from picosdk.ps6000a import ps6000a as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
+from picosdk.PicoDeviceStructs import picoStruct as struct
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, assert_pico_ok
+from picosdk.functions import mV2adc, adc2mV, assert_pico_ok
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -25,7 +26,7 @@ assert_pico_ok(status["openunit"])
 # Set channel A on
 # handle = chandle
 channelA = enums.PICO_CHANNEL["PICO_CHANNEL_A"]
-coupling = enums.PICO_COUPLING["PICO_DC_OHM"]
+coupling = enums.PICO_COUPLING["PICO_DC_50OHM"]
 channelRange = 5
 # analogueOffset = 0 V
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
@@ -53,7 +54,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC), direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, mV2adc(100,channelRange,maxADC), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # Get fastest available timebase
@@ -173,7 +174,25 @@ overflow = (ctypes.c_int16 * 10)()
 status["getValues"] = ps.ps6000aGetValuesBulk(chandle, 0, ctypes.byref(noOfSamples),0, 9, 1, downSampleMode, ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
+# Handle = chandle
+# triggerInfo = (struct.PICO_TRIGGER_INFO * 10)()
+# Fromsegmentindex = 0
+# Tosegementindex = 9
+triggerInfo = (struct.PICO_TRIGGER_INFO * 10)()
 
+status["GetTriggerInfo"] = ps.ps6000aGetTriggerInfo(chandle, ctypes.byref(triggerInfo), 0, 10)
+assert_pico_ok(status["GetTriggerInfo"])
+print("TimestampCounter values in samples (only relative timestamps one segment to the next)")
+# print("Timestamp samples for 2nd segment (index 1, from segment 0 to 1) = ", triggerInfo(1).timeStampCounter)
+print("Printing triggerInfo for segments-")
+for i in triggerInfo:
+    print("segmentIndex is ", i.segmentIndex)
+    print("PICO_STATUS is ", i.status)
+    # print("triggerIndex is ", i.triggerIndex)
+    # print("triggerTime is ", i.triggerTime)
+    # print("timeUnits is ", i.timeUnits)
+    print("timeStampCounter is ", i.timeStampCounter)
+    print("-------------------------------")
 
 # convert ADC counts data to mV
 adc2mVChAMax =  adc2mV(bufferAMax, channelRange, maxADC)
