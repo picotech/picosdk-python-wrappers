@@ -20,6 +20,8 @@ class Ps6000alib(Library):
 
 ps6000a = Ps6000alib()
 
+ps6000a.DEFAULT_RESOLUTION = enums.PICO_DEVICE_RESOLUTION["PICO_DR_8BIT"]
+
 doc = """ void ps6000aExternalReferenceInteractions
     (
         int16_t    handle,
@@ -144,7 +146,7 @@ doc = """ PICO_STATUS ps6000aGetUnitInfo
         int16_t    *requiredSize,
         PICO_INFO    info
     ); """
-ps6000a.make_symbol("_GetUnitInfo", "ps6000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_int32], doc)
+ps6000a.make_symbol("_GetUnitInfo", "ps6000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps6000aCloseUnit
     (
@@ -352,7 +354,7 @@ doc = """ PICO_STATUS ps6000aSigGenLimits
         double    *maximumPermissibleValue,
         double    *step
     ); """
-ps6000a.make_symbol("_SigGenLimits", "ps6000aSigGenLimits", c_uint32, [c_int16, c_uint32, c_double, c_double, c_double], doc)
+ps6000a.make_symbol("_SigGenLimits", "ps6000aSigGenLimits", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps6000aSigGenFrequencyLimits
     (
@@ -599,6 +601,15 @@ doc = """ PICO_STATUS ps6000aGetValuesBulk
         int16_t    *overflow
     ); """
 ps6000a.make_symbol("_GetValuesBulk", "ps6000aGetValuesBulk", c_uint32, [c_int16, c_uint64, c_void_p, c_uint64, c_uint64, c_uint64, c_uint32, c_void_p], doc)
+
+doc = """ PICO_STATUS ps6000aGetTriggerInfo
+    (
+        int16_t    handle,
+        PICO_TRIGGER_INFO    *startIndex,
+        uint64_t    firstSegmentIndex,
+        uint64_t    segmentCount,
+    ); """
+ps6000a.make_symbol("_GetTriggerInfo", "ps6000aGetTriggerInfo", c_uint32, [c_int16, c_void_p, c_uint64, c_uint64], doc)
 
 doc = """ PICO_STATUS ps6000aGetValuesAsync
     (

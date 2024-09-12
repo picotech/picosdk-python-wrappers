@@ -117,6 +117,17 @@ class PICO_SCALING_FACTORS(Structure):
                 
 picoStruct.PICO_SCALING_FACTORS = PICO_SCALING_FACTORS
 
+class PICO_SCALING_FACTORS_FOR_RANGE_TYPES(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_uint32),
+                ("rangeMin", c_int64),
+                ("rangeMax", c_int64),
+                ("rangeType", c_uint32),
+                ("offset", c_int16),
+                ("scalingFactor", c_double)]
+                
+picoStruct.PICO_SCALING_FACTORS_FOR_RANGE_TYPES = PICO_SCALING_FACTORS_FOR_RANGE_TYPES
+
 class PROBE_APP(Structure):
     _pack_ = 1
     _fields_ = [("id", c_int32),
@@ -142,3 +153,31 @@ class PICO_DIGITAL_PORT_INTERACTIONS(Structure):
                 ("calibrationDate", c_int8)]
                 
 picoStruct.PICO_DIGITAL_PORT_INTERACTIONS = PICO_DIGITAL_PORT_INTERACTIONS
+
+class PICO_CHANNEL_OVERVOLTAGE_TRIPPED(Structure):
+    _pack_ = 1
+    _fields_ = [("channel", c_uint32),
+                ("tripped", c_uint8)]
+                
+picoStruct.PICO_CHANNEL_OVERVOLTAGE_TRIPPED = PICO_CHANNEL_OVERVOLTAGE_TRIPPED
+
+class PICO_USB_POWER_DELIVERY(Structure):
+    _pack_ = 1
+    _fields_ = [("valid", c_uint8),
+                ("busVoltagemV", c_uint32),
+                ("rpCurrentLimitmA", c_uint32),
+                ("partnerConnected", c_uint8),
+                ("ccPolarity", c_uint8),
+                ("attachedDevice", c_uint32),
+                ("contractExists", c_uint8),
+                ("currentPdo", c_uint32),
+                ("currentRdo", c_uint32)]
+                
+picoStruct.PICO_USB_POWER_DELIVERY = PICO_USB_POWER_DELIVERY
+
+class PICO_USB_POWER_DETAILS(Structure):
+    _pack_ = 1
+    _fields_ = [("dataPort", c_uint32),
+                ("powerPort", c_uint32)]
+                
+picoStruct.PICO_USB_POWER_DETAILS = PICO_USB_POWER_DETAILS

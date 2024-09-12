@@ -1,48 +1,52 @@
 #
-# Copyright (C) 2020-2024 Pico Technology Ltd. See LICENSE file for terms.
+# Copyright (C) 2024 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS6000 A BLOCK MODE EXAMPLE
-# This example opens a 6000a driver device, sets up two channels and a trigger then collects a block of data.
+# PSOSPA BLOCK MODE EXAMPLE
+# This example opens a psospa driver device, sets up two channels and a trigger then collects a block of data.
 # This data is then plotted as mV against time in ns.
 
 import ctypes
 import numpy as np
-from picosdk.ps6000a import ps6000a as ps
+from picosdk.psospa import psospa as ps
 from picosdk.PicoDeviceEnums import picoEnum as enums
+from picosdk.PicoDeviceStructs import picoStruct as structs
+# from picosdk.PicoConnectProbes import picoConnectProbes as probes
 import matplotlib.pyplot as plt
-from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
+from picosdk.functions import adc2mVV2, mV2adcV2, assert_pico_ok
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
 status = {}
 
-# Open 6000 A series PicoScope
-# returns handle to chandle for use in future API functions
+# Open a psospa driver device
+# returns handle for future API functions
 resolution = enums.PICO_DEVICE_RESOLUTION["PICO_DR_8BIT"]
-status["openunit"] = ps.ps6000aOpenUnit(ctypes.byref(chandle), None, resolution)
-assert_pico_ok(status["openunit"])
+status["openUnit"] = ps.psospaOpenUnit(ctypes.byref(chandle), None, resolution, None)
+assert_pico_ok(status["openUnit"])
 
 # Set channel A on
 # handle = chandle
 channelA = enums.PICO_CHANNEL["PICO_CHANNEL_A"]
-coupling = enums.PICO_COUPLING["PICO_DC_50OHM"]
-channelRange = 5
-# analogueOffset = 0 V
+coupling = enums.PICO_COUPLING["PICO_DC"]
+rangeMax = 2000000000 #nV
+rangeMin = -rangeMax #nV
+rangeType = 0 #probes.PICO_PROBE_RANGE_INFO["PICO_PROBE_NONE_NV"]
+analogueOffset = 0
 bandwidth = enums.PICO_BANDWIDTH_LIMITER["PICO_BW_FULL"]
-status["setChannelA"] = ps.ps6000aSetChannelOn(chandle, channelA, coupling, channelRange, 0, bandwidth)
+status["setChannelA"] = ps.psospaSetChannelOn(chandle, channelA, coupling, rangeMin, rangeMax, rangeType, analogueOffset, bandwidth)
 assert_pico_ok(status["setChannelA"])
 
 # set channel B-H off
-for x in range (1, 7, 1):
+for x in range (1, 3, 1):
     channel = x
-    status["setChannel",x] = ps.ps6000aSetChannelOff(chandle,channel)
+    status["setChannel",x] = ps.psospaSetChannelOff(chandle,channel)
     assert_pico_ok(status["setChannel",x])
     
 # get max ADC value
 # handle = chandle
 minADC = ctypes.c_int16()
 maxADC = ctypes.c_int16()
-status["getAdcLimits"] = ps.ps6000aGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
+status["getAdcLimits"] = ps.psospaGetAdcLimits(chandle, resolution, ctypes.byref(minADC), ctypes.byref(maxADC))
 assert_pico_ok(status["getAdcLimits"])
 
 # Set simple trigger on channel A, 1 V rising with 1 s autotrigger
@@ -53,7 +57,7 @@ source = channelA
 direction = enums.PICO_THRESHOLD_DIRECTION["PICO_RISING"]
 # delay = 0 s
 # autoTriggerMicroSeconds = 1000000 us
-status["setSimpleTrigger"] = ps.ps6000aSetSimpleTrigger(chandle, 1, source, (mV2adc(100,channelRange,maxADC)), direction, 0, 1000000)
+status["setSimpleTrigger"] = ps.psospaSetSimpleTrigger(chandle, 1, source, mV2adcV2(100,rangeMax,maxADC), direction, 0, 1000000)
 assert_pico_ok(status["setSimpleTrigger"])
 
 # Get fastest available timebase
@@ -62,7 +66,7 @@ enabledChannelFlags = enums.PICO_CHANNEL_FLAGS["PICO_CHANNEL_A_FLAGS"]
 timebase = ctypes.c_uint32(0)
 timeInterval = ctypes.c_double(0)
 # resolution = resolution
-status["getMinimumTimebaseStateless"] = ps.ps6000aGetMinimumTimebaseStateless(chandle, enabledChannelFlags, ctypes.byref(timebase), ctypes.byref(timeInterval), resolution)
+status["getMinimumTimebaseStateless"] = ps.psospaGetMinimumTimebaseStateless(chandle, enabledChannelFlags, ctypes.byref(timebase), ctypes.byref(timeInterval), resolution)
 print("timebase = ", timebase.value)
 print("sample interval =", timeInterval.value, "s")
 
@@ -87,7 +91,7 @@ downSampleMode = enums.PICO_RATIO_MODE["PICO_RATIO_MODE_RAW"]
 clear = enums.PICO_ACTION["PICO_CLEAR_ALL"]
 add = enums.PICO_ACTION["PICO_ADD"]
 action = clear|add # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION["PICO_ADD"]  
-status["setDataBuffers"] = ps.ps6000aSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, downSampleMode, action)
+status["setDataBuffers"] = ps.psospaSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, downSampleMode, action)
 assert_pico_ok(status["setDataBuffers"])
 
 # Run block capture
@@ -97,14 +101,14 @@ timeIndisposedMs = ctypes.c_double(0)
 # segmentIndex = 0
 # lpReady = None   Using IsReady rather than a callback
 # pParameter = None
-status["runBlock"] = ps.ps6000aRunBlock(chandle, noOfPreTriggerSamples, noOfPostTriggerSamples, timebase, ctypes.byref(timeIndisposedMs), 0, None, None)
+status["runBlock"] = ps.psospaRunBlock(chandle, noOfPreTriggerSamples, noOfPostTriggerSamples, timebase, ctypes.byref(timeIndisposedMs), 0, None, None)
 assert_pico_ok(status["runBlock"])
 
-# Check for data collection to finish using ps6000aIsReady
+# Check for data collection to finish using psospaIsReady
 ready = ctypes.c_int16(0)
 check = ctypes.c_int16(0)
 while ready.value == check.value:
-    status["isReady"] = ps.ps6000aIsReady(chandle, ctypes.byref(ready))
+    status["isReady"] = ps.psospaIsReady(chandle, ctypes.byref(ready))
     
 # Get data from scope
 # handle = chandle
@@ -113,25 +117,25 @@ noOfSamples = ctypes.c_uint64(nSamples)
 # downSampleRatio = 1
 # segmentIndex = 0
 overflow = ctypes.c_int16(0)
-status["getValues"] = ps.ps6000aGetValues(chandle, 0, ctypes.byref(noOfSamples), 1, downSampleMode, 0, ctypes.byref(overflow))
+status["getValues"] = ps.psospaGetValues(chandle, 0, ctypes.byref(noOfSamples), 1, downSampleMode, 0, ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
 
 
-# convert ADC counts data to mV
-adc2mVChAMax =  adc2mV(bufferAMax, channelRange, maxADC)
+# # convert ADC counts data to mV
+adc2mVChAMax =  adc2mVV2(bufferAMax, rangeMax, maxADC)
 
 # Create time data
 time = np.linspace(0, (nSamples -1) * timeInterval.value * 1000000000, nSamples)
 
 # plot data from channel A and B
-plt.plot(time, adc2mVChAMax[:])
+plt.plot(time, bufferAMax[:])
 plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
 
-# Close the scope
-status["closeunit"] = ps.ps6000aCloseUnit(chandle)
-assert_pico_ok(status["closeunit"])
+# Close the psospa driver device
+status["closeUnit"] = ps.psospaCloseUnit(chandle)
+assert_pico_ok(status["closeUnit"])
 
 print(status)
