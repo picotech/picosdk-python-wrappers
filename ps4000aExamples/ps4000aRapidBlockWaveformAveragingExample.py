@@ -15,11 +15,10 @@ from picosdk.functions import adc2mV, assert_pico_ok, mV2adc
 from picosdk.functionsExhibitions import *
 from math import ceil
 
-
+# Scope settings
 noOfChannels = 1
-bits = 8
 samplingRate = 1 #Mhz 
-sampleLength = 100000 #Samples
+sampleLength = 10000 #Samples
 numberOfSegments = 10
 
 timebase = ps4000aTimebase(samplingRate)
@@ -195,6 +194,7 @@ for x in range (0, numberOfSegments,1):
 # Average waveforms
 averageWaveform=np.zeros((noOfChannels,nSamples))
 
+# loop through each channel, each memory segment and each sample to sum together, then divides by the number of memory segment to get the mean waveform for each channel
 for y in range (0, noOfChannels, 1):
     for x in range (0, numberOfSegments,1):
         for z in range (0, nSamples,1):
