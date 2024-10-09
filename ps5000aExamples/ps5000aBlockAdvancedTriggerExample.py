@@ -96,6 +96,7 @@ triggerProperties[3] = ps.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2(adcTriggerLevelD
                                                            
 															
 status["setTriggerChannelPropertiesV2"] = ps.ps5000aSetTriggerChannelPropertiesV2(chandle, ctypes.byref(triggerProperties), 4, 0)
+assert_pico_ok(status["setTriggerChannelPropertiesV2"])
 
 triggerConditionsA = ps.PS5000A_CONDITION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"],
                                                            ps.PS5000A_TRIGGER_STATE["PS5000A_CONDITION_TRUE"])
@@ -109,9 +110,14 @@ clear = 1
 add = 2
 														   
 status["setTriggerChannelConditionsV2_A"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsA), 1, (clear + add))
+assert_pico_ok(status["setTriggerChannelConditionsV2_A"])
 status["setTriggerChannelConditionsV2_B"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsB), 1, (add))
+assert_pico_ok(status["setTriggerChannelConditionsV2_B"])
 status["setTriggerChannelConditionsV2_C"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsC), 1, (add))
+assert_pico_ok(status["setTriggerChannelConditionsV2_C"])
 status["setTriggerChannelConditionsV2_D"] = ps.ps5000aSetTriggerChannelConditionsV2(chandle, ctypes.byref(triggerConditionsD), 1, (add))
+assert_pico_ok(status["setTriggerChannelConditionsV2_D"])
+
 
 triggerDirections = (ps.PS5000A_DIRECTION * 4)()
 triggerDirections[0] = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_A"], 
@@ -127,6 +133,8 @@ triggerDirections[3] = ps.PS5000A_DIRECTION(ps.PS5000A_CHANNEL["PS5000A_CHANNEL_
                                                             ps.PS5000A_THRESHOLD_DIRECTION["PS5000A_RISING"], 
                                                             ps.PS5000A_THRESHOLD_MODE["PS5000A_LEVEL"])
 status["setTriggerChannelDirections"] = ps.ps5000aSetTriggerChannelDirectionsV2(chandle, ctypes.byref(triggerDirections), 4)
+assert_pico_ok(status["setTriggerChannelDirections"])
+
 
 
 # Set number of pre and post trigger samples to be collected

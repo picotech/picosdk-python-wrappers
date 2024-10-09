@@ -10,6 +10,7 @@ from ctypes import *
 from picosdk.library import Library
 from picosdk.errors import ArgumentOutOfRangeError
 from picosdk.constants import make_enum
+from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 
 
 class Ps2000lib(Library):
@@ -73,6 +74,16 @@ ps2000.PICO_VOLTAGE_RANGE = {
 }
 
 ps2000.MAX_MEMORY = 32e3
+
+ps2000.PS2000_TIME_UNITS = make_enum([
+    'PS2000_FS',
+    'PS2000_PS',
+    'PS2000_NS',
+    'PS2000_US',
+    'PS2000_MS',
+    'PS2000_S',
+    'PS2000_MAX_TIME_UNITS',
+])
 
 doc = """ int16_t ps2000_open_unit
     (
@@ -412,3 +423,26 @@ ps2000.make_symbol("_PingUnit", "ps2000PingUnit", c_int16, [c_int16, ], doc)
 ps2000.PICO_INFO = {k: v for k, v in ps2000.PICO_INFO.items() if v <= 0x00000005}
 ps2000.PICO_INFO["PICO_ERROR_CODE"] = 0x00000006
 ps2000.PICO_INFO["PICO_KERNEL_DRIVER_VERSION"] = 0x00000007
+
+
+doc = """ void *my_get_overview_buffers
+    (
+        int16_t    **overviewBuffers
+        int16_t   overflow,
+        uint32_t  triggerAt,
+        int16_t   triggered,
+        int16_t   autoStop,
+        uint32_t    nValues
+    );
+    define a python function which accepts the correct arguments, and pass it to the constructor of this type.
+    """
+
+ps2000.GetOverviewBuffersType = C_CALLBACK_FUNCTION_FACTORY(None,
+                                                         c_void_p,
+                                                         c_int16,
+                                                         c_uint32,
+                                                         c_int16,
+                                                         c_int16,
+                                                         c_uint32)
+
+ps2000.GetOverviewBuffersType.__doc__ = doc
