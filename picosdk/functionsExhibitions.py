@@ -5,6 +5,8 @@
 import numpy as np
 import openpyxl
 from math import floor, log2, log10
+import shutil
+import os
 
 def dataImporter(name):
 
@@ -100,9 +102,9 @@ def BitEnumSelector(bits):
         
     return enum
     
-def saveConfigFile(channels, bits, sampleRate,captureLength, maxAmplitude, segments):
+def saveConfigFile(channels, bits, sampleRate,captureLength, segments):
     
-    configValues = [channels, bits, sampleRate, captureLength, maxAmplitude, segments]
+    configValues = [channels, bits, sampleRate, captureLength, segments]
     
     # Save the list to a text file
     with open('configValues.txt', 'w') as file:
@@ -129,7 +131,19 @@ def loadConfigValues():
     bits = restored_configValues[1]
     sampleRate = restored_configValues[2]
     captureLength = restored_configValues[3]
-    maxAmplitude = restored_configValues[4]
     segments = restored_configValues[5]
     
-    return channels, bits, sampleRate, captureLength, maxAmplitude, segments
+    return channels, bits, sampleRate, captureLength, segments
+    
+def copyFile(source_directory, filename):
+    
+    destination_directory = 'D:/'
+
+    # Define the destination file path
+    source_file = os.path.join(source_directory, filename)
+    destination_file = os.path.join(destination_directory, filename)
+
+    # Copy the file to the new location
+    shutil.copy(source_file, destination_file)
+    
+    return 
