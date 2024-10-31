@@ -7,6 +7,7 @@ import openpyxl
 from math import floor, log2, log10
 import shutil
 import os
+import toml
 
 def dataImporter(name):
 
@@ -104,34 +105,31 @@ def BitEnumSelector(bits):
     
 def saveConfigFile(channels, bits, sampleRate,captureLength, segments):
     
-    configValues = [channels, bits, sampleRate, captureLength, segments]
+    # configValues = [channels, bits, sampleRate, captureLength, segments]
+    data = {
+        "Active Channels" : channels,
+        "Scope Bit Resolution" : bits,
+        "Sampling Rate (MHz)" : sampleRate,
+        "Capture Length (Samples)" : captureLength,
+        "Number of Capture Segments for Rapid Block" : segments,
+        }
+    # # Save the list to a text file
+    with open('configValues.toml', 'w') as file:
+        toml.dump(data,file)  
     
-    # Save the list to a text file
-    with open('configValues.txt', 'w') as file:
-    # Write each element of the list on a new line
-        for value in configValues:
-            file.write(f"{value}\n")
         
     return
     
 def loadConfigValues():
     
-    restored_configValues = []
-    
-    with open('configValues.txt', 'r') as file:
-        for line in file:
-            value = line.strip()
-            # Convert to integer or float as necessary
-            if '.' in value:
-                restored_configValues.append(float(value))
-            else:
-                restored_configValues.append(int(value))
+    with open('configValues.toml', 'r') as file:
+        restored_configValues = toml.load(file)
             
-    channels = restored_configValues[0]
-    bits = restored_configValues[1]
-    sampleRate = restored_configValues[2]
-    captureLength = restored_configValues[3]
-    segments = restored_configValues[5]
+    channels = int(restored_configValues["Active Channels"])
+    bits = int(restored_configValues["Scope Bit Resolution"])
+    sampleRate = float(restored_configValues["Sampling Rate (MHz)"])
+    captureLength = int(float(restored_configValues["Capture Length (Samples)"]))
+    segments = int(restored_configValues["Number of Capture Segments for Rapid Block"])
     
     return channels, bits, sampleRate, captureLength, segments
     
