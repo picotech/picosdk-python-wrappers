@@ -77,9 +77,10 @@ doc = """ PICO_STATUS psospaGetVariantDetails
         const int8_t*    variantName,
         int16_t    variantNameLength,
         int8_t*    outputString,
-        int32_t*    outputStringLength
+        int32_t*    outputStringLength,
+        PICO_TEXT_FORMAT textFormat
     ); """
-psospa.make_symbol("_GetVariantDetails", "psospaGetVariantDetails", c_uint32, [c_char_p, c_int16, c_char_p, c_void_p], doc)
+psospa.make_symbol("_GetVariantDetails", "psospaGetVariantDetails", c_uint32, [c_char_p, c_int16, c_char_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS psospaMemorySegments
     (
