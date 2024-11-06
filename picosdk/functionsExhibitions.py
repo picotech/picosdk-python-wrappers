@@ -107,11 +107,11 @@ def saveConfigFile(channels, bits, sampleRate,captureLength, segments):
     
     # configValues = [channels, bits, sampleRate, captureLength, segments]
     data = {
-        "Active Channels" : channels,
-        "Scope Bit Resolution" : bits,
-        "Sampling Rate (MHz)" : sampleRate,
-        "Capture Length (Samples)" : captureLength,
-        "Number of Capture Segments for Rapid Block" : segments,
+        "Active Channels" : int(channels),
+        "Scope Bit Resolution" : int(bits),
+        "Sampling Rate (MHz)" : float(sampleRate),
+        "Capture Length (Samples)" : int(captureLength),
+        "Number of Capture Segments for Rapid Block" : int(segments),
         }
     # # Save the list to a text file
     with open('configValues.toml', 'w') as file:
