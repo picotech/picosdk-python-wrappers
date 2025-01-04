@@ -18,7 +18,7 @@ to install the required driver packages for your product.
 
 ### macOS
 
-Please visit [our Downloads page](https://www.picotech.com/downloads) to download the PicoSDK C Libraries for MacOS.
+Please visit [our Downloads page](https://www.picotech.com/downloads) to download the PicoSDK C Libraries for MacOS. NOTE! Apple silicon not supported!
 
 ## Installing the python driver bindings
 
