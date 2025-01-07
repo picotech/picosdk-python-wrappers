@@ -165,9 +165,10 @@ for h in range (0, maxBuffers, 1):
     plt.plot(time[startTime:endTime],bufferAmV[h])
     startTime += nSamples
     endTime += nSamples
-plt.xlabel('Time (us)')
-plt.ylabel('Voltage (mV)')
-plt.show()
+# plt.xlabel('Time (us)')
+# plt.ylabel('Voltage (mV)')
+# plt.show()
+
 
 
 # Close the scope

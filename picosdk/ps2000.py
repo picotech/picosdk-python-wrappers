@@ -438,7 +438,7 @@ doc = """ void *my_get_overview_buffers
     """
 
 ps2000.GetOverviewBuffersType = C_CALLBACK_FUNCTION_FACTORY(None,
-                                                         c_void_p,
+                                                         POINTER(POINTER(c_int16)),
                                                          c_int16,
                                                          c_uint32,
                                                          c_int16,

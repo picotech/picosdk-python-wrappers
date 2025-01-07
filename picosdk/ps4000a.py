@@ -256,10 +256,13 @@ ps4000a.PS4000A_EXTRA_OPERATIONS = make_enum([
 	'PS4000A_PRBS',
 ])
 
-ps4000a.PS4000A_CONDITIONS_INFO = make_enum([
-    'PS4000A_CLEAR',
-    'PS4000A_ADD',
-])
+def _define_conditions_info():
+    PICO_CLEAR = 0x00000001
+    PICO_ADD = 0x00000002
+    
+    return {k.upper(): v for k, v in locals().items() if k.startswith("PICO")}
+    
+ps4000a.PS4000A_CONDITIONS_INFO = _define_action()
 
 ps4000a.PS4000A_THRESHOLD_DIRECTION = make_enum([
     ("PS4000A_ABOVE", "PS4000A_INSIDE"),
