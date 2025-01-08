@@ -185,6 +185,14 @@ ps2000a.PS2000A_DIGITAL_DIRECTION = make_enum([
     "PS2000A_DIGITAL_MAX_DIRECTION",
 ])
 
+ps2000a.PS2000A_PULSE_WIDTH_TYPE = make_enum([
+    "PS2000A_PW_TYPE_NONE",
+    "PS2000A_PW_TYPE_LESS_THAN",
+    "PS2000A_PW_TYPE_GREATER_THAN",
+    "PS2000A_PW_TYPE_IN_RANGE",
+    "PS2000A_PW_TYPE_OUT_OF_RANGE"
+])
+
 
 class PS2000A_TRIGGER_CONDITIONS(Structure):
     _pack_ = 1
@@ -196,6 +204,8 @@ class PS2000A_TRIGGER_CONDITIONS(Structure):
                 ("aux", c_int32),
                 ("pulseWidthQualifier", c_int32),
                 ("digital", c_int32)]
+               
+ps2000a.PS2000A_TRIGGER_CONDITIONS = PS2000A_TRIGGER_CONDITIONS
 
 
 class PS2000A_PWQ_CONDITIONS(Structure):
@@ -207,12 +217,16 @@ class PS2000A_PWQ_CONDITIONS(Structure):
                 ("external", c_int32),
                 ("aux", c_int32),
                 ("digital", c_int32)]
+                
+ps2000a.PS2000A_PWQ_CONDITIONS = PS2000A_PWQ_CONDITIONS
 
 
 class PS2000A_DIGITAL_CHANNEL_DIRECTIONS(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32)]
+               
+ps2000a.PS2000A_DIGITAL_CHANNEL_DIRECTIONS = PS2000A_DIGITAL_CHANNEL_DIRECTIONS
 
 
 class PS2000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
@@ -224,6 +238,7 @@ class PS2000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
                 ("channel", c_int32),
                 ("thresholdMode", c_int32)]
 
+ps2000a.PS2000A_TRIGGER_CHANNEL_PROPERTIES = PS2000A_TRIGGER_CHANNEL_PROPERTIES
 
 doc = """ PICO_STATUS ps2000aOpenUnit
     (
