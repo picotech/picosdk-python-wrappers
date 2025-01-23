@@ -1,9 +1,9 @@
 #
 # Copyright (C) 2019 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PL1000 SINGLE MODE EXAMPLE
-# This example opens a pl1000 device, sets up the device for capturing data from channel 1.
-# Then this example collect a sample from channel 1 and displays it on the console.
+# PL1000 STREAMING MODE EXAMPLE
+# This example opens a PicoLog 1000 device, configures streaming mode to capture data from channel 1 at
+# a sampling rate of 100 kS/s for 10 seconds, retrieves the data, and displays it on a plot.
 
 import ctypes
 import numpy as np
@@ -49,7 +49,7 @@ inputRange = 2500
 mVValues =  adc2mVpl1000(values, inputRange, maxADC)
 
 # create time data
-interval = (0.01 * usForBlock.value)/(noOfValues.value * 1)
+interval = (0.001 * usForBlock.value)/(noOfValues.value * 1)
 
 timeMs = np.linspace(0, (len(mVValues) -1) * interval, len(mVValues))
 
