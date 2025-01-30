@@ -292,7 +292,7 @@ def _define_conditions_info():
     
     return {k.upper(): v for k, v in locals().items() if k.startswith("PICO")}
     
-ps4000a.PS4000A_CONDITIONS_INFO = _define_action()
+ps4000a.PS4000A_CONDITIONS_INFO = _define_conditions_info()
 
 ps4000a.PS4000A_THRESHOLD_DIRECTION = make_enum([
     ("PS4000A_ABOVE", "PS4000A_INSIDE"),
