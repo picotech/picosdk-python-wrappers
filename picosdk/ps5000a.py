@@ -233,7 +233,7 @@ ps5000a.PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2 = PS5000A_TRIGGER_CHANNEL_PROPERTI
 class PS5000A_CONDITION (Structure):
 	_pack_ = 1
 	_fields_ = [("source", c_int32),
-				("condition", c_int16)]
+				("condition", c_int32)]
                 
 ps5000a.PS5000A_CONDITION = PS5000A_CONDITION
 
@@ -491,7 +491,7 @@ ps5000a.make_symbol("_SetTriggerChannelProperties", "ps5000aSetTriggerChannelPro
 doc = """ PICO_STATUS ps5000aSetTriggerChannelPropertiesV2
     (
         int16_t                             handle,
-        PS5000A_TRIGGER_CHANNEL_PROPERTIESV2 *channelProperties,
+        PS5000A_TRIGGER_CHANNEL_PROPERTIES_V2 *channelProperties,
         int16_t                             nChannelProperties,
         int16_t                             auxOutputEnable,
     ); """
@@ -518,7 +518,7 @@ ps5000a.make_symbol("_SetTriggerChannelConditions", "ps5000aSetTriggerChannelCon
 doc = """ PICO_STATUS ps5000aSetTriggerChannelConditionsV2
     (
         int16_t                     handle,
-        PS5000A_TRIGGER_CONDITIONS *conditions,
+        PS5000A_CONDITION *conditions,
         int16_t                     nConditions
         PS5000A_CONDITIONS_INFO     info
     ); """

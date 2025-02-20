@@ -71,7 +71,7 @@ assert_pico_ok(status["setChB"])
 
 # Size of capture
 sizeOfOneBuffer = 500
-numBuffersToCapture = 10
+numBuffersToCapture = 100
 
 totalSamples = sizeOfOneBuffer * numBuffersToCapture
 
@@ -116,7 +116,7 @@ status["setDataBuffersB"] = ps.ps4000aSetDataBuffers(chandle,
 assert_pico_ok(status["setDataBuffersB"])
 
 # Begin streaming mode:
-sampleInterval = ctypes.c_int32(250)
+sampleInterval = ctypes.c_int32(2500)
 sampleUnits = ps.PS4000A_TIME_UNITS['PS4000A_US']
 # We are not triggering:
 maxPreTriggerSamples = 0
@@ -188,8 +188,8 @@ adc2mVChBMax = adc2mV(bufferCompleteB, channel_range, maxADC)
 time = np.linspace(0, (totalSamples - 1) * actualSampleIntervalNs, totalSamples)
 
 # Plot data from channel A and B
-plt.plot(time, adc2mVChAMax[:])
-plt.plot(time, adc2mVChBMax[:])
+plt.plot(time, bufferCompleteA[:])
+plt.plot(time, bufferCompleteB[:])
 plt.xlabel('Time (ns)')
 plt.ylabel('Voltage (mV)')
 plt.show()
