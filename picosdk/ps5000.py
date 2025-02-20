@@ -57,8 +57,8 @@ ps5000.PS5000_TIME_UNITS = make_enum([
 	
 
 class PWQ_CONDITIONS (Structure):
-	_pack = 1
-	_fields = [("channelA", c_int32),
+	_pack_ = 1
+	_fields_ = [("channelA", c_int32),
 				("channelB", c_int32),
 				("channelC", c_int32),
 				("channelD", c_int32),
@@ -68,8 +68,8 @@ class PWQ_CONDITIONS (Structure):
 ps5000.PWQ_CONDITIONS = PWQ_CONDITIONS
 
 class TRIGGER_CONDITIONS (Structure):
-	_pack = 1
-	_fields = [("channelA", c_int32),
+	_pack_ = 1
+	_fields_ = [("channelA", c_int32),
 				("channelB", c_int32),
 				("channelC", c_int32),
 				("channelD", c_int32),
@@ -80,8 +80,8 @@ class TRIGGER_CONDITIONS (Structure):
 ps5000.TRIGGER_CONDITIONS = TRIGGER_CONDITIONS
 
 class TRIGGER_CHANNEL_PROPERTIES (Structure):
-	_pack = 1
-	_fields = [("thresholdMajor", c_int16),
+	_pack_ = 1
+	_fields_ = [("thresholdMajor", c_int16),
 				("thresholdMinor", c_int16),
 				("hysteresis", c_uint16),
 				("channel", c_int32),
