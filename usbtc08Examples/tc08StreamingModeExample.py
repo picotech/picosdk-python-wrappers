@@ -9,6 +9,7 @@ import numpy as np
 import time
 from picosdk.usbtc08 import usbtc08 as tc08
 from picosdk.functions import assert_pico2000_ok
+import matplotlib.pyplot as plt
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
@@ -38,13 +39,13 @@ assert_pico2000_ok(status["get_minimum_interval_ms"])
 status["run"] = tc08.usb_tc08_run(chandle, status["get_minimum_interval_ms"])
 assert_pico2000_ok(status["run"])
 
-time.sleep(2)
+time.sleep(21)
 
 # collect data 
-temp_buffer = (ctypes.c_float * 2 * 15)()
-times_ms_buffer = (ctypes.c_int32 * 15)()
+temp_buffer = (ctypes.c_float * 2 * 100)()
+times_ms_buffer = (ctypes.c_int32 * 100)()
 overflow = ctypes.c_int16()
-status["get_temp"] = tc08.usb_tc08_get_temp(chandle, ctypes.byref(temp_buffer), ctypes.byref(times_ms_buffer), 15, ctypes.byref(overflow), 1, 0, 1)
+status["get_temp"] = tc08.usb_tc08_get_temp(chandle, ctypes.byref(temp_buffer), ctypes.byref(times_ms_buffer), 100, ctypes.byref(overflow), 1, 0, 1)
 assert_pico2000_ok(status["get_temp"])
 
 # stop unit
@@ -54,6 +55,12 @@ assert_pico2000_ok(status["stop"])
 # close unit
 status["close_unit"] = tc08.usb_tc08_close_unit(chandle)
 assert_pico2000_ok(status["close_unit"])
+
+# plot data
+plt.plot(temp_buffer[0:status["get_temp"]])
+plt.xlabel('Time (ns)')
+plt.ylabel('Temperature (oC)')
+plt.show()
 
 # display status returns
 print(status)

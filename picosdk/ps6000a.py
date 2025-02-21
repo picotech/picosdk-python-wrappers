@@ -836,3 +836,10 @@ doc = """ PICO_STATUS ps6000aSetTemperatureSensorInteractioNCallback
         PicoTemperatureSensorInteractions    callback
     ); """
 ps6000a.make_symbol("_SetTemperatureSensroInteractionCallback", "ps6000aSetTemperatureSensorInteractionCallback", c_uint32, [c_int16, c_void_p], doc)
+
+doc = """ PICO_STATUS ps6000aSetAuxIoMode
+    (
+        int16_t    handle,
+        PICO_AUXIO_MODE    auxIoMode
+    ); """
+ps6000a.make_symbol("_SetAuxIoMode", "ps6000aSetAuxIoMode", c_uint32, [c_int16, c_uint32], doc)
