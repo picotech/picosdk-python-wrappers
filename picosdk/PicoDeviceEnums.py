@@ -338,3 +338,10 @@ def _define_power_delivery_device_type():
     return {k.upper(): v for k, v in locals().items() if k.startswith("PICO")}
     
 picoEnum.PICO_USB_POWER_DELIEVRY_DEVICE_TYPE = _define_power_delivery_device_type
+
+picoEnum.PICO_AUXIO_MODE = make_enum([
+    "PICO_AUXIO_INPUT",
+    "PICO_AUXIO_HIGH_OUT",
+    "PICO_AUXIO_LOW_OUT",
+    "PICO_AUXIO_TRIGGER_OUT"
+    ])
