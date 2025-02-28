@@ -73,10 +73,10 @@ action = clear|add
 status["setTriggerChannelConditions"] = ps.ps6000aSetTriggerChannelConditions(chandle, ctypes.byref(conditions),nConditions,action)
 assert_pico_ok(status["setTriggerChannelConditions"])
 
-directions = (struct.PICO_DIGITAL_CHANNEL_DIRECTIONS * 1)()
-directions = stuct.PICO_DIGITAL_CHANNEL_DIRECTIONS(enums.PICO_PORT_DIGITAL_CHANNEL["PICO_PORT_DIGITAL_CHANNEL0"],enums.PICO_DIGITAL_DIRECTION["PICO_DIGITAL_DIRECTION_RISING"])
+directions = (struct.DIGITAL_CHANNEL_DIRECTIONS * 1)()
+directions = struct.DIGITAL_CHANNEL_DIRECTIONS(enums.PICO_PORT_DIGITAL_CHANNEL["PICO_PORT_DIGITAL_CHANNEL0"],enums.PICO_DIGITAL_DIRECTION["PICO_DIGITAL_DIRECTION_RISING"])
 nDirections = 1
-status["setTriggerDigitalPortProperties"] = ps.ps6000a.SetTriggerDigitalPortProperties(chandle,port,ctypes.byref(directions),nDirections)
+status["setTriggerDigitalPortProperties"] = ps.ps6000aSetTriggerDigitalPortProperties(chandle,port,ctypes.byref(directions),nDirections)
 assert_pico_ok(status["setTriggerDigitalPortProperties"])
 
 
