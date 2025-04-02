@@ -69,7 +69,7 @@ doc = """ PICO_STATUS UsbPt104Enumerate
         uint32_t    *length,
         COMMUNICATION_TYPE    type
     ); """
-usbPt104.make_symbol("_Enumerate", "UsbPt104Enumerate", c_uint32, [c_int8, c_uint32, c_uint32], doc)
+usbPt104.make_symbol("_Enumerate", "UsbPt104Enumerate", c_uint32, [c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS UsbPt104GetUnitInfo
     (
