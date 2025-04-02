@@ -11,12 +11,12 @@ from picosdk.library import Library
 from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.constants import make_enum
 
-class usbPT104lib(Library):
+class usbpt104lib(Library):
     def __init__(self):
-        super(usbPT104lib, self).__init__("usbPt104")
+        super(usbpt104lib, self).__init__("usbpt104")
 
 
-usbPt104 = usbPT104lib()
+usbPt104 = usbpt104lib()
 
 usbPt104.PT104_CHANNELS = {
     'USBPT104_CHANNEL_1' : 1,
