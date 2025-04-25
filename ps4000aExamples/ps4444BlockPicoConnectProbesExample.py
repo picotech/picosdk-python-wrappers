@@ -40,22 +40,6 @@ def PicoConnectProbe_callback(handle, pico_status, probes_ptr, nProbes):
         # Add more fields as needed
     
 
-    # # Create array of ps.PS4000A_USER_PROBE_INTERACTIONS for each of the 4 channels
-    # four_PS4000AUserProbeInfo = (ps.PS4000A_USER_PROBE_INTERACTIONS*4) ()
-
-    # # Copy probeUpdates to matching channels in four_PS4000AUserProbeInfo
-    # for i in range(0,nProbes):
-        # four_PS4000AUserProbeInfo[i.channel] = cProbes[i]
-
-    # DEBUG to print out current/last probe stat on each channel
-    # for i in four_PS4000AUserProbeInfo:
-        # print("Channel is ", i.channel)
-        # print("PICO_STATUS is ", i.status)
-        # print("Enabled is ", i.enable)
-        # print("Connected is ", i.connected)
-        # print("Current Range is ", i.rangeCurrent_)  
-    # #WORK IN PROCESS!
-
 # Convert the python function into a C function pointer.
 cFuncPtr2 = ps.ps4000aProbeInteractions(PicoConnectProbe_callback)
 
