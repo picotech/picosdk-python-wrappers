@@ -116,7 +116,7 @@ status["setDataBuffersB"] = ps.ps4000aSetDataBuffers(chandle,
 assert_pico_ok(status["setDataBuffersB"])
 
 # Begin streaming mode:
-sampleInterval = ctypes.c_int32(2500)
+sampleInterval = ctypes.c_int32(250)
 sampleUnits = ps.PS4000A_TIME_UNITS['PS4000A_US']
 # We are not triggering:
 maxPreTriggerSamples = 0

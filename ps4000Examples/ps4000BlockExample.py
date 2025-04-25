@@ -40,6 +40,10 @@ chBRange = 7
 status["setChB"] = ps.ps4000SetChannel(chandle, 1, 1, 1, chBRange)
 assert_pico_ok(status["setChB"])
 
+# setbandwidth filter A
+
+status["setBW"] = ps.ps4000SetBwFilter(chandle, 0, 1)
+
 # Set up single trigger
 # handle = chandle
 # enabled = 1

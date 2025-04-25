@@ -1111,7 +1111,7 @@ doc = """ void *ps4000aProbeInteractions
 ps4000a.ps4000aProbeInteractions = C_CALLBACK_FUNCTION_FACTORY(None,
                                                          c_int16,
                                                         c_uint32,
-                                                        c_void_p,
+                                                        POINTER(PS4000A_USER_PROBE_INTERACTIONS),
                                                         c_uint32
                                                         )
 
