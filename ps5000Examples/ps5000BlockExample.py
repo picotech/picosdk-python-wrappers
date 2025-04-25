@@ -72,7 +72,7 @@ timebase = 8
 oversample = 1
 # pointer to maxSamples = ctypes.byref(returnedMaxSamples)
 # segment index = 0
-timeIntervalns = ctypes.c_float()
+timeIntervalns = ctypes.c_long()
 returnedMaxSamples = ctypes.c_int32()
 status["getTimebase"] = ps.ps5000GetTimebase(chandle, timebase, maxSamples, ctypes.byref(timeIntervalns), oversample, ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["getTimebase"])
