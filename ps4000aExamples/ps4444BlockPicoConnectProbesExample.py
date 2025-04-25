@@ -89,9 +89,7 @@ time.sleep(4) # Delay for first Probe callback events to trigger
 # coupling type = PS4000a_DC = 1
 # range = PS4000a_2V = 7
 # analogOffset = 0 V
-# chARange = 7
-# chARange = ps.PICO_CONNECT_PROBE_RANGE["PICO_CURRENT_CLAMP_40A_5A"]
-chARange = ps.PICO_CONNECT_PROBE_RANGE["PICO_CURRENT_CLAMP_200A_2KA_5A"] # pico_current_clamp_200a_2ka_5a
+chARange = ps.PICO_CONNECT_PROBE_RANGE["PICO_X1_PROBE_1V"]
 # Look in \picosdk\ps4000a.py for all "PICO_CONNECT_PROBE_RANGE" defines for your Probe.
 
 # The 4444 PicoConnect current clamps don't have auto zero offset.
