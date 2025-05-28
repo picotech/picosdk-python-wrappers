@@ -103,13 +103,16 @@ class Library(object):
         # AND if the function is camel case, add an "underscore-ized" version:
         if python_name.lower() != python_name:
             acc = []
+            if python_name.startswith('_'):
+                python_name = python_name[1:]
             for c in python_name:
                 # Be careful to exclude both digits (lower index) and lower case (higher index).
                 if ord('A') <= ord(c) <= ord('Z'):
                     c = "_" + c.lower()
                 acc.append(c)
-            if acc[:2] == ['_', '_']:
-                acc = acc[1:]
+            new_python_name = "".join(acc)
+            if not new_python_name.startswith('_'):
+                new_python_name = "_" + new_python_name
             setattr(self, "".join(acc), c_function)
 
     def list_units(self):
