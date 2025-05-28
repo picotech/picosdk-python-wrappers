@@ -103,7 +103,7 @@ class Library(object):
         # AND if the function is camel case, add an "underscore-ized" version:
         if python_name.lower() != python_name:
             acc = []
-            for c in python_name[1:]:
+            for c in python_name:
                 # Be careful to exclude both digits (lower index) and lower case (higher index).
                 if ord('A') <= ord(c) <= ord('Z'):
                     c = "_" + c.lower()
