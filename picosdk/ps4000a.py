@@ -43,9 +43,14 @@ ps4000a.PS4000A_CHANNEL = {
     "PS4000A_PULSE_WIDTH_SOURCE" : 0x10000000
 }
 
-ps4000a.PICO_CHANNEL = {k[19:]: v for k, v in ps4000a.PS4000A_CHANNEL.items()}
-
-
+ps4000a.PICO_CHANNEL = {}
+prefix = "PS4000A_CHANNEL_"
+for key, value in ps4000a.PS4000A_CHANNEL.items():
+    if isinstance(key, tuple):
+        key = key[0]  # Use the first name in the tuple.
+    if key.startswith(prefix):
+        key = key[len(prefix):]
+        ps4000a.PICO_CHANNEL[key] = value  # Only channels are included (A, B, C, D, E, F, G, H).
 
 # The voltage ranges for this driver are so oddly defined, that it is easier to describe them as a literal than trying
 # to use make_enum:
