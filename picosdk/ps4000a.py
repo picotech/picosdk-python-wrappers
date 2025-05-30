@@ -190,14 +190,14 @@ ps4000a.PICO_VOLTAGE_RANGE = process_enum(ps4000a.PICO_CONNECT_PROBE_RANGE)
 class PS4000A_USER_PROBE_INTERACTIONS(Structure):
     _pack_ = 1
     _fields_ = [    ("connected", c_uint16),
-                
+
                     ("channel", c_int32),
                     ("enabled", c_uint16),
 
                     ("probeName", c_uint32),
 
                     ("requiresPower_", c_uint8),
-                    ("isPowered_", c_uint8),  
+                    ("isPowered_", c_uint8),
 
                     ("status", c_uint32),
 
@@ -289,9 +289,9 @@ ps4000a.PS4000A_EXTRA_OPERATIONS = make_enum([
 def _define_conditions_info():
     PICO_CLEAR = 0x00000001
     PICO_ADD = 0x00000002
-    
+
     return {k.upper(): v for k, v in locals().items() if k.startswith("PICO")}
-    
+
 ps4000a.PS4000A_CONDITIONS_INFO = _define_conditions_info()
 
 ps4000a.PS4000A_THRESHOLD_DIRECTION = make_enum([
@@ -331,14 +331,14 @@ class PS4000A_CONDITION (Structure):
 	_pack_ = 1
 	_fields_ = [("source", c_int32),
 	("condition", c_int32)]
-                
+
 ps4000a.PS4000A_CONDITION = PS4000A_CONDITION
 
 class PS4000A_DIRECTION(Structure):
     _pack_ = 1
     _fields_ = [("channel", c_int32),
                 ("direction", c_int32)]
-                
+
 ps4000a.PS4000A_DIRECTION = PS4000A_DIRECTION
 
 class PS4000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
@@ -349,7 +349,7 @@ class PS4000A_TRIGGER_CHANNEL_PROPERTIES(Structure):
                 ("thresholdLowerHysteresis", c_uint16),
                 ("channel", c_int32),
                 ("thresholdMode", c_int32)]
-                
+
 ps4000a.PS4000A_TRIGGER_CHANNEL_PROPERTIES = PS4000A_TRIGGER_CHANNEL_PROPERTIES
 
 doc = """ PICO_STATUS ps4000aOpenUnit
@@ -357,14 +357,14 @@ doc = """ PICO_STATUS ps4000aOpenUnit
         int16_t *handle,
         int8_t  *serial
     ); """
-ps4000a.make_symbol("_OpenUnit", "ps4000aOpenUnit", c_uint32, [c_void_p, c_char_p], doc)
+ps4000a.make_symbol("_open_unit", "ps4000aOpenUnit", c_uint32, [c_void_p, c_char_p], doc)
 
 doc = """ PICO_STATUS ps4000aOpenUnitAsync
     (
         int16_t *status,
         int8_t  *serial
     ); """
-ps4000a.make_symbol("_OpenUnitAsync", "ps4000aOpenUnitAsync", c_uint32, [c_void_p, c_char_p], doc)
+ps4000a.make_symbol("_open_unit_async", "ps4000aOpenUnitAsync", c_uint32, [c_void_p, c_char_p], doc)
 
 doc = """ PICO_STATUS ps4000aOpenUnitProgress
     (
@@ -372,7 +372,7 @@ doc = """ PICO_STATUS ps4000aOpenUnitProgress
         int16_t *progressPercent,
         int16_t *complete
     ); """
-ps4000a.make_symbol("_OpenUnitProgress", "ps4000aOpenUnitProgress", c_uint32, [c_void_p, c_void_p, c_void_p], doc)
+ps4000a.make_symbol("_open_unit_progress", "ps4000aOpenUnitProgress", c_uint32, [c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetUnitInfo
     (
@@ -382,7 +382,7 @@ doc = """ PICO_STATUS ps4000aGetUnitInfo
         int16_t   *requiredSize,
         PICO_INFO  info
     ); """
-ps4000a.make_symbol("_GetUnitInfo", "ps4000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32],
+ps4000a.make_symbol("_get_unit_info", "ps4000aGetUnitInfo", c_uint32, [c_int16, c_char_p, c_int16, c_void_p, c_uint32],
                     doc)
 
 doc = """ PICO_STATUS ps4000aFlashLed
@@ -390,7 +390,7 @@ doc = """ PICO_STATUS ps4000aFlashLed
         int16_t  handle,
         int16_t  start
     ); """
-ps4000a.make_symbol("_FlashLed", "ps4000aFlashLed", c_uint32, [c_int16, c_int16], doc)
+ps4000a.make_symbol("_flash_led", "ps4000aFlashLed", c_uint32, [c_int16, c_int16], doc)
 
 doc = """ PICO_STATUS ps4000aSetChannelLed
     (
@@ -398,20 +398,20 @@ doc = """ PICO_STATUS ps4000aSetChannelLed
         PS4000A_CHANNEL_LED_SETTING *ledStates,
         uint16_t                     nLedStates
     ); """
-ps4000a.make_symbol("_SetChannelLed", "ps4000aSetChannelLed", c_uint32, [c_int16, c_void_p, c_uint16], doc)
+ps4000a.make_symbol("_set_channel_led", "ps4000aSetChannelLed", c_uint32, [c_int16, c_void_p, c_uint16], doc)
 
 doc = """ PICO_STATUS ps4000aIsLedFlashing
     (
         int16_t  handle,
         int16_t *status
     ); """
-ps4000a.make_symbol("_IsLedFlashing", "ps4000aIsLedFlashing", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_is_led_flashing", "ps4000aIsLedFlashing", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aCloseUnit
     (
         int16_t  handle
     ); """
-ps4000a.make_symbol("_CloseUnit", "ps4000aCloseUnit", c_uint32, [c_int16, ], doc)
+ps4000a.make_symbol("_close_unit", "ps4000aCloseUnit", c_uint32, [c_int16, ], doc)
 
 doc = """ PICO_STATUS ps4000aMemorySegments
     (
@@ -419,7 +419,7 @@ doc = """ PICO_STATUS ps4000aMemorySegments
         uint32_t  nSegments,
         int32_t  *nMaxSamples
     ); """
-ps4000a.make_symbol("_MemorySegments", "ps4000aMemorySegments", c_uint32, [c_int16, c_uint32, c_void_p], doc)
+ps4000a.make_symbol("_memory_segments", "ps4000aMemorySegments", c_uint32, [c_int16, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aSetChannel
     (
@@ -430,7 +430,7 @@ doc = """ PICO_STATUS ps4000aSetChannel
         PS4000A_RANGE     range,
         float             analogOffset
     ); """
-ps4000a.make_symbol("_SetChannel", "ps4000aSetChannel", c_uint32,
+ps4000a.make_symbol("_set_channel", "ps4000aSetChannel", c_uint32,
                     [c_int16, c_int32, c_int16, c_int32, c_int32, c_float], doc)
 
 doc = """ PICO_STATUS ps4000aSetBandwidthFilter
@@ -439,7 +439,7 @@ doc = """ PICO_STATUS ps4000aSetBandwidthFilter
         PS4000A_CHANNEL            channel,
         PS4000A_BANDWIDTH_LIMITER  bandwidth
     ); """
-ps4000a.make_symbol("_SetBandwidthFilter", "ps4000aSetBandwidthFilter", c_uint32, [c_int16, c_int32, c_int32], doc)
+ps4000a.make_symbol("_set_bandwidth_filter", "ps4000aSetBandwidthFilter", c_uint32, [c_int16, c_int32, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aApplyResistanceScaling
     (
@@ -451,7 +451,7 @@ doc = """ PICO_STATUS ps4000aApplyResistanceScaling
         uint32_t         buffertLth,
         int16_t         *overflow
     ); """
-ps4000a.make_symbol("_ApplyResistanceScaling", "ps4000aApplyResistanceScaling", c_uint32,
+ps4000a.make_symbol("_apply_resistance_scaling", "ps4000aApplyResistanceScaling", c_uint32,
                     [c_int16, c_int32, c_int32, c_int16, c_int16, c_uint32, c_int16], doc)
 
 doc = """ PICO_STATUS ps4000aGetTimebase
@@ -463,7 +463,7 @@ doc = """ PICO_STATUS ps4000aGetTimebase
         int32_t  *maxSamples,
         uint32_t  segmentIndex
     ); """
-ps4000a.make_symbol('_GetTimebase', 'ps4000aGetTimebase', c_uint32,
+ps4000a.make_symbol('_get_timebase', 'ps4000aGetTimebase', c_uint32,
                     [c_int16, c_uint32, c_int32, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aGetTimebase2
@@ -475,7 +475,7 @@ doc = """ PICO_STATUS ps4000aGetTimebase2
         int32_t  *maxSamples,
         uint32_t  segmentIndex
     ); """
-ps4000a.make_symbol("_GetTimebase2", "ps4000aGetTimebase2", c_uint32,
+ps4000a.make_symbol("_get_timebase2", "ps4000aGetTimebase2", c_uint32,
                     [c_int16, c_uint32, c_int32, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aSetSigGenArbitrary
@@ -498,7 +498,7 @@ doc = """ PICO_STATUS ps4000aSetSigGenArbitrary
         PS4000A_SIGGEN_TRIG_SOURCE  triggerSource,
         int16_t                     extInThreshold
     ); """
-ps4000a.make_symbol("_SetSigGenArbitrary", "ps4000aSetSigGenArbitrary", c_uint32,
+ps4000a.make_symbol("_set_sig_gen_arbitrary", "ps4000aSetSigGenArbitrary", c_uint32,
                     [c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p,
                      c_int32, c_int32, c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
@@ -520,7 +520,7 @@ doc = """ PICO_STATUS ps4000aSetSigGenBuiltIn
         PS4000A_SIGGEN_TRIG_SOURCE  triggerSource,
         int16_t                     extInThreshold
     ); """
-ps4000a.make_symbol("_SetSigGenBuiltIn", "ps4000aSetSigGenBuiltIn", c_uint32,
+ps4000a.make_symbol("_set_sig_gen_built_in", "ps4000aSetSigGenBuiltIn", c_uint32,
                     [c_int16, c_int32, c_uint32, c_int32, c_double, c_double, c_double, c_double,
                      c_int32, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
@@ -538,7 +538,7 @@ doc = """ PICO_STATUS ps4000aSetSigGenPropertiesArbitrary
         PS4000A_SIGGEN_TRIG_SOURCE  triggerSource,
         int16_t                     extInThreshold
     ); """
-ps4000a.make_symbol("_SetSigGenPropertiesArbitrary", "ps4000aSetSigGenPropertiesArbitrary", c_uint32,
+ps4000a.make_symbol("_set_sig_gen_properties_arbitrary", "ps4000aSetSigGenPropertiesArbitrary", c_uint32,
                     [c_int16, c_uint32, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_uint32, c_int32, c_int32,
                      c_int16], doc)
 
@@ -556,7 +556,7 @@ doc = """ PICO_STATUS ps4000aSetSigGenPropertiesBuiltIn
         PS4000A_SIGGEN_TRIG_SOURCE  triggerSource,
         int16_t                     extInThreshold
     ); """
-ps4000a.make_symbol("_SetSigGenPropertiesBuiltIn", "ps4000aSetSigGenPropertiesBuiltIn", c_uint32,
+ps4000a.make_symbol("_set_sig_gen_properties_built_in", "ps4000aSetSigGenPropertiesBuiltIn", c_uint32,
                     [c_int16, c_double, c_double, c_double, c_double, c_int32, c_uint32, c_uint32, c_int32, c_int32,
                      c_int16], doc)
 
@@ -568,7 +568,7 @@ doc = """ PICO_STATUS ps4000aSigGenFrequencyToPhase
         uint32_t            bufferLength,
         uint32_t           *phase
     ); """
-ps4000a.make_symbol("_SigGenFrequencyToPhase", "ps4000aSigGenFrequencyToPhase", c_uint32,
+ps4000a.make_symbol("_sig_gen_frequency_to_phase", "ps4000aSigGenFrequencyToPhase", c_uint32,
                     [c_int16, c_double, c_int32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aSigGenArbitraryMinMaxValues
@@ -579,7 +579,7 @@ doc = """ PICO_STATUS ps4000aSigGenArbitraryMinMaxValues
         uint32_t *minArbitraryWaveformSize,
         uint32_t *maxArbitraryWaveformSize
     ); """
-ps4000a.make_symbol("_SigGenArbitraryMinMaxValues", "ps4000aSigGenArbitraryMinMaxValues", c_uint32,
+ps4000a.make_symbol("_sig_gen_arbitrary_min_max_values", "ps4000aSigGenArbitraryMinMaxValues", c_uint32,
                     [c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aSigGenSoftwareControl
@@ -587,7 +587,7 @@ doc = """ PICO_STATUS ps4000aSigGenSoftwareControl
         int16_t  handle,
         int16_t  state
     );"""
-ps4000a.make_symbol("_SigGenSoftwareControl", "ps4000aSigGenSoftwareControl", c_uint32, [c_int16, c_int16], doc)
+ps4000a.make_symbol("_sig_gen_software_control", "ps4000aSigGenSoftwareControl", c_uint32, [c_int16, c_int16], doc)
 
 doc = """ PICO_STATUS ps4000aSetEts
     (
@@ -597,7 +597,7 @@ doc = """ PICO_STATUS ps4000aSetEts
         int16_t           etsInterleave,
         int32_t          *sampleTimePicoseconds
     ); """
-ps4000a.make_symbol("_SetEts", "ps4000aSetEts", c_uint32, [c_int16, c_int32, c_int16, c_int16, c_void_p], doc)
+ps4000a.make_symbol("_set_ets", "ps4000aSetEts", c_uint32, [c_int16, c_int32, c_int16, c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aSetTriggerChannelProperties
     (
@@ -607,7 +607,7 @@ doc = """ PICO_STATUS ps4000aSetTriggerChannelProperties
         int16_t                             auxOutputEnable,
         int32_t                             autoTriggerMilliseconds
     ); """
-ps4000a.make_symbol("_SetTriggerChannelProperties", "ps4000aSetTriggerChannelProperties", c_uint32,
+ps4000a.make_symbol("_set_trigger_channel_properties", "ps4000aSetTriggerChannelProperties", c_uint32,
                     [c_int16, c_void_p, c_int16, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetTriggerChannelConditions
@@ -617,7 +617,7 @@ doc = """ PICO_STATUS ps4000aSetTriggerChannelConditions
         int16_t                  nConditions,
         PS4000A_CONDITIONS_INFO  info
     ); """
-ps4000a.make_symbol("_SetTriggerChannelConditions", "ps4000aSetTriggerChannelConditions", c_uint32,
+ps4000a.make_symbol("_set_trigger_channel_conditions", "ps4000aSetTriggerChannelConditions", c_uint32,
                     [c_int16, c_void_p, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetTriggerChannelDirections
@@ -626,7 +626,7 @@ doc = """ PICO_STATUS ps4000aSetTriggerChannelDirections
         PS4000A_DIRECTION *directions,
         int16_t            nDirections
     ); """
-ps4000a.make_symbol("_SetTriggerChannelDirections", "ps4000aSetTriggerChannelDirections", c_uint32,
+ps4000a.make_symbol("_set_trigger_channel_directions", "ps4000aSetTriggerChannelDirections", c_uint32,
                     [c_int16, c_void_p, c_int16], doc)
 
 doc = """ PICO_STATUS ps4000aSetSimpleTrigger
@@ -639,7 +639,7 @@ doc = """ PICO_STATUS ps4000aSetSimpleTrigger
         uint32_t                     delay,
         int16_t                      autoTrigger_ms
     ); """
-ps4000a.make_symbol("_SetSimpleTrigger", "ps4000aSetSimpleTrigger", c_uint32,
+ps4000a.make_symbol("_set_simple_trigger", "ps4000aSetSimpleTrigger", c_uint32,
                     [c_int16, c_int16, c_int32, c_int16, c_int32, c_uint32, c_int16], doc)
 
 doc = """ PICO_STATUS ps4000aSetTriggerDelay
@@ -647,7 +647,7 @@ doc = """ PICO_STATUS ps4000aSetTriggerDelay
         int16_t   handle,
         uint32_t  delay
     ); """
-ps4000a.make_symbol("_SetTriggerDelay", "ps4000aSetTriggerDelay", c_uint32, [c_int16, c_uint32], doc)
+ps4000a.make_symbol("_set_trigger_delay", "ps4000aSetTriggerDelay", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aSetPulseWidthQualifierProperties
     (
@@ -657,7 +657,7 @@ doc = """ PICO_STATUS ps4000aSetPulseWidthQualifierProperties
         uint32_t                     upper,
         PS4000A_PULSE_WIDTH_TYPE     type
     ); """
-ps4000a.make_symbol("_SetPulseWidthQualifierProperties", "ps4000aSetPulseWidthQualifierProperties", c_uint32,
+ps4000a.make_symbol("_set_pulse_width_qualifier_properties", "ps4000aSetPulseWidthQualifierProperties", c_uint32,
                     [c_int16, c_int32, c_uint32, c_uint32, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetPulseWidthQualifierConditions
@@ -667,7 +667,7 @@ doc = """ PICO_STATUS ps4000aSetPulseWidthQualifierConditions
         int16_t                  nConditions,
         PS4000A_CONDITIONS_INFO  info
     ); """
-ps4000a.make_symbol("_SetPulseWidthQualifierConditions", "ps4000aSetPulseWidthQualifierConditions", c_uint32,
+ps4000a.make_symbol("_set_pulse_width_qualifier_conditions", "ps4000aSetPulseWidthQualifierConditions", c_uint32,
                     [c_int16, c_void_p, c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aIsTriggerOrPulseWidthQualifierEnabled
@@ -676,7 +676,7 @@ doc = """ PICO_STATUS ps4000aIsTriggerOrPulseWidthQualifierEnabled
         int16_t *triggerEnabled,
         int16_t *pulseWidthQualifierEnabled
     ); """
-ps4000a.make_symbol("_IsTriggerOrPulseWidthQualifierEnabled", "ps4000aIsTriggerOrPulseWidthQualifierEnabled", c_uint32,
+ps4000a.make_symbol("_is_trigger_or_pulse_width_qualifier_enabled", "ps4000aIsTriggerOrPulseWidthQualifierEnabled", c_uint32,
                     [c_int16, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetTriggerTimeOffset
@@ -687,7 +687,7 @@ doc = """ PICO_STATUS ps4000aGetTriggerTimeOffset
         PS4000A_TIME_UNITS *timeUnits,
         uint32_t            segmentIndex
     ); """
-ps4000a.make_symbol("_GetTriggerTimeOffset", "ps4000aGetTriggerTimeOffset", c_uint32,
+ps4000a.make_symbol("_get_trigger_time_offset", "ps4000aGetTriggerTimeOffset", c_uint32,
                     [c_int16, c_void_p, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aGetTriggerTimeOffset64
@@ -697,7 +697,7 @@ doc = """ PICO_STATUS ps4000aGetTriggerTimeOffset64
         PS4000A_TIME_UNITS *timeUnits,
         uint32_t            segmentIndex
     ); """
-ps4000a.make_symbol("_GetTriggerTimeOffset64", "ps4000aGetTriggerTimeOffset64", c_uint32,
+ps4000a.make_symbol("_get_trigger_time_offset64", "ps4000aGetTriggerTimeOffset64", c_uint32,
                     [c_int16, c_void_p, c_void_p, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aGetValuesTriggerTimeOffsetBulk
@@ -709,7 +709,7 @@ doc = """ PICO_STATUS ps4000aGetValuesTriggerTimeOffsetBulk
         uint32_t            fromSegmentIndex,
         uint32_t            toSegmentIndex
     ); """
-ps4000a.make_symbol("_GetValuesTriggerTimeOffsetBulk", "ps4000aGetValuesTriggerTimeOffsetBulk", c_uint32,
+ps4000a.make_symbol("_get_values_trigger_time_offset_bulk", "ps4000aGetValuesTriggerTimeOffsetBulk", c_uint32,
                     [c_int16, c_void_p, c_void_p, c_void_p, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aGetValuesTriggerTimeOffsetBulk64
@@ -720,7 +720,7 @@ doc = """ PICO_STATUS ps4000aGetValuesTriggerTimeOffsetBulk64
         uint32_t            fromSegmentIndex,
         uint32_t            toSegmentIndex
     ); """
-ps4000a.make_symbol("_GetValuesTriggerTimeOffsetBulk64", "ps4000aGetValuesTriggerTimeOffsetBulk64", c_uint32,
+ps4000a.make_symbol("_get_values_trigger_time_offset_bulk64", "ps4000aGetValuesTriggerTimeOffsetBulk64", c_uint32,
                     [c_int16, c_void_p, c_void_p, c_uint32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aSetDataBuffers
@@ -733,7 +733,7 @@ doc = """ PICO_STATUS ps4000aSetDataBuffers
         uint32_t            segmentIndex,
         PS4000A_RATIO_MODE  mode
     ); """
-ps4000a.make_symbol("_SetDataBuffers", "ps4000aSetDataBuffers", c_uint32,
+ps4000a.make_symbol("_set_data_buffers", "ps4000aSetDataBuffers", c_uint32,
                     [c_int16, c_int32, c_void_p, c_void_p, c_int32, c_uint32, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetDataBuffer
@@ -745,7 +745,7 @@ doc = """ PICO_STATUS ps4000aSetDataBuffer
         uint32_t            segmentIndex,
         PS4000A_RATIO_MODE  mode
     ); """
-ps4000a.make_symbol("_SetDataBuffer", "ps4000aSetDataBuffer", c_uint32,
+ps4000a.make_symbol("_set_data_buffer", "ps4000aSetDataBuffer", c_uint32,
                     [c_int16, c_int32, c_void_p, c_int32, c_uint32, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetEtsTimeBuffer
@@ -754,7 +754,7 @@ doc = """ PICO_STATUS ps4000aSetEtsTimeBuffer
         int64_t *buffer,
         int32_t  bufferLth
     ); """
-ps4000a.make_symbol("_SetEtsTimeBuffer", "ps4000aSetEtsTimeBuffer", c_uint32, [c_int16, c_void_p, c_int32], doc)
+ps4000a.make_symbol("_set_ets_time_buffer", "ps4000aSetEtsTimeBuffer", c_uint32, [c_int16, c_void_p, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetEtsTimeBuffers
     (
@@ -763,7 +763,7 @@ doc = """ PICO_STATUS ps4000aSetEtsTimeBuffers
         uint32_t *timeLower,
         int32_t   bufferLth
     ); """
-ps4000a.make_symbol("_SetEtsTimeBuffers", "ps4000aSetEtsTimeBuffers", c_uint32, [c_int16, c_void_p, c_void_p, c_int32],
+ps4000a.make_symbol("_set_ets_time_buffers", "ps4000aSetEtsTimeBuffers", c_uint32, [c_int16, c_void_p, c_void_p, c_int32],
                     doc)
 
 doc = """ PICO_STATUS ps4000aIsReady
@@ -771,7 +771,7 @@ doc = """ PICO_STATUS ps4000aIsReady
         int16_t  handle,
         int16_t *ready
     ); """
-ps4000a.make_symbol("_IsReady", "ps4000aIsReady", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_is_ready", "ps4000aIsReady", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aRunBlock
     (
@@ -784,7 +784,7 @@ doc = """ PICO_STATUS ps4000aRunBlock
         ps4000aBlockReady  lpReady,
         void              *pParameter
     ); """
-ps4000a.make_symbol("_RunBlock", "ps4000aRunBlock", c_uint32,
+ps4000a.make_symbol("_run_block", "ps4000aRunBlock", c_uint32,
                     [c_int16, c_int32, c_int32, c_uint32, c_void_p, c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aRunStreaming
@@ -799,7 +799,7 @@ doc = """ PICO_STATUS ps4000aRunStreaming
         PS4000A_RATIO_MODE  downSampleRatioMode,
         uint32_t            overviewBufferSize
     ); """
-ps4000a.make_symbol("_RunStreaming", "ps4000aRunStreaming", c_uint32,
+ps4000a.make_symbol("_run_streaming", "ps4000aRunStreaming", c_uint32,
                     [c_int16, c_void_p, c_int32, c_uint32, c_uint32, c_int16, c_uint32, c_int32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aGetStreamingLatestValues
@@ -808,7 +808,7 @@ doc = """ PICO_STATUS ps4000aGetStreamingLatestValues
         ps4000aStreamingReady  lpPs4000aReady,
         void                  *pParameter
     ); """
-ps4000a.make_symbol("_GetStreamingLatestValues", "ps4000aGetStreamingLatestValues", c_uint32,
+ps4000a.make_symbol("_get_streaming_latest_values", "ps4000aGetStreamingLatestValues", c_uint32,
                     [c_int16, c_void_p, c_void_p], doc)
 
 doc = """ void *ps4000aStreamingReady
@@ -843,7 +843,7 @@ doc = """ PICO_STATUS ps4000aNoOfStreamingValues
         int16_t   handle,
         uint32_t *noOfValues
     ); """
-ps4000a.make_symbol("_NoOfStreamingValues", "ps4000aNoOfStreamingValues", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_no_of_streaming_values", "ps4000aNoOfStreamingValues", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetMaxDownSampleRatio
     (
@@ -853,7 +853,7 @@ doc = """ PICO_STATUS ps4000aGetMaxDownSampleRatio
         PS4000A_RATIO_MODE  downSampleRatioMode,
         uint32_t            segmentIndex
     ); """
-ps4000a.make_symbol("_GetMaxDownSampleRatio", "ps4000aGetMaxDownSampleRatio", c_uint32,
+ps4000a.make_symbol("_get_max_down_sample_ratio", "ps4000aGetMaxDownSampleRatio", c_uint32,
                     [c_int16, c_uint32, c_void_p, c_int32, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aGetValues
@@ -866,7 +866,7 @@ doc = """ PICO_STATUS ps4000aGetValues
         uint32_t            segmentIndex,
         int16_t            *overflow
     ); """
-ps4000a.make_symbol("_GetValues", "ps4000aGetValues", c_uint32,
+ps4000a.make_symbol("_get_values", "ps4000aGetValues", c_uint32,
                     [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetValuesAsync
@@ -880,7 +880,7 @@ doc = """ PICO_STATUS ps4000aGetValuesAsync
         void               *lpDataReady,
         void               *pParameter
     ); """
-ps4000a.make_symbol("_GetValuesAsync", "ps4000aGetValuesAsync", c_uint32,
+ps4000a.make_symbol("_get_values_async", "ps4000aGetValuesAsync", c_uint32,
                     [c_int16, c_uint32, c_uint32, c_uint32, c_int32, c_uint32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetValuesBulk
@@ -893,7 +893,7 @@ doc = """ PICO_STATUS ps4000aGetValuesBulk
         PS4000A_RATIO_MODE  downSampleRatioMode,
         int16_t            *overflow
     ); """
-ps4000a.make_symbol("_GetValuesBulk", "ps4000aGetValuesBulk", c_uint32,
+ps4000a.make_symbol("_get_values_bulk", "ps4000aGetValuesBulk", c_uint32,
                     [c_int16, c_void_p, c_uint32, c_uint32, c_uint32, c_int32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetValuesOverlapped
@@ -906,7 +906,7 @@ doc = """ PICO_STATUS ps4000aGetValuesOverlapped
         uint32_t            segmentIndex,
         int16_t            *overflow
     ); """
-ps4000a.make_symbol("_GetValuesOverlapped", "ps4000aGetValuesOverlapped", c_uint32,
+ps4000a.make_symbol("_get_values_overlapped", "ps4000aGetValuesOverlapped", c_uint32,
                     [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetValuesOverlappedBulk
@@ -920,7 +920,7 @@ doc = """ PICO_STATUS ps4000aGetValuesOverlappedBulk
         uint32_t            toSegmentIndex,
         int16_t            *overflow
     ); """
-ps4000a.make_symbol("_GetValuesOverlappedBulk", "ps4000aGetValuesOverlappedBulk", c_uint32,
+ps4000a.make_symbol("_get_values_overlapped_bulk", "ps4000aGetValuesOverlappedBulk", c_uint32,
                     [c_int16, c_uint32, c_void_p, c_uint32, c_int32, c_uint32, c_uint32, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aEnumerateUnits
@@ -929,7 +929,7 @@ doc = """ PICO_STATUS ps4000aEnumerateUnits
         int8_t  *serials,
         int16_t *serialLth
     ); """
-ps4000a.make_symbol("_EnumerateUnits", "ps4000aEnumerateUnits", c_uint32, [c_void_p, c_void_p, c_void_p], doc)
+ps4000a.make_symbol("_enumerate_units", "ps4000aEnumerateUnits", c_uint32, [c_void_p, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetChannelInformation
     (
@@ -940,7 +940,7 @@ doc = """ PICO_STATUS ps4000aGetChannelInformation
         int32_t              *length,
         int32_t               channels
     ); """
-ps4000a.make_symbol("_GetChannelInformation", "ps4000aGetChannelInformation", c_uint32,
+ps4000a.make_symbol("_get_channel_information", "ps4000aGetChannelInformation", c_uint32,
                     [c_int16, c_int32, c_int32, c_void_p, c_void_p, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aConnectDetect
@@ -949,21 +949,21 @@ doc = """ PICO_STATUS ps4000aConnectDetect
         PS4000A_CONNECT_DETECT *sensor,
         int16_t                 nSensors
     ); """
-ps4000a.make_symbol("_ConnectDetect", "ps4000aConnectDetect", c_uint32, [c_int16, c_void_p, c_int16], doc)
+ps4000a.make_symbol("_connect_detect", "ps4000aConnectDetect", c_uint32, [c_int16, c_void_p, c_int16], doc)
 
 doc = """ PICO_STATUS ps4000aMaximumValue
     (
         int16_t  handle,
         int16_t *value
     ); """
-ps4000a.make_symbol("_MaximumValue", "ps4000aMaximumValue", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_maximum_value", "ps4000aMaximumValue", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aMinimumValue
     (
         int16_t		handle,
         int16_t * value
     ); """
-ps4000a.make_symbol("_MinimumValue", "ps4000aMinimumValue", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_minimum_value", "ps4000aMinimumValue", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetAnalogueOffset
     (
@@ -973,7 +973,7 @@ doc = """ PICO_STATUS ps4000aGetAnalogueOffset
         float            *maximumVoltage,
         float            *minimumVoltage
     ); """
-ps4000a.make_symbol("_GetAnalogueOffset", "ps4000aGetAnalogueOffset", c_uint32,
+ps4000a.make_symbol("_get_analogue_offset", "ps4000aGetAnalogueOffset", c_uint32,
                     [c_int16, c_int32, c_int32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetMaxSegments
@@ -981,53 +981,53 @@ doc = """ PICO_STATUS ps4000aGetMaxSegments
         int16_t   handle,
         uint32_t *maxSegments
     ); """
-ps4000a.make_symbol("_GetMaxSegments", "ps4000aGetMaxSegments", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_get_max_segments", "ps4000aGetMaxSegments", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aChangePowerSource
     (
         int16_t      handle,
         PICO_STATUS  powerState
     ); """
-ps4000a.make_symbol("_ChangePowerSource", "ps4000aChangePowerSource", c_uint32, [c_int16, c_uint32], doc)
+ps4000a.make_symbol("_change_power_source", "ps4000aChangePowerSource", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aCurrentPowerSource
     (
         int16_t  handle
     ); """
-ps4000a.make_symbol("_CurrentPowerSource", "ps4000aCurrentPowerSource", c_uint32, [c_int16, ], doc)
+ps4000a.make_symbol("_current_power_source", "ps4000aCurrentPowerSource", c_uint32, [c_int16, ], doc)
 
 doc = """ PICO_STATUS ps4000aStop
     (
         int16_t  handle
     ); """
-ps4000a.make_symbol("_Stop", "ps4000aStop", c_uint32, [c_int16, ], doc)
+ps4000a.make_symbol("_stop", "ps4000aStop", c_uint32, [c_int16, ], doc)
 
 doc = """ PICO_STATUS ps4000aPingUnit
     (
         int16_t  handle
     ); """
-ps4000a.make_symbol("_PingUnit", "ps4000aPingUnit", c_uint32, [c_int16, ], doc)
+ps4000a.make_symbol("_ping_unit", "ps4000aPingUnit", c_uint32, [c_int16, ], doc)
 
 doc = """ PICO_STATUS ps4000aSetNoOfCaptures
     (
         int16_t   handle,
         uint32_t  nCaptures
     ); """
-ps4000a.make_symbol("_SetNoOfCaptures", "ps4000aSetNoOfCaptures", c_uint32, [c_int16, c_uint32], doc)
+ps4000a.make_symbol("_set_no_of_captures", "ps4000aSetNoOfCaptures", c_uint32, [c_int16, c_uint32], doc)
 
 doc = """ PICO_STATUS ps4000aGetNoOfCaptures
     (
         int16_t   handle,
         uint32_t *nCaptures
     ); """
-ps4000a.make_symbol("_GetNoOfCaptures", "ps4000aGetNoOfCaptures", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_get_no_of_captures", "ps4000aGetNoOfCaptures", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetNoOfProcessedCaptures
     (
         int16_t   handle,
         uint32_t *nProcessedCaptures
     ); """
-ps4000a.make_symbol("_GetNoOfProcessedCaptures", "ps4000aGetNoOfProcessedCaptures", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_get_no_of_processed_captures", "ps4000aGetNoOfProcessedCaptures", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aDeviceMetaData
     (
@@ -1038,7 +1038,7 @@ doc = """ PICO_STATUS ps4000aDeviceMetaData
         PS4000A_META_OPERATION  operation,
         PS4000A_META_FORMAT     format
     ); """
-ps4000a.make_symbol("_DeviceMetaData", "ps4000aDeviceMetaData", c_uint32,
+ps4000a.make_symbol("_device_meta_data", "ps4000aDeviceMetaData", c_uint32,
                     [c_int16, c_void_p, c_void_p, c_int32, c_int32, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aGetString
@@ -1048,14 +1048,14 @@ doc = """ PICO_STATUS ps4000aGetString
         int8_t            *string,
         int32_t           *stringLength
     ); """
-ps4000a.make_symbol("_GetString", "ps4000aGetString", c_uint32, [c_int16, c_int32, c_void_p, c_void_p], doc)
+ps4000a.make_symbol("_get_string", "ps4000aGetString", c_uint32, [c_int16, c_int32, c_void_p, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aGetCommonModeOverflow
     (
         int16_t   handle,
         uint16_t *overflow
     ); """
-ps4000a.make_symbol("_GetCommonModeOverflow", "ps4000aGetCommonModeOverflow", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_get_common_mode_overflow", "ps4000aGetCommonModeOverflow", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aSetFrequencyCounter
     (
@@ -1066,7 +1066,7 @@ doc = """ PICO_STATUS ps4000aSetFrequencyCounter
         int16_t                          thresholdMajor,
         int16_t                          thresholdMinor
     ); """
-ps4000a.make_symbol("_SetFrequencyCounter", "ps4000aSetFrequencyCounter", c_uint32,
+ps4000a.make_symbol("_set_frequency_counter", "ps4000aSetFrequencyCounter", c_uint32,
                     [c_int16, c_int32, c_int16, c_int32, c_int16, c_int16], doc)
 
 doc = """ PICO_STATUS ps4000aOpenUnitWithResolution
@@ -1075,28 +1075,28 @@ doc = """ PICO_STATUS ps4000aOpenUnitWithResolution
 		int8_t     *serial,
 		PS4000A_DEVICE_RESOLUTION    resolution
 	); """
-ps4000a.make_symbol("_OpenUnitWithResolution", "ps4000aOpenUnitWithResolution", c_uint32, [c_void_p, c_void_p, c_int32], doc)
+ps4000a.make_symbol("_open_unit_with_resolution", "ps4000aOpenUnitWithResolution", c_uint32, [c_void_p, c_void_p, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aGetDeviceResolution
     (
 	    int16_t    handle,
 		PS4000A_DEVICE_RESOLUTION    *resolution
 	); """
-ps4000a.make_symbol("_GetResolution", "ps4000aGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_get_resolution", "ps4000aGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aSetDeviceResolution
     (
 	    int16_t    handle,
 		PS4000A_DEVICE_RESOLUTION    resolution
 	); """
-ps4000a.make_symbol("_SetResolution", "ps4000aSetDeviceResolution", c_uint32, [c_int16, c_int32], doc)
+ps4000a.make_symbol("_set_resolution", "ps4000aSetDeviceResolution", c_uint32, [c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetProbeInteractionCallback
     (
 	    int16_t    handle,
 		ps4000aProbeInteractions callback
 	); """
-ps4000a.make_symbol("_SetProbeInteractionCallback", "ps4000aSetProbeInteractionCallback", c_uint32, [c_int16, c_void_p], doc)
+ps4000a.make_symbol("_set_probe_interaction_callback", "ps4000aSetProbeInteractionCallback", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ void *ps4000aProbeInteractions
     (
