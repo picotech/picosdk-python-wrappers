@@ -10,7 +10,7 @@ this type and attach the missing methods.
 from __future__ import print_function
 
 import sys
-from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer, byref
+from ctypes import c_int16, c_int32, c_uint32, c_float, c_double, c_void_p, create_string_buffer, byref
 from ctypes.util import find_library
 import collections
 import picosdk.constants as constants
@@ -353,11 +353,11 @@ class Library(object):
         if len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int16:
             if analog_offset is not None:
                 raise ArgumentOutOfRangeError("This device doesn't support analog offset")
-            return_code = self._set_channel(c_int16(handle),
-                                            c_int16(channel_id),
-                                            c_int16(enabled),
-                                            c_int16(coupling_id),
-                                            c_int16(range_id))
+
+            args = (handle, channel_id, enabled, coupling_id, range_id)
+            converted_args = self._convert_args(self._set_channel, args)
+            return_code = self._set_channel(*converted_args)
+
             if return_code == 0:
                 raise ValidRangeEnumValueNotValidForThisDevice(
                     f"{self.PICO_VOLTAGE_RANGE[range_id]}V is out of range for this device.")
@@ -367,20 +367,17 @@ class Library(object):
             if len(self._set_channel.argtypes) == 6:
                 if analog_offset is None:
                     analog_offset = 0.0
-                status = self._set_channel(c_int16(handle),
-                                           c_int32(channel_id),
-                                           c_int16(enabled),
-                                           c_int32(coupling_id),
-                                           c_int32(range_id),
-                                           c_float(analog_offset))
+                args = (handle, channel_id, enabled, coupling_id, range_id, analog_offset)
+                converted_args = self._convert_args(self._set_channel, args)
+                status = self._set_channel(*converted_args)
+
             elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32:
                 if analog_offset is not None:
                     raise ArgumentOutOfRangeError("This device doesn't support analog offset")
-                status = self._set_channel(c_int16(handle),
-                                           c_int32(channel_id),
-                                           c_int16(enabled),
-                                           c_int16(coupling_id),
-                                           c_int32(range_id))
+                args = (handle, channel_id, enabled, coupling_id, range_id)
+                converted_args = self._convert_args(self._set_channel, args)
+                status = self._set_channel(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
                 if status == self.PICO_STATUS['PICO_INVALID_VOLTAGE_RANGE']:
                     raise ValidRangeEnumValueNotValidForThisDevice(
@@ -426,28 +423,26 @@ class Library(object):
             time_interval = c_int32(0)
             time_units = c_int16(0)
             max_samples = c_int32(0)
-            return_code = self._get_timebase(c_int16(handle),
-                                             c_int16(timebase_id),
-                                             c_int32(no_of_samples),
-                                             byref(time_interval),
-                                             byref(time_units),
-                                             c_int16(oversample),
-                                             byref(max_samples))
+
+            args = (handle, timebase_id, no_of_samples, time_interval,
+                   time_units, oversample, max_samples)
+            converted_args = self._convert_args(self._get_timebase, args)
+            return_code = self._get_timebase(*converted_args)
+
             if return_code == 0:
                 raise InvalidTimebaseError()
 
             return TimebaseInfo(timebase_id, float(time_interval.value), time_units.value, max_samples.value, None)
         elif hasattr(self, '_get_timebase2') and (
-                     len(self._get_timebase2.argtypes) == 7 and self._get_timebase2.argtypes[1] == c_uint32):
+                len(self._get_timebase2.argtypes) == 7 and self._get_timebase2.argtypes[1] == c_uint32):
             time_interval = c_float(0.0)
             max_samples = c_int32(0)
-            status = self._get_timebase2(c_int16(handle),
-                                         c_uint32(timebase_id),
-                                         c_int32(no_of_samples),
-                                         byref(time_interval),
-                                         c_int16(oversample),
-                                         byref(max_samples),
-                                         c_uint32(segment_index))
+
+            args = (handle, timebase_id, no_of_samples, time_interval,
+                    oversample, max_samples, segment_index)
+            converted_args = self._convert_args(self._get_timebase2, args)
+            status = self._get_timebase2(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidTimebaseError(f"get_timebase2 failed ({constants.pico_tag(status)})")
 
@@ -460,12 +455,10 @@ class Library(object):
         auto_trigger_after_millis = 1
         if hasattr(self, '_set_trigger') and len(self._set_trigger.argtypes) == 6:
             PS2000_NONE = 5
-            return_code = self._set_trigger(c_int16(device.handle),
-                                            c_int16(PS2000_NONE),
-                                            c_int16(0),
-                                            c_int16(0),
-                                            c_int16(0),
-                                            c_int16(auto_trigger_after_millis))
+            args = (device.handle, PS2000_NONE, 0, 0, 0, auto_trigger_after_millis)
+            converted_args = self._convert_args(self._set_trigger, args)
+            return_code = self._set_trigger(*converted_args)
+
             if return_code == 0:
                 raise InvalidTriggerParameters()
         elif hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
@@ -496,23 +489,19 @@ class Library(object):
     def _python_run_block(self, handle, pre_samples, post_samples, timebase_id, oversample, segment_index):
         time_indisposed = c_int32(0)
         if len(self._run_block.argtypes) == 5:
-            return_code = self._run_block(c_int16(handle),
-                                          c_int32(pre_samples + post_samples),
-                                          c_int16(timebase_id),
-                                          c_int16(oversample),
-                                          byref(time_indisposed))
+            args = (handle, pre_samples + post_samples, timebase_id,
+                   oversample, time_indisposed)
+            converted_args = self._convert_args(self._run_block, args)
+            return_code = self._run_block(*converted_args)
+
             if return_code == 0:
                 raise InvalidCaptureParameters()
         elif len(self._run_block.argtypes) == 9:
-            status = self._run_block(c_int16(handle),
-                                     c_int32(pre_samples),
-                                     c_int32(post_samples),
-                                     c_uint32(timebase_id),
-                                     c_int16(oversample),
-                                     byref(time_indisposed),
-                                     c_uint32(segment_index),
-                                     None,
-                                     None)
+            args = (handle, pre_samples, post_samples, timebase_id,
+                   oversample, time_indisposed, segment_index, None, None)
+            converted_args = self._convert_args(self._run_block, args)
+            status = self._run_block(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"run_block failed ({constants.pico_tag(status)})")
         else:
@@ -538,10 +527,13 @@ class Library(object):
 
     @requires_device()
     def maximum_value(self, device):
+        """Get the maximum ADC value for this device."""
         if not hasattr(self, '_maximum_value'):
             return (2**15)-1
         max_adc = c_int16(0)
-        self._maximum_value(c_int16(device.handle), byref(max_adc))
+        args = (device.handle, max_adc)
+        converted_args = self._convert_args(self._maximum_value, args)
+        self._maximum_value(*converted_args)
         return max_adc.value
 
     @requires_device()
@@ -555,36 +547,32 @@ class Library(object):
             inputs = {k: None for k in 'ABCD'}
             for k, arr in results.items():
                 inputs[k] = arr.ctypes.data
-            return_code = self._get_values(c_int16(device.handle),
-                                           inputs['A'],
-                                           inputs['B'],
-                                           inputs['C'],
-                                           inputs['D'],
-                                           byref(overflow),
-                                           c_int32(num_samples))
+
+            args = (device.handle, inputs['A'], inputs['B'], inputs['C'],
+                   inputs['D'], overflow, no_of_samples)
+            converted_args = self._convert_args(self._get_values, args)
+            return_code = self._get_values(*converted_args)
+
             if return_code == 0:
                 raise InvalidCaptureParameters()
         elif len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_uint32:
             # For this function pattern, we first call a function (self._set_data_buffer) to register each buffer. Then,
             # we can call self._get_values to actually populate them.
             for channel, array in results.items():
-                status = self._set_data_buffer(c_int16(device.handle),
-                                               c_int32(self.PICO_CHANNEL[channel]),
-                                               array.ctypes.data,
-                                               c_int32(num_samples),
-                                               c_uint32(segment_index),
-                                               c_int32(self.PICO_RATIO_MODE['NONE']))
+                args = (device.handle, available_channels[channel], array.ctypes.data,
+                       no_of_samples, segment_index, self.PICO_RATIO_MODE['NONE'])
+                converted_args = self._convert_args(self._set_data_buffer, args)
+                status = self._set_data_buffer(*converted_args)
+
                 if status != self.PICO_STATUS['PICO_OK']:
                     raise InvalidCaptureParameters(f"set_data_buffer failed ({constants.pico_tag(status)})")
 
-            samples_collected = c_uint32(num_samples)
-            status = self._get_values(c_int16(device.handle),
-                                      c_uint32(0),
-                                      byref(samples_collected),
-                                      c_uint32(1),
-                                      c_int32(self.PICO_RATIO_MODE['NONE']),
-                                      c_uint32(segment_index),
-                                      byref(overflow))
+            samples_collected = c_uint32(no_of_samples)
+            args = (device.handle, 0, samples_collected, 1,
+                   self.PICO_RATIO_MODE['NONE'], segment_index, overflow)
+            converted_args = self._convert_args(self._get_values, args)
+            status = self._get_values(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"get_values failed ({constants.pico_tag(status)})")
 
@@ -598,13 +586,16 @@ class Library(object):
 
     @requires_device()
     def stop(self, device):
+        """Stop data capture."""
+        args = (device.handle,)
+        converted_args = self._convert_args(self._stop, args)
+
         if self._stop.restype == c_int16:
-            return_code = self._stop(c_int16(device.handle))
-            if isinstance(return_code, c_int16):
-                if return_code == 0:
-                    raise InvalidCaptureParameters()
+            return_code = self._stop(*converted_args)
+            if isinstance(return_code, c_int16) and return_code == 0:
+                raise InvalidCaptureParameters()
         else:
-            status = self._stop(c_int16(device.handle))
+            status = self._stop(*converted_args)
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"stop failed ({constants.pico_tag(status)})")
 
