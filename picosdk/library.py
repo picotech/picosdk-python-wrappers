@@ -462,14 +462,19 @@ class Library(object):
             if return_code == 0:
                 raise InvalidTriggerParameters()
         elif hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
-            enabled = False
-            status = self._set_simple_trigger(c_int16(device.handle),
-                                              c_int16(int(enabled)),
-                                              c_int32(self.PICO_CHANNEL['A']),
-                                              c_int16(0),
-                                              c_int32(self.PICO_THRESHOLD_DIRECTION['NONE']),
-                                              c_uint32(0),
-                                              c_int16(auto_trigger_after_millis))
+            threshold_direction_id = None
+            if not self.PICO_THRESHOLD_DIRECTION:
+                threshold_directions = getattr(self, self.name.upper() + '_THRESHOLD_DIRECTION', None)
+                if not threshold_directions:
+                    raise NotImplementedError("This device doesn't support threshold direction")
+                threshold_direction_id = threshold_directions[self.name.upper() + '_NONE']
+            else:
+                threshold_direction_id = self.PICO_THRESHOLD_DIRECTION['NONE']
+            args = (device.handle, False, self.PICO_CHANNEL['A'], 0,
+                   threshold_direction_id, 0, auto_trigger_after_millis)
+            converted_args = self._convert_args(self._set_simple_trigger, args)
+            status = self._set_simple_trigger(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidTriggerParameters(f"set_simple_trigger failed ({constants.pico_tag(status)})")
         else:
