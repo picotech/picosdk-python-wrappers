@@ -631,6 +631,74 @@ class Library(object):
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"stop failed ({constants.pico_tag(status)})")
 
+    @requires_device()
+    def set_sig_gen_built_in(self, device, offset_voltage=0, pk_to_pk=2000000, wave_type="SINE",
+                             start_frequency=1000.0, stop_frequency=1000.0, increment=0.0,
+                             dwell_time=1.0, sweep_type="UP", operation='ES_OFF', shots=1, sweeps=1,
+                             trigger_type="RISING", trigger_source="NONE", ext_in_threshold=0):
+        """Set up the signal generator to output a built-in waveform.
+
+        Args:
+            device: Device instance
+            offset_voltage: Offset voltage in microvolts (default 0)
+            pk_to_pk: Peak-to-peak voltage in microvolts (default 2000000)
+            wave_type: Type of waveform (e.g. "SINE", "SQUARE", "TRIANGLE")
+            start_frequency: Start frequency in Hz (default 1000.0)
+            stop_frequency: Stop frequency in Hz (default 1000.0)
+            increment: Frequency increment in Hz (default 0.0)
+            dwell_time: Time at each frequency in seconds (default 1.0)
+            sweep_type: Sweep type (e.g. "UP", "DOWN", "UPDOWN")
+            operation: Configures the white noise/PRBS (e.g. "ES_OFF", "WHITENOISE", "PRBS")
+            shots: Number of shots per trigger (default 1)
+            sweeps: Number of sweeps (default 1)
+            trigger_type: Type of trigger (e.g. "RISING", "FALLING")
+            trigger_source: Source of trigger (e.g. "NONE", "SCOPE_TRIG")
+            ext_in_threshold: External trigger threshold in ADC counts
+
+        Returns:
+            None
+
+        Raises:
+            ArgumentOutOfRangeError: If parameters are invalid for device
+        """
+        prefix = self.name.upper()
+
+        # Convert string parameters to enum values
+        try:
+            wave_type_val = getattr(self, f"{prefix}_WAVE_TYPE")[f"{prefix}_{wave_type.upper()}"]
+            sweep_type_val = getattr(self, f"{prefix}_SWEEP_TYPE")[f"{prefix}_{sweep_type.upper()}"]
+        except (AttributeError, KeyError) as e:
+            raise ArgumentOutOfRangeError(f"Invalid wave_type or sweep_type for this device: {e}")
+
+        # Check function signature and call appropriate version
+        if len(self._set_sig_gen_built_in.argtypes) == 10:
+            args = (device.handle, offset_voltage, pk_to_pk, wave_type_val,
+                   start_frequency, stop_frequency, increment, dwell_time,
+                   sweep_type_val, sweeps)
+            converted_args = self._convert_args(self._set_sig_gen_built_in, args)
+            status = self._set_sig_gen_built_in(*converted_args)
+
+        elif len(self._set_sig_gen_built_in.argtypes) == 15:
+            try:
+                trigger_type_val = getattr(self, f"{prefix}_SIGGEN_TRIG_TYPE")[f"{prefix}_SIGGEN_{trigger_type.upper()}"]
+                trigger_source_val = getattr(self, f"{prefix}_SIGGEN_TRIG_SOURCE")[f"{prefix}_SIGGEN_{trigger_source.upper()}"]
+                extra_ops_val = getattr(self, f"{prefix}_EXTRA_OPERATIONS")[f"{prefix}_{operation.upper()}"]
+            except (AttributeError, KeyError) as e:
+                raise ArgumentOutOfRangeError(f"Invalid trigger parameters for this device: {e}")
+
+            args = (device.handle, offset_voltage, pk_to_pk, wave_type_val,
+                   start_frequency, stop_frequency, increment, dwell_time,
+                   sweep_type_val, extra_ops_val, shots, sweeps,
+                   trigger_type_val, trigger_source_val, ext_in_threshold)
+            converted_args = self._convert_args(self._set_sig_gen_built_in, args)
+            status = self._set_sig_gen_built_in(*converted_args)
+
+        else:
+            raise NotImplementedError("Signal generator not supported on this device")
+
+        if status != self.PICO_STATUS["PICO_OK"]:
+            raise PicoError(f"set_sig_gen_built_in failed: {constants.pico_tag(status)}")
+
     def _convert_args(self, func, args):
         """Convert arguments to match function argtypes.
 
