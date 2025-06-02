@@ -359,8 +359,8 @@ class Library(object):
                                             c_int16(coupling_id),
                                             c_int16(range_id))
             if return_code == 0:
-                raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
-                    self.PICO_VOLTAGE_RANGE[range_id]))
+                raise ValidRangeEnumValueNotValidForThisDevice(
+                    f"{self.PICO_VOLTAGE_RANGE[range_id]}V is out of range for this device.")
         elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32 or (
              len(self._set_channel.argtypes) == 6):
             status = self.PICO_STATUS['PICO_OK']
@@ -383,13 +383,12 @@ class Library(object):
                                            c_int32(range_id))
             if status != self.PICO_STATUS['PICO_OK']:
                 if status == self.PICO_STATUS['PICO_INVALID_VOLTAGE_RANGE']:
-                    raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
-                        self.PICO_VOLTAGE_RANGE[range_id]))
+                    raise ValidRangeEnumValueNotValidForThisDevice(
+                        f"{self.PICO_VOLTAGE_RANGE[range_id]}V is out of range for this device.")
                 if status == self.PICO_STATUS['PICO_INVALID_CHANNEL'] and not enabled:
                     # don't throw errors if the user tried to disable a missing channel.
                     return
-                raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
-
+                raise ArgumentOutOfRangeError(f"problem configuring channel ({constants.pico_tag(status)})")
         else:
             raise NotImplementedError("not done other driver types yet")
 
@@ -450,7 +449,7 @@ class Library(object):
                                          byref(max_samples),
                                          c_uint32(segment_index))
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidTimebaseError("get_timebase2 failed (%s)" % constants.pico_tag(status))
+                raise InvalidTimebaseError(f"get_timebase2 failed ({constants.pico_tag(status)})")
 
             return TimebaseInfo(timebase_id, time_interval.value, None, max_samples.value, segment_index)
         else:
@@ -479,7 +478,7 @@ class Library(object):
                                               c_uint32(0),
                                               c_int16(auto_trigger_after_millis))
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidTriggerParameters("set_simple_trigger failed (%s)" % constants.pico_tag(status))
+                raise InvalidTriggerParameters(f"set_simple_trigger failed ({constants.pico_tag(status)})")
         else:
             raise NotImplementedError("not done other driver types yet")
 
@@ -515,7 +514,7 @@ class Library(object):
                                      None,
                                      None)
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidCaptureParameters("run_block failed (%s)" % constants.pico_tag(status))
+                raise InvalidCaptureParameters(f"run_block failed ({constants.pico_tag(status)})")
         else:
             raise NotImplementedError("not done other driver types yet")
 
@@ -576,7 +575,7 @@ class Library(object):
                                                c_uint32(segment_index),
                                                c_int32(self.PICO_RATIO_MODE['NONE']))
                 if status != self.PICO_STATUS['PICO_OK']:
-                    raise InvalidCaptureParameters("set_data_buffer failed (%s)" % constants.pico_tag(status))
+                    raise InvalidCaptureParameters(f"set_data_buffer failed ({constants.pico_tag(status)})")
 
             samples_collected = c_uint32(num_samples)
             status = self._get_values(c_int16(device.handle),
@@ -587,7 +586,7 @@ class Library(object):
                                       c_uint32(segment_index),
                                       byref(overflow))
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidCaptureParameters("get_values failed (%s)" % constants.pico_tag(status))
+                raise InvalidCaptureParameters(f"get_values failed ({constants.pico_tag(status)})")
 
         overflow_warning = {}
         if overflow.value:
@@ -607,4 +606,4 @@ class Library(object):
         else:
             status = self._stop(c_int16(device.handle))
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidCaptureParameters("stop failed (%s)" % constants.pico_tag(status))
+                raise InvalidCaptureParameters(f"stop failed ({constants.pico_tag(status)})")
