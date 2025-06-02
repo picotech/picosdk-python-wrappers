@@ -16,7 +16,7 @@ import collections
 import picosdk.constants as constants
 import numpy
 
-from picosdk.errors import CannotFindPicoSDKError, CannotOpenPicoSDKError, DeviceNotFoundError, \
+from picosdk.errors import PicoError, CannotFindPicoSDKError, CannotOpenPicoSDKError, DeviceNotFoundError, \
     ArgumentOutOfRangeError, ValidRangeEnumValueNotValidForThisDevice, DeviceCannotSegmentMemoryError, \
     InvalidMemorySegmentsError, InvalidTimebaseError, InvalidTriggerParameters, InvalidCaptureParameters
 
@@ -308,6 +308,33 @@ class Library(object):
                 excluded += (range_id,)
 
         return max_voltage
+
+    @requires_device("set_digital_port requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def set_digital_port(self, device, port_number=0, enabled=True, logic_level=0):
+        """Set the digital port
+
+        Args:
+            port_number (int): identifies the port for digital data. (e.g. 0 for digital channels 0-7)
+            enabled (bool): whether or not to enable the channel (boolean)
+            logic_level (int): the voltage at which the state transitions between 0 and 1.
+                Range: –32767 (–5 V) to 32767 (+5 V).
+        Raises:
+            NotImplementedError: This device doesn't support digital ports.
+            PicoError: set_digital_port failed
+        """
+        if hasattr(self, '_set_digital_port') and len(self._set_digital_port.argtypes) == 4:
+            digital_ports = getattr(self, self.name.upper() + '_DIGITAL_PORT', None)
+            if not digital_ports:
+                raise NotImplementedError("This device doesn't support digital ports")
+            port_id = digital_ports[self.name.upper() + "_DIGITAL_PORT" + str(port_number)]
+            args = (device.handle, port_id, enabled, logic_level)
+            converted_args = self._convert_args(self._set_digital_port, args)
+            status = self._set_digital_port(*converted_args)
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise PicoError(
+                    f"set_digital_port failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device doesn't support digital ports or is not implemented yet")
 
     def _resolve_range(self, signal_peak, exclude=()):
         # we use >= so that someone can specify the range they want precisely.
