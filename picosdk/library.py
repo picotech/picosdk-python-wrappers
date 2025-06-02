@@ -537,10 +537,22 @@ class Library(object):
         return max_adc.value
 
     @requires_device()
-    def get_values(self, device, active_channels, num_samples, segment_index=0):
-        # Initialise buffers to hold the data:
-        results = {channel: numpy.empty(num_samples, numpy.dtype('int16')) for channel in active_channels}
+    def get_values(self, device, active_channels, no_of_samples, segment_index=0):
+        """Get captured data from the device.
 
+        Args:
+            device: Device instance
+            active_channels: List of channels to get data from (port numbers included)
+            no_of_samples: Number of samples to get
+            segment_index: Memory segment to get data from
+
+        Returns:
+            Tuple of (results dict, overflow warnings dict)
+        """
+        if isinstance(active_channels, int):
+            active_channels = [active_channels]
+        results = {channel: numpy.empty(no_of_samples, numpy.dtype('int16'))
+                  for channel in active_channels}
         overflow = c_int16(0)
 
         if len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_int16:
@@ -558,6 +570,13 @@ class Library(object):
         elif len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_uint32:
             # For this function pattern, we first call a function (self._set_data_buffer) to register each buffer. Then,
             # we can call self._get_values to actually populate them.
+            available_channels = self.PICO_CHANNEL
+            digital_ports = getattr(self, self.name.upper() + '_DIGITAL_PORT', None)
+            if digital_ports:
+                for digital_port, value in digital_ports.items():
+                    if digital_port.startswith(self.name.upper() + '_DIGITAL_PORT'):
+                        port_number = int(digital_port[-1])
+                        available_channels[port_number] = value
             for channel, array in results.items():
                 args = (device.handle, available_channels[channel], array.ctypes.data,
                        no_of_samples, segment_index, self.PICO_RATIO_MODE['NONE'])
