@@ -501,6 +501,14 @@ class Library(object):
 
             if return_code == 0:
                 raise InvalidCaptureParameters()
+        elif len(self._run_block.argtypes) == 8:
+            args = (handle, pre_samples, post_samples, timebase_id,
+                    time_indisposed, segment_index, None, None)
+            converted_args = self._convert_args(self._run_block, args)
+            status = self._run_block(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidCaptureParameters(f"run_block failed ({constants.pico_tag(status)})")
         elif len(self._run_block.argtypes) == 9:
             args = (handle, pre_samples, post_samples, timebase_id,
                    oversample, time_indisposed, segment_index, None, None)
