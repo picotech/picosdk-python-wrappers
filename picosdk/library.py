@@ -607,3 +607,29 @@ class Library(object):
             status = self._stop(c_int16(device.handle))
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"stop failed ({constants.pico_tag(status)})")
+
+    def _convert_args(self, func, args):
+        """Convert arguments to match function argtypes.
+
+        Args:
+            func: The C function with argtypes defined
+            args: Tuple of arguments to convert
+
+        Returns:
+            Tuple of converted arguments matching argtypes
+        """
+        if not hasattr(func, 'argtypes'):
+            return args
+
+        converted = []
+        for arg, argtype in zip(args, func.argtypes):
+            # Handle byref parameters
+            if argtype == c_void_p and isinstance(arg, (c_int16, c_int32, c_uint32, c_float, c_double)):
+                converted.append(byref(arg))
+            # Handle normal parameters
+            elif arg is not None:
+                converted.append(argtype(arg))
+            else:
+                converted.append(None)
+        return tuple(converted)
+
