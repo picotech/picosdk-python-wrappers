@@ -43,6 +43,22 @@ def requires_device(error_message="This method requires a Device instance regist
     return check_device_decorator
 
 
+def voltage_to_logic_level(voltage):
+    """Convert a voltage value into logic level for digital channels.
+
+    Range: –32767 (–5 V) to 32767 (5 V).
+
+    Args:
+        voltage (float): Voltage in volts.
+
+    Returns:
+        int: The calculated logic level count.
+    """
+    clamped_voltage = min(max(-5, voltage), 5)
+    logic_level = int((clamped_voltage) * (32767 / 5))
+    return logic_level
+
+
 class Library(object):
     def __init__(self, name):
         self.name = name
@@ -310,19 +326,19 @@ class Library(object):
         return max_voltage
 
     @requires_device("set_digital_port requires a picosdk.device.Device instance, passed to the correct owning driver.")
-    def set_digital_port(self, device, port_number=0, enabled=True, logic_level=0):
+    def set_digital_port(self, device, port_number=0, enabled=True, voltage_level=0):
         """Set the digital port
 
         Args:
             port_number (int): identifies the port for digital data. (e.g. 0 for digital channels 0-7)
             enabled (bool): whether or not to enable the channel (boolean)
-            logic_level (int): the voltage at which the state transitions between 0 and 1.
-                Range: –32767 (–5 V) to 32767 (+5 V).
+            voltage_level (float): the voltage at which the state transitions between 0 and 1. Range: –5.0 to 5.0 (V).
         Raises:
             NotImplementedError: This device doesn't support digital ports.
             PicoError: set_digital_port failed
         """
         if hasattr(self, '_set_digital_port') and len(self._set_digital_port.argtypes) == 4:
+            logic_level = voltage_to_logic_level(voltage_level)
             digital_ports = getattr(self, self.name.upper() + '_DIGITAL_PORT', None)
             if not digital_ports:
                 raise NotImplementedError("This device doesn't support digital ports")
