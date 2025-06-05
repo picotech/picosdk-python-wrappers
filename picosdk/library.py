@@ -326,7 +326,7 @@ class Library(object):
         return max_voltage
 
     @requires_device("set_digital_port requires a picosdk.device.Device instance, passed to the correct owning driver.")
-    def set_digital_port(self, device, port_number=0, enabled=True, voltage_level=0):
+    def set_digital_port(self, device, port_number=0, enabled=True, voltage_level=1.8):
         """Set the digital port
 
         Args:
