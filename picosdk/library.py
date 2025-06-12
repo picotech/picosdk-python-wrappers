@@ -666,7 +666,7 @@ class Library(object):
             raise NotImplementedError("not done other driver types yet")
 
     @requires_device()
-    def stop_block_capture(self, device, timeout_minutes=0):
+    def stop_block_capture(self, device, timeout_minutes=5):
         """Poll the driver to see if it has finished collecting the requested samples.
 
         Args:
