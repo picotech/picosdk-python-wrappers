@@ -61,6 +61,21 @@ def voltage_to_logic_level(voltage):
     logic_level = int((clamped_voltage) * (32767 / 5))
     return logic_level
 
+class NumpyEncoder(json.JSONEncoder):
+    """Module specific json encoder class."""
+    def default(self, o):
+        """Default json encoder override.
+
+        Code inspired from https://github.com/Crimson-Crow/json-numpy/blob/main/json_numpy.py
+        """
+        if isinstance(o, (numpy.ndarray, numpy.generic)):
+            return {
+                "__numpy__": b64encode(o.data if o.flags.c_contiguous else o.tobytes()).decode(),
+                "dtype": dtype_to_descr(o.dtype),
+                "shape": o.shape,
+            }
+        return super().default(o)
+
 
 class SingletonScopeDataDict(dict):
     """SingletonScopeDataDict is a singleton dictionary object for sharing picoscope data between multiple classes.
