@@ -972,7 +972,7 @@ class Library(object):
         converted = []
         for arg, argtype in zip(args, func.argtypes):
             # Handle byref parameters
-            if argtype == c_void_p and isinstance(arg, (c_int16, c_int32, c_uint32, c_float, c_double)):
+            if argtype == c_void_p and arg is not None:
                 converted.append(byref(arg))
             # Handle normal parameters
             elif arg is not None:
