@@ -560,9 +560,8 @@ class Library(object):
                                                        no_of_samples,
                                                        oversample,
                                                        segment_index)
-        self.time_interval_sec = nanoseconds_result.time_interval * 1.e-9
         return TimebaseInfo(nanoseconds_result.timebase_id,
-                            self.time_interval_sec,
+                            nanoseconds_result.time_interval * 1.e-9,
                             nanoseconds_result.time_units,
                             nanoseconds_result.max_samples,
                             nanoseconds_result.segment_id)
@@ -765,7 +764,7 @@ class Library(object):
         return {channel_or_port: buffer}
 
     @requires_device()
-    def get_values(self, device, buffers, samples, max_voltage={}, start_index=0, downsample_ratio=0,
+    def get_values(self, device, buffers, samples, time_interval_sec, max_voltage={}, start_index=0, downsample_ratio=0,
                    downsample_ratio_mode="NONE", segment_index=0, output_dir=".", filename="data", save_to_file=False,
                    probe_attenuation=DEFAULT_PROBE_ATTENUATION):
         """Get stored data values from the scope and store it in a clean SingletonScopeDataDict object.
@@ -780,6 +779,7 @@ class Library(object):
             buffers (dict): Dictionary of buffers where the data will be stored. The keys are channel names or port numbers,
                             and the values are numpy arrays.
             samples (int): The number of samples to retrieve from the scope.
+            time_interval_sec (float): The time interval between samples in seconds. (obtained from get_timebase)
             max_voltage (dict): The maximum voltage of the range used per channel.
             start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
                                sample intervals from the start of the buffer.
@@ -820,7 +820,7 @@ class Library(object):
                                                             self.maximum_value(device))) * probe_attenuation[channel]
 
         time_sec = numpy.linspace(0,
-                                  (samples - 1) * self.time_interval_sec,
+                                  (samples - 1) * time_interval_sec,
                                   samples)
         scope_data["time"] = numpy.array(time_sec)
 
