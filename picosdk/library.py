@@ -425,9 +425,9 @@ class Library(object):
                                                        no_of_samples,
                                                        oversample,
                                                        segment_index)
-
+        self.time_interval_sec = nanoseconds_result.time_interval * 1.e-9
         return TimebaseInfo(nanoseconds_result.timebase_id,
-                            nanoseconds_result.time_interval * 1.e-9,
+                            self.time_interval_sec,
                             nanoseconds_result.time_units,
                             nanoseconds_result.max_samples,
                             nanoseconds_result.segment_id)
@@ -507,10 +507,12 @@ class Library(object):
                                       oversample,
                                       segment_index)
 
-    def _python_run_block(self, handle, pre_samples, post_samples, timebase_id, oversample, segment_index):
+    def _python_run_block(self, handle, pre_trigger_samples, post_trigger_samples, timebase_id, oversample,
+                          segment_index):
+        self.max_samples = pre_trigger_samples + post_trigger_samples
         time_indisposed = c_int32(0)
         if len(self._run_block.argtypes) == 5:
-            args = (handle, pre_samples + post_samples, timebase_id,
+            args = (handle, pre_trigger_samples + post_trigger_samples, timebase_id,
                    oversample, time_indisposed)
             converted_args = self._convert_args(self._run_block, args)
             return_code = self._run_block(*converted_args)
@@ -518,7 +520,7 @@ class Library(object):
             if return_code == 0:
                 raise InvalidCaptureParameters()
         elif len(self._run_block.argtypes) == 8:
-            args = (handle, pre_samples, post_samples, timebase_id,
+            args = (handle, pre_trigger_samples, post_trigger_samples, timebase_id,
                     time_indisposed, segment_index, None, None)
             converted_args = self._convert_args(self._run_block, args)
             status = self._run_block(*converted_args)
@@ -526,7 +528,7 @@ class Library(object):
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"run_block failed ({constants.pico_tag(status)})")
         elif len(self._run_block.argtypes) == 9:
-            args = (handle, pre_samples, post_samples, timebase_id,
+            args = (handle, pre_trigger_samples, post_trigger_samples, timebase_id,
                    oversample, time_indisposed, segment_index, None, None)
             converted_args = self._convert_args(self._run_block, args)
             status = self._run_block(*converted_args)
@@ -566,67 +568,107 @@ class Library(object):
         return max_adc.value
 
     @requires_device()
-    def get_values(self, device, active_channels, no_of_samples, segment_index=0):
-        """Get captured data from the device.
+    def set_data_buffer(self, device, channel_or_port, buffer_length, segment_index=0, mode='NONE'):
+        """Set the data buffer for a specific channel.
 
         Args:
             device: Device instance
-            active_channels: List of channels to get data from (port numbers included)
-            no_of_samples: Number of samples to get
-            segment_index: Memory segment to get data from
+            channel_or_port: Channel (e.g. 'A', 'B') or digital port (e.g. 0, 1) to set data for
+            buffer_length: The size of the buffer array (equal to no_of_samples)
+            segment_index: The number of the memory segment to be used (default is 0)
+            mode: The ratio mode to be used (default is 'NONE')
+
+        Raises:
+            ArgumentOutOfRangeError: If parameters are invalid for device
+        """
+        if not hasattr(self, '_set_data_buffer'):
+            raise NotImplementedError("This device doesn't support setting data buffers")
+        if len(self._set_data_buffer.argtypes) != 6:
+            raise NotImplementedError("set_data_buffer is not implemented for this driver")
+        if isinstance(channel_or_port, str) and channel_or_port.upper() in self.PICO_CHANNEL:
+            id = self.PICO_CHANNEL[channel_or_port]
+        else:
+            try:
+                port_num = int(channel_or_port)
+                digital_ports = getattr(self, self.name.upper() + '_DIGITAL_PORT', None)
+                if digital_ports:
+                    digital_port = self.name.upper() + '_DIGITAL_PORT' + str(port_num)
+                    if digital_port not in digital_ports:
+                        raise ArgumentOutOfRangeError(f"Invalid digital port number {port_num}")
+                    id = digital_ports[digital_port]
+            except ValueError:
+                raise ArgumentOutOfRangeError(f"Invalid digital port number {port_num}")
+
+        if mode not in self.PICO_RATIO_MODE:
+            raise ArgumentOutOfRangeError(f"Invalid ratio mode '{mode}' for {self.name} driver"
+                                        "or PICO_RATIO_MODE doesn't exist for this driver")
+        buffer = (c_int16 * buffer_length)()
+        args = (device.handle, id, buffer, buffer_length, segment_index, self.PICO_RATIO_MODE[mode])
+        converted_args = self._convert_args(self._set_data_buffer, args)
+        status = self._set_data_buffer(*converted_args)
+
+        if status != self.PICO_STATUS['PICO_OK']:
+            raise ArgumentOutOfRangeError(f"set_data_buffer failed ({constants.pico_tag(status)})")
+
+        self.buffer[channel_or_port.upper()] = buffer
+
+    @requires_device()
+    def get_values(self, device, start_index=0, downsample_ratio=0, downsample_ratio_mode="NONE",
+                   segment_index=0, output_dir=".", filename="data", save_to_file=False):
+        """Get stored data values from the scope and store it in a clean SingletonScopeDataDict object.
+
+        This function is used after data collection has stopped. It gets the stored data from the scope, with or
+        without downsampling, starting at the specified sample number.
+
+        Args:
+            device (picosdk.device.Device): Device instance
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                               sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            segment_index (int): Memory segment index
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
 
         Returns:
             Tuple of (results dict, overflow warnings dict)
         """
-        if isinstance(active_channels, int):
-            active_channels = [active_channels]
-        results = {channel: numpy.empty(no_of_samples, numpy.dtype('int16'))
-                  for channel in active_channels}
-        overflow = c_int16(0)
+        scope_data = SingletonScopeDataDict()
+        scope_data.clean_dict()
+        overflow = (c_int16 * 10)()
+        no_of_samples = c_uint32(self.max_samples)
 
-        if len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_int16:
-            inputs = {k: None for k in 'ABCD'}
-            for k, arr in results.items():
-                inputs[k] = arr.ctypes.data
-
-            args = (device.handle, inputs['A'], inputs['B'], inputs['C'],
-                   inputs['D'], overflow, no_of_samples)
-            converted_args = self._convert_args(self._get_values, args)
-            return_code = self._get_values(*converted_args)
-
-            if return_code == 0:
-                raise InvalidCaptureParameters()
-        elif len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_uint32:
-            # For this function pattern, we first call a function (self._set_data_buffer) to register each buffer. Then,
-            # we can call self._get_values to actually populate them.
-            available_channels = self.PICO_CHANNEL
-            digital_ports = getattr(self, self.name.upper() + '_DIGITAL_PORT', None)
-            if digital_ports:
-                for digital_port, value in digital_ports.items():
-                    if digital_port.startswith(self.name.upper() + '_DIGITAL_PORT'):
-                        port_number = int(digital_port[-1])
-                        available_channels[port_number] = value
-            for channel, array in results.items():
-                args = (device.handle, available_channels[channel], array.ctypes.data,
-                       no_of_samples, segment_index, self.PICO_RATIO_MODE['NONE'])
-                converted_args = self._convert_args(self._set_data_buffer, args)
-                status = self._set_data_buffer(*converted_args)
-
-                if status != self.PICO_STATUS['PICO_OK']:
-                    raise InvalidCaptureParameters(f"set_data_buffer failed ({constants.pico_tag(status)})")
-
-            samples_collected = c_uint32(no_of_samples)
-            args = (device.handle, 0, samples_collected, 1,
-                   self.PICO_RATIO_MODE['NONE'], segment_index, overflow)
+        if len(self._get_values.argtypes) == 7:
+            args = (device.handle, start_index, no_of_samples, downsample_ratio,
+                    self.PICO_RATIO_MODE[downsample_ratio_mode], segment_index, overflow)
             converted_args = self._convert_args(self._get_values, args)
             status = self._get_values(*converted_args)
 
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"get_values failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("not done other driver types yet")
+
+        for channel, buffer in self.buffer.items():
+            if channel.isnumeric():
+                scope_data[channel] = numpy.asarray(split_mso_data_fast(no_of_samples, buffer))
+            else:
+                scope_data[channel] = numpy.array(
+                    adc_to_mv(buffer, self.channel_range[channel], self.max_adc)) * self.probe_attenuation[channel]
+
+        time_sec = numpy.linspace(0,
+                                  (self.max_samples - 1) * self.time_interval_sec,
+                                  self.max_samples)
+        scope_data["time"] = numpy.array(time_sec)
+
+        if save_to_file:
+            with open(f"{output_dir}/{filename}.json", "w", encoding="utf-8") as json_file:
+                json.dump(scope_data, json_file, indent=4, cls=NumpyEncoder)
 
         overflow_warning = {}
         if overflow.value:
-            for channel in results.keys():
+            for channel in self.buffer.keys():
                 if overflow.value & (1 >> self.PICO_CHANNEL[channel]):
                     overflow_warning[channel] = True
 
