@@ -61,6 +61,27 @@ def voltage_to_logic_level(voltage):
     logic_level = int((clamped_voltage) * (32767 / 5))
     return logic_level
 
+
+def split_mso_data_fast(data_length, data):
+    """Return a tuple of 8 arrays, each of which is the values over time of a different digital channel.
+
+    The tuple contains the channels in order (D7, D6, D5, ... D0) or equivalently (D15, D14, D13, ... D8).
+
+    Args:
+        data_length (c_int32): The length of the data array.
+        data (c_int16 array): The data array containing the digital port values.
+    """
+    num_samples = data_length.value
+    # Makes an array for each digital channel
+    buffer_binary_dj = tuple(numpy.empty(num_samples, dtype=numpy.uint8) for _ in range(8))
+    # Splits out the individual bits from the port into the binary values for each digital channel/pin.
+    for i in range(num_samples):
+        for j in range(8):
+            buffer_binary_dj[j][i] = 1 if (data[i] & (1 << (7-j))) else 0
+
+    return buffer_binary_dj
+
+
 class NumpyEncoder(json.JSONEncoder):
     """Module specific json encoder class."""
     def default(self, o):
