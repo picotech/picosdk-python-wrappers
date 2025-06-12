@@ -849,9 +849,9 @@ class Library(object):
 
     @requires_device()
     def set_sig_gen_built_in(self, device, offset_voltage=0, pk_to_pk=2000000, wave_type="SINE",
-                             start_frequency=1000.0, stop_frequency=1000.0, increment=0.0,
-                             dwell_time=1.0, sweep_type="UP", operation='ES_OFF', shots=1, sweeps=1,
-                             trigger_type="RISING", trigger_source="NONE", ext_in_threshold=0):
+                             start_frequency=10000, stop_frequency=10000, increment=0,
+                             dwell_time=1, sweep_type="UP", operation='ES_OFF', shots=0, sweeps=0,
+                             trigger_type="RISING", trigger_source="NONE", ext_in_threshold=1):
         """Set up the signal generator to output a built-in waveform.
 
         Args:
