@@ -9,10 +9,13 @@ this type and attach the missing methods.
 
 from __future__ import print_function
 
+import json
 import sys
 from ctypes import c_int16, c_int32, c_uint32, c_float, c_double, c_void_p, create_string_buffer, byref
 from ctypes.util import find_library
 import collections
+import time
+import gc
 import picosdk.constants as constants
 import numpy
 
@@ -57,6 +60,76 @@ def voltage_to_logic_level(voltage):
     clamped_voltage = min(max(-5, voltage), 5)
     logic_level = int((clamped_voltage) * (32767 / 5))
     return logic_level
+
+
+class SingletonScopeDataDict(dict):
+    """SingletonScopeDataDict is a singleton dictionary object for sharing picoscope data between multiple classes.
+
+    It handles both analog and digital data with uniform access patterns:
+    - Analog channels are accessed by their letter (e.g. 'A', 'B', 'C', 'D')
+    - Digital channels are accessed as 'D0'-'D15' (MSB channel D15 to LSB channel D0)
+    - Digital ports are accessed by their number (e.g. 0, 1)
+    """
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        """Create new singleton dictionary instance or return existing one."""
+        if cls._instance is None:
+            cls._instance = super(SingletonScopeDataDict, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
+    def clean_dict(self):
+        """Remove all data from the singleton dictionary and run garbage collection."""
+        self.clear()
+        gc.collect()
+
+    def __getitem__(self, key: str):
+        """Get data with uniform access pattern for analog and digital channels.
+
+        Args:
+            key: Channel identifier:
+                - 'A', 'B', 'C', 'D' for analog channels
+                - 'D0'-'D15' for digital channels
+                - 0-3 for digital ports
+
+        Returns:
+            numpy array containing the channel data
+
+        Raises:
+            KeyError: If channel doesn't exist
+            ValueError: If digital channel number is invalid
+        """
+        # Handle digital channels (D0-D15)
+        if isinstance(key, str) and key.upper().startswith('D'):
+            try:
+                digital_number = int(key[1:])
+                if not 0 <= digital_number <= 15:
+                    raise ValueError(f"Digital channel number must be 0-15, got {digital_number}")
+
+                # Calculate which port and bit
+                port_number = digital_number // 8  # Port 0 = D0-D7, Port 1 = D8-D15
+                bit_number = 7 - (digital_number % 8)  # Reverse bit order within port
+
+                # Get port data
+                port_data = super().__getitem__(port_number)
+
+                # Extract individual channel data
+                return (port_data >> bit_number) & 0x1
+
+            except (IndexError, ValueError) as e:
+                raise ValueError(f"Invalid digital channel {key}: {str(e)}")
+
+        # Handle direct port access (0-3) or analog channels
+        return super().__getitem__(key)
+
+    def set_port_data(self, port_number: int, data: np.ndarray):
+        """Set digital port data.
+
+        Args:
+            port_number: Digital port number (0-3)
+            data: Numpy array containing port data
+        """
+        self[port_number] = data
 
 
 class Library(object):
