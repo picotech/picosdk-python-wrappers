@@ -666,6 +666,20 @@ class Library(object):
             raise NotImplementedError("not done other driver types yet")
 
     @requires_device()
+    def stop_block_capture(self, device, timeout_minutes=0):
+        """Poll the driver to see if it has finished collecting the requested samples.
+
+        Args:
+            timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
+        """
+        if timeout_minutes < 0:
+            raise ArgumentOutOfRangeError("timeout_minutes must be non-negative.")
+        timeout = time.time() + timeout_minutes*60
+        while not self.is_ready(device):
+            if time.time() > timeout:
+                break
+
+    @requires_device()
     def maximum_value(self, device):
         """Get the maximum ADC value for this device."""
         if not hasattr(self, '_maximum_value'):
