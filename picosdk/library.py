@@ -27,6 +27,17 @@ from picosdk.errors import PicoError, CannotFindPicoSDKError, CannotOpenPicoSDKE
 from picosdk.device import Device
 
 
+DEFAULT_PROBE_ATTENUATION = {
+    'A': 10,
+    'B': 10,
+    'C': 10,
+    'D': 10,
+    'E': 10,
+    'F': 10,
+    'G': 10,
+    'H': 10,
+}
+
 """TimebaseInfo: A type for holding the particulars of a timebase configuration.
 """
 TimebaseInfo = collections.namedtuple('TimebaseInfo', ['timebase_id',
@@ -80,6 +91,21 @@ def split_mso_data_fast(data_length, data):
             buffer_binary_dj[j][i] = 1 if (data[i] & (1 << (7-j))) else 0
 
     return buffer_binary_dj
+
+
+def adc_to_mv(buffer_adc, channel_range, max_adc):
+    """Convert a buffer of raw adc count values into millivolts.
+
+    Args:
+        buffer_adc (c_short_Array): The buffer of ADC count values.
+        channel_range (int): The channel range in V.
+        max_adc (int): The maximum ADC count.
+
+    Returns:
+        list: The buffer in millivolts.
+    """
+    buffer_mv = [(x * channel_range * 1000) / max_adc for x in buffer_adc]
+    return buffer_mv
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -737,18 +763,25 @@ class Library(object):
         if status != self.PICO_STATUS['PICO_OK']:
             raise ArgumentOutOfRangeError(f"set_data_buffer failed ({constants.pico_tag(status)})")
 
-        self.buffer[channel_or_port.upper()] = buffer
+        return {channel_or_port: buffer}
 
     @requires_device()
-    def get_values(self, device, start_index=0, downsample_ratio=0, downsample_ratio_mode="NONE",
-                   segment_index=0, output_dir=".", filename="data", save_to_file=False):
+    def get_values(self, device, buffers, samples, max_voltage={}, start_index=0, downsample_ratio=0,
+                   downsample_ratio_mode="NONE", segment_index=0, output_dir=".", filename="data", save_to_file=False,
+                   probe_attenuation=DEFAULT_PROBE_ATTENUATION):
         """Get stored data values from the scope and store it in a clean SingletonScopeDataDict object.
 
         This function is used after data collection has stopped. It gets the stored data from the scope, with or
         without downsampling, starting at the specified sample number.
 
+        The returned captured data is converted to mV.
+
         Args:
             device (picosdk.device.Device): Device instance
+            buffers (dict): Dictionary of buffers where the data will be stored. The keys are channel names or port numbers,
+                            and the values are numpy arrays.
+            samples (int): The number of samples to retrieve from the scope.
+            max_voltage (dict): The maximum voltage of the range used per channel.
             start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
                                sample intervals from the start of the buffer.
             downsample_ratio (int): The downsampling factor that will be applied to the raw data.
@@ -757,14 +790,15 @@ class Library(object):
             output_dir (str): The output directory where the json file will be saved.
             filename (str): The name of the json file where the data will be stored
             save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+            probe_attenuation (dict): The attenuation factor of the probe used per the channel (1 or 10).
 
         Returns:
             Tuple of (results dict, overflow warnings dict)
         """
         scope_data = SingletonScopeDataDict()
         scope_data.clean_dict()
-        overflow = (c_int16 * 10)()
-        no_of_samples = c_uint32(self.max_samples)
+        overflow = c_int16(0)
+        no_of_samples = c_uint32(samples)
 
         if len(self._get_values.argtypes) == 7:
             args = (device.handle, start_index, no_of_samples, downsample_ratio,
@@ -777,16 +811,18 @@ class Library(object):
         else:
             raise NotImplementedError("not done other driver types yet")
 
-        for channel, buffer in self.buffer.items():
+        num_samples_retrieved = no_of_samples.value
+        for channel, arr in buffers.items():
+            data = arr[:num_samples_retrieved]
             if channel.isnumeric():
-                scope_data[channel] = numpy.asarray(split_mso_data_fast(no_of_samples, buffer))
+                scope_data[channel] = numpy.asarray(split_mso_data_fast(no_of_samples, data))
             else:
-                scope_data[channel] = numpy.array(
-                    adc_to_mv(buffer, self.channel_range[channel], self.max_adc)) * self.probe_attenuation[channel]
+                scope_data[channel] = numpy.array(adc_to_mv(data, max_voltage[channel],
+                                                            self.maximum_value(device))) * probe_attenuation[channel]
 
         time_sec = numpy.linspace(0,
-                                  (self.max_samples - 1) * self.time_interval_sec,
-                                  self.max_samples)
+                                  (samples - 1) * self.time_interval_sec,
+                                  samples)
         scope_data["time"] = numpy.array(time_sec)
 
         if save_to_file:
@@ -795,11 +831,12 @@ class Library(object):
 
         overflow_warning = {}
         if overflow.value:
-            for channel in self.buffer.keys():
+            for channel in buffers.keys():
                 if overflow.value & (1 >> self.PICO_CHANNEL[channel]):
                     overflow_warning[channel] = True
 
-        return results, overflow_warning
+        return scope_data, overflow_warning
+
 
     @requires_device("set_trigger_channel_properties requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def set_trigger_channel_properties(self, device, threshold_upper, threshold_upper_hysteresis, threshold_lower, threshold_lower_hysteresis, channel, threshold_mode, aux_output_enable, auto_trigger_milliseconds):
