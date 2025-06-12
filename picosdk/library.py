@@ -797,6 +797,41 @@ class Library(object):
 
         return results, overflow_warning
 
+    @requires_device("set_trigger_channel_properties requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def set_trigger_channel_properties(self, device, threshold_upper, threshold_upper_hysteresis, threshold_lower, threshold_lower_hysteresis, channel, threshold_mode, aux_output_enable, auto_trigger_milliseconds):
+        """Set the trigger channel properties for the device.
+
+        Args:
+            device: Device instance
+            threshold_upper: Upper threshold in ADC counts
+            threshold_upper_hysteresis: Hysteresis for upper threshold in ADC counts
+            threshold_lower: Lower threshold in ADC counts
+            threshold_lower_hysteresis: Hysteresis for lower threshold in ADC counts
+            channel: Channel to set properties for (e.g. 'A', 'B', 'C', 'D')
+            threshold_mode: Threshold mode (e.g. "LEVEL", "WINDOW")
+            aux_output_enable: Enable auxiliary output (boolean) (Not used in eg. ps2000a, ps3000a, ps4000a)
+            auto_trigger_milliseconds: The number of milliseconds for which the scope device will wait for a trigger
+                before timing out. If set to zero, the scope device will wait indefinitely for a trigger
+
+        Returns:
+            None
+
+        Raises:
+            ArgumentOutOfRangeError: If parameters are invalid for device
+        """
+        if hasattr(self, '_set_trigger_channel_properties'):
+            args = (device.handle, threshold_upper, threshold_upper_hysteresis,
+                   threshold_lower, threshold_lower_hysteresis,
+                   self.PICO_CHANNEL[channel], self.PICO_THRESHOLD_DIRECTION[threshold_mode],
+                   aux_output_enable, auto_trigger_milliseconds)
+            converted_args = self._convert_args(self._set_trigger_channel_properties, args)
+            status = self._set_trigger_channel_properties(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise PicoError(f"set_trigger_channel_properties failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device does not support setting trigger channel properties.")
+
     @requires_device()
     def stop(self, device):
         """Stop data capture."""
