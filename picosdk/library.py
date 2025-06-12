@@ -558,14 +558,18 @@ class Library(object):
                 raise InvalidTimebaseError()
 
             return TimebaseInfo(timebase_id, float(time_interval.value), time_units.value, max_samples.value, None)
-        elif hasattr(self, '_get_timebase2') and (
-                len(self._get_timebase2.argtypes) == 7 and self._get_timebase2.argtypes[1] == c_uint32):
+        elif hasattr(self, '_get_timebase2') and self._get_timebase2.argtypes[1] == c_uint32:
             time_interval = c_float(0.0)
             max_samples = c_int32(0)
-
-            args = (handle, timebase_id, no_of_samples, time_interval,
-                    oversample, max_samples, segment_index)
-            converted_args = self._convert_args(self._get_timebase2, args)
+            if len(self._get_timebase2.argtypes) == 7:
+                args = (handle, timebase_id, no_of_samples, time_interval,
+                        oversample, max_samples, segment_index)
+                converted_args = self._convert_args(self._get_timebase2, args)
+            elif len(self._get_timebase2.argtypes) == 6:
+                args = (handle, timebase_id, no_of_samples, time_interval, max_samples, segment_index)
+                converted_args = self._convert_args(self._get_timebase2, args)
+            else:
+                raise NotImplementedError("_get_timebase2 is not implemented for this driver yet")
             status = self._get_timebase2(*converted_args)
 
             if status != self.PICO_STATUS['PICO_OK']:
@@ -573,7 +577,7 @@ class Library(object):
 
             return TimebaseInfo(timebase_id, time_interval.value, None, max_samples.value, segment_index)
         else:
-            raise NotImplementedError("not done other driver types yet")
+            raise NotImplementedError("_get_timebase2 or _get_timebase is not implemented for this driver yet")
 
     @requires_device()
     def set_null_trigger(self, device):
