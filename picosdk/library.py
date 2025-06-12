@@ -648,7 +648,6 @@ class Library(object):
 
     def _python_run_block(self, handle, pre_trigger_samples, post_trigger_samples, timebase_id, oversample,
                           segment_index):
-        self.max_samples = pre_trigger_samples + post_trigger_samples
         time_indisposed = c_int32(0)
         if len(self._run_block.argtypes) == 5:
             args = (handle, pre_trigger_samples + post_trigger_samples, timebase_id,
