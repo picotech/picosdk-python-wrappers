@@ -620,7 +620,7 @@ class Library(object):
             raise NotImplementedError("_get_timebase2 or _get_timebase is not implemented for this driver yet")
 
     @requires_device()
-    def set_null_trigger(self, device):
+    def set_null_trigger(self, device, channel="A"):
         auto_trigger_after_millis = 1
         if hasattr(self, '_set_trigger') and len(self._set_trigger.argtypes) == 6:
             PS2000_NONE = 5
@@ -632,14 +632,15 @@ class Library(object):
                 raise InvalidTriggerParameters()
         elif hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
             threshold_direction_id = None
-            if not self.PICO_THRESHOLD_DIRECTION:
-                threshold_directions = getattr(self, self.name.upper() + '_THRESHOLD_DIRECTION', None)
-                if not threshold_directions:
-                    raise NotImplementedError("This device doesn't support threshold direction")
-                threshold_direction_id = threshold_directions[self.name.upper() + '_NONE']
-            else:
+            if self.PICO_THRESHOLD_DIRECTION:
                 threshold_direction_id = self.PICO_THRESHOLD_DIRECTION['NONE']
-            args = (device.handle, False, self.PICO_CHANNEL['A'], 0,
+            else:
+                threshold_directions = getattr(self, self.name.upper() + '_THRESHOLD_DIRECTION', None)
+                if threshold_directions:
+                    threshold_direction_id = threshold_directions[self.name.upper() + '_NONE']
+                else:
+                    raise NotImplementedError("This device doesn't support threshold direction")
+            args = (device.handle, False, self.PICO_CHANNEL[channel], 0,
                    threshold_direction_id, 0, auto_trigger_after_millis)
             converted_args = self._convert_args(self._set_simple_trigger, args)
             status = self._set_simple_trigger(*converted_args)
