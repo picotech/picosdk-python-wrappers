@@ -108,6 +108,21 @@ def adc_to_mv(buffer_adc, channel_range, max_adc):
     return buffer_mv
 
 
+def mv_to_adc(millivolts, channel_range, max_adc):
+    """Convert a voltage value into an ADC count.
+
+    Args:
+        millivolts (float): Voltage in millivolts.
+        channel_range (int): The channel range in V.
+        max_adc (c_int16): The maximum ADC count.
+
+    Returns:
+        int: The ADC count.
+    """
+    adc_value = round((millivolts * max_adc) / (channel_range * 1000))
+    return adc_value
+
+
 class NumpyEncoder(json.JSONEncoder):
     """Module specific json encoder class."""
     def default(self, o):
