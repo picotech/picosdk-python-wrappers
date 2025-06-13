@@ -894,6 +894,43 @@ class Library(object):
 
         return scope_data, overflow_warning
 
+    @requires_device()
+    def set_and_load_data(self, device, active_sources, buffer_length, time_interval_sec, max_voltage={},
+                    segment_index=0, ratio_mode='NONE', start_index=0,
+                    downsample_ratio=0, downsample_ratio_mode="NONE", probe_attenuation=DEFAULT_PROBE_ATTENUATION,
+                    output_dir=".", filename="data", save_to_file=False):
+        """Load values from the device.
+
+        Combines set_data_buffer and get_values to load values from the device.
+
+        Args:
+            device (picosdk.device.Device): Device instance
+            active_sources (lsit[str/int]): List of active channels and/or ports
+            buffer_length: The size of the buffer array (equal to the number of samples)
+            time_interval_sec (float): The time interval between samples in seconds. (obtained from get_timebase)
+            max_voltage (dict): The maximum voltage of the range used per channel. (obtained from set_channel)
+            segment_index (int): Memory segment index
+            ratio_mode: The ratio mode to be used (default is 'NONE')
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            probe_attenuation (dict): The attenuation factor of the probe used per the channel (1 or 10).
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            Tuple of (captured data including time, overflow warnings)
+        """
+        buffers = {}
+        for source in active_sources:
+            buffer = self.set_data_buffer(device, source, buffer_length, segment_index, ratio_mode)
+            buffers = buffers | buffer
+
+        return self.get_values(device, buffers, buffer_length, time_interval_sec, max_voltage, start_index,
+                               downsample_ratio, downsample_ratio_mode, segment_index, output_dir, filename,
+                               save_to_file, probe_attenuation)
 
     @requires_device("set_trigger_channel_properties requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def set_trigger_channel_properties(self, device, threshold_upper, threshold_upper_hysteresis, threshold_lower,
