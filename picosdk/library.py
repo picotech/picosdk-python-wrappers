@@ -648,7 +648,47 @@ class Library(object):
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidTriggerParameters(f"set_simple_trigger failed ({constants.pico_tag(status)})")
         else:
-            raise NotImplementedError("not done other driver types yet")
+            raise NotImplementedError("This device doesn't support set_null_trigger (yet)")
+
+    @requires_device()
+    def set_simple_trigger(self, device, max_voltage, max_adc, enable=1, channel="A", threshold_mv=500,
+                        direction="FALLING", delay=0, auto_trigger_ms=1000):
+        """Set a simple trigger for a channel
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            max_voltage (int/float): The maximum voltage of the range used by the channel. (obtained from `set_channel`)
+            max_adc (int): The maximum ADC count. (obtained from `maximum_value`)
+            enable (bool): False to disable the trigger, True to enable it
+            channel (str): The channel on which to trigger
+            threshold_mv (int/float): The threshold in millivolts at which the trigger will fire.
+            direction (str): The direction in which the signal must move to cause a trigger.
+            delay (int): The time (sample periods) between the trigger occurring and the first sample.
+            auto_trigger_ms (int): The number of milliseconds the device will wait if no trigger occurs.
+                If this is set to zero, the scope device will wait indefinitely for a trigger.
+        """
+        if hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
+            adc_threshold = mv_to_adc(threshold_mv, max_voltage, max_adc)
+            threshold_direction_id = None
+            if self.PICO_THRESHOLD_DIRECTION:
+                threshold_direction_id = self.PICO_THRESHOLD_DIRECTION[direction]
+            else:
+                threshold_directions = getattr(self, self.name.upper() + '_THRESHOLD_DIRECTION', None)
+                if threshold_directions:
+                    threshold_direction_id = threshold_directions[self.name.upper() + f'_{direction.upper()}']
+                else:
+                    raise NotImplementedError("This device doesn't support threshold direction")
+
+            args = (device.handle, enable, self.PICO_CHANNEL[channel], adc_threshold,
+                   threshold_direction_id, delay, auto_trigger_ms)
+            converted_args = self._convert_args(self._set_simple_trigger, args)
+            status = self._set_simple_trigger(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidTriggerParameters(f"set_simple_trigger failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device doesn't support set_simple_trigger (yet)")
+
 
     @requires_device()
     def run_block(self, device, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
