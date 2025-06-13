@@ -894,7 +894,9 @@ class Library(object):
 
 
     @requires_device("set_trigger_channel_properties requires a picosdk.device.Device instance, passed to the correct owning driver.")
-    def set_trigger_channel_properties(self, device, threshold_upper, threshold_upper_hysteresis, threshold_lower, threshold_lower_hysteresis, channel, threshold_mode, aux_output_enable, auto_trigger_milliseconds):
+    def set_trigger_channel_properties(self, device, threshold_upper, threshold_upper_hysteresis, threshold_lower,
+                                       threshold_lower_hysteresis, channel, threshold_mode, aux_output_enable,
+                                       auto_trigger_milliseconds):
         """Set the trigger channel properties for the device.
 
         Args:
