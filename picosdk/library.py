@@ -447,7 +447,7 @@ class Library(object):
         enabled: whether to enable the channel (boolean)
         coupling: string of the relevant enum member for your driver less the driver name prefix. e.g. 'DC' or 'AC'.
         range_peak: float which is the largest value you expect in the input signal. We will throw an exception if no
-                    range on the device is large enough for that value.
+                    range on the device is large enough for that value. (in Voltage)
         analog_offset: the meaning of 0 for this channel.
         return value: Max voltage of new range. Raises an exception in error cases."""
 
@@ -850,7 +850,7 @@ class Library(object):
             probe_attenuation (dict): The attenuation factor of the probe used per the channel (1 or 10).
 
         Returns:
-            Tuple of (results dict, overflow warnings dict)
+            Tuple of (captured data including time, overflow warnings)
         """
         scope_data = SingletonScopeDataDict()
         scope_data.clean_dict()
