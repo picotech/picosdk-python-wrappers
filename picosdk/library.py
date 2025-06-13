@@ -869,7 +869,7 @@ class Library(object):
         num_samples_retrieved = no_of_samples.value
         for channel, arr in buffers.items():
             data = arr[:num_samples_retrieved]
-            if channel.isnumeric():
+            if isinstance(channel, int) or channel.isnumeric():
                 scope_data[channel] = numpy.asarray(split_mso_data_fast(no_of_samples, data))
             else:
                 scope_data[channel] = numpy.array(adc_to_mv(data, max_voltage[channel],
