@@ -17,7 +17,9 @@ import collections
 import time
 import gc
 import picosdk.constants as constants
+from base64 import b64encode
 import numpy
+from numpy.lib.format import dtype_to_descr
 
 from picosdk.errors import PicoError, CannotFindPicoSDKError, CannotOpenPicoSDKError, DeviceNotFoundError, \
     ArgumentOutOfRangeError, ValidRangeEnumValueNotValidForThisDevice, DeviceCannotSegmentMemoryError, \
