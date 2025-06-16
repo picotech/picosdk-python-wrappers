@@ -415,6 +415,18 @@ class Device(object):
         self.driver.stop_block_capture(timeout_minutes)
 
     @requires_open()
+    def set_data_buffer(self, channel_or_port, buffer_length, segment_index=0, mode='NONE'):
+        """Set the data buffer for a specific channel.
+
+        Args:
+            channel_or_port: Channel (e.g. 'A', 'B') or digital port (e.g. 0, 1) to set data for
+            buffer_length: The size of the buffer array (equal to no_of_samples)
+            segment_index: The number of the memory segment to be used (default is 0)
+            mode: The ratio mode to be used (default is 'NONE')
+        """
+        self._buffers[channel_or_port] = self.driver.set_data_buffer(self, channel_or_port, buffer_length, segment_index, mode)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
