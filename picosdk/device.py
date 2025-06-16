@@ -400,6 +400,12 @@ class Device(object):
         self.driver.run_block(pre_trigger_samples, post_trigger_samples, timebase_id, oversample, segment_index)
 
     @requires_open()
+    def is_ready(self):
+        """poll this function to find out when block mode is ready or has triggered.
+        returns: True if data is ready, False otherwise."""
+        return self.driver.is_ready(self)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
