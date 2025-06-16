@@ -77,7 +77,7 @@ class Device(object):
         self._channel_ranges = {}
         self._channel_offsets = {}
         self._enabled_sources = []
-        self._time_interval_ns = None
+        self._time_interval = None
         self._probe_attenuations = DEFAULT_PROBE_ATTENUATION
 
     @property
@@ -117,8 +117,9 @@ class Device(object):
         return self._enabled_sources
 
     @property
-    def time_interval_ns(self):
-        return self._time_interval_ns
+    def time_interval(self):
+        """The time interval in seconds"""
+        return self._time_interval
 
     @property
     def probe_attenuations(self):
