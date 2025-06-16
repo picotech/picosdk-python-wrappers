@@ -133,6 +133,24 @@ class Device(object):
     def info(self):
         return self.driver.get_unit_info(self)
 
+    @requires_open("The device either did not initialise correctly or has already been closed.")
+    def close(self):
+        self.driver.close_unit(self)
+        self._handle = None
+        self._max_adc = None
+        self._buffers.clear()
+        self._max_samples = None
+        self._channel_ranges.clear()
+        self._channel_offsets.clear()
+        self._enabled_sources.clear()
+        self._time_interval_ns = None
+        self._probe_attenuations = DEFAULT_PROBE_ATTENUATION.copy()
+        # Reset any cached timebase information if those attributes exist from prior modifications
+        if hasattr(self, '_cached_timebase_options'):
+            self._cached_timebase_options = None
+        if hasattr(self, '_cached_timebase_info'):
+            self._cached_timebase_info = None
+
     def __enter__(self):
         return self
 
