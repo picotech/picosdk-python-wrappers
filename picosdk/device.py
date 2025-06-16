@@ -330,7 +330,17 @@ class Device(object):
 
     @requires_open()
     def get_timebase(self, timebase_id, no_of_samples, oversample=1, segment_index=0):
-        """Query the device about what time precision modes it can handle."""
+        """Query the device about what time precision modes it can handle.
+
+        Returns:
+            namedtuple:
+                - timebase_id: The id corresponding to the timebase used
+                - time_interval: The time interval between readings at the selected timebase.
+                - time_units: The unit of time (not supported in e.g. 3000a)
+                - max_samples: The maximum number of samples available. The number may vary depending on the number of
+                    channels enabled and the timebase chosen.
+                - segment_id: The index of the memory segment to use
+        """
         timebase_info = self.driver.get_timebase(self, timebase_id, no_of_samples, oversample, segment_index)
         self._max_samples = timebase_info.max_samples
         self._time_interval = timebase_info.time_interval
