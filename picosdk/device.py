@@ -329,6 +329,14 @@ class Device(object):
         raise NoValidTimebaseForOptionsError(*args)
 
     @requires_open()
+    def get_timebase(self, timebase_id, no_of_samples, oversample=1, segment_index=0):
+        """Query the device about what time precision modes it can handle."""
+        timebase_info = self.driver.get_timebase(self, timebase_id, no_of_samples, oversample, segment_index)
+        self._max_samples = timebase_info.max_samples
+        self._time_interval = timebase_info.time_interval
+        return timebase_info
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
