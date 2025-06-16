@@ -347,6 +347,19 @@ class Device(object):
         return timebase_info
 
     @requires_open()
+    def memory_segments(self, number_segments):
+        """The number of segments defaults to 1, meaning that each capture fills the scope's available memory.
+        This function allows you to divide the memory into a number of segments so that the scope can store several
+        waveforms sequentially.
+
+        Returns:
+            int: The number of samples available in each segment. This is the total number over all channels,
+                so if more than one channel is in use then the number of samples available to each
+                channel is max_samples divided by the number of channels.
+        """
+        return self.driver.memory_segments(number_segments)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
