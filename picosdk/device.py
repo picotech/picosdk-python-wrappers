@@ -48,7 +48,7 @@ ChannelConfig = collections.namedtuple('ChannelConfig', 'name enabled coupling r
 
 
 """TimebaseOptions: A type for specifying timebase constraints (pass to Device.find_timebase or Device.capture_*)
-All are optional. Please specify the options which matter to you: 
+All are optional. Please specify the options which matter to you:
   - the maximum time interval (if you want the fastest/most precise timebase you can get),
   - the number of samples in one buffer,
   - the minimum total collection time (if you want at least x.y seconds of uninterrupted capture data)
