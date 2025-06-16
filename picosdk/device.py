@@ -406,6 +406,15 @@ class Device(object):
         return self.driver.is_ready(self)
 
     @requires_open()
+    def stop_block_capture(self, timeout_minutes=5):
+        """Poll the driver to see if it has finished collecting the requested samples.
+
+        Args:
+            timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
+        """
+        self.driver.stop_block_capture(timeout_minutes)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
