@@ -653,14 +653,14 @@ class Library(object):
             raise NotImplementedError("This device doesn't support set_null_trigger (yet)")
 
     @requires_device()
-    def set_simple_trigger(self, device, max_voltage, max_adc, enable=1, channel="A", threshold_mv=500,
+    def set_simple_trigger(self, device, max_voltage, max_adc=None, enable=1, channel="A", threshold_mv=500,
                         direction="FALLING", delay=0, auto_trigger_ms=1000):
         """Set a simple trigger for a channel
 
         Args:
             device (picosdk.device.Device): The device instance
             max_voltage (int/float): The maximum voltage of the range used by the channel. (obtained from `set_channel`)
-            max_adc (int): The maximum ADC count. (obtained from `maximum_value`)
+            max_adc (int): Maximum ADC value for the device (if None, obtained via `maximum_value`)
             enable (bool): False to disable the trigger, True to enable it
             channel (str): The channel on which to trigger
             threshold_mv (int/float): The threshold in millivolts at which the trigger will fire.
@@ -670,6 +670,8 @@ class Library(object):
                 If this is set to zero, the scope device will wait indefinitely for a trigger.
         """
         if hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
+            if not max_adc:
+                max_adc = self.maximum_value(device)
             adc_threshold = mv_to_adc(threshold_mv, max_voltage, max_adc)
             threshold_direction_id = None
             if self.PICO_THRESHOLD_DIRECTION:
