@@ -31,8 +31,8 @@ enabled = bool indicating whether the channel should be enabled or disabled.
 coupling (optional) = 'AC' or 'DC', default is 'DC'.
 range_peak (optional) = +/- max volts, the highest precision range which includes your value will be selected.
 analog_offset (optional) = the meaning of 0 for this channel."""
-ChannelConfig = collections.namedtuple('ChannelConfig', ['name', 'enabled', 'coupling', 'range_peak', 'analog_offset'])
-ChannelConfig.__new__.__defaults__ = (None, None, None)
+ChannelConfig = collections.namedtuple('ChannelConfig', 'name enabled coupling range_peak analog_offset',
+                                       defaults=['DC', float('inf'), None])
 
 
 """TimebaseOptions: A type for specifying timebase constraints (pass to Device.find_timebase or Device.capture_*)
@@ -84,27 +84,35 @@ class Device(object):
         return False
 
     @requires_open()
-    def set_channel(self, channel_config):
-        name = channel_config.name
-        if not channel_config.enabled:
+    def set_channel(self, channel_name, enabled, coupling='DC', range_peak=float('inf'), analog_offset=None):
+        """Configures a single analog channel.
+
+        channel_name: The channel name as a string (e.g., 'A').
+        enabled: bool, True to enable the channel, False to disable.
+        coupling (optional): 'AC' or 'DC'. Defaults to 'DC'.
+        range_peak (optional): Desired +/- peak voltage. The driver selects the best range.
+                               Required if enabling the channel.
+        analog_offset (optional): The analog offset for the channel in Volts.
+        """
+        if not enabled:
             self.driver.set_channel(self,
-                                    channel_name=name,
-                                    enabled=channel_config.enabled)
+                                    channel_name=channel_name,
+                                    enabled=enabled)
             try:
-                del self._channel_ranges[name]
-                del self._channel_offsets[name]
+                del self._channel_ranges[channel_name]
+                del self._channel_offsets[channel_name]
             except KeyError:
                 pass
             return
-        # if enabled, we pass through the values from the channel config:
-        self._channel_ranges[name] = self.driver.set_channel(self,
-                                                             channel_name=name,
-                                                             enabled=channel_config.enabled,
-                                                             coupling=channel_config.coupling,
-                                                             range_peak=channel_config.range_peak,
-                                                             analog_offset=channel_config.analog_offset)
-        self._channel_offsets[name] = channel_config.analog_offset
-        return self._channel_ranges[name]
+
+        self._channel_ranges[channel_name] = self.driver.set_channel(device=self,
+                                                                     channel_name=channel_name,
+                                                                     enabled=enabled,
+                                                                     coupling=coupling,
+                                                                     range_peak=range_peak,
+                                                                     analog_offset=analog_offset)
+        self._channel_offsets[channel_name] = analog_offset
+        return self._channel_ranges[channel_name]
 
     @requires_open()
     def set_channels(self, *channel_configs):
@@ -121,7 +129,7 @@ class Device(object):
                 channel_configs.append(ChannelConfig(channel_name, False))
 
         for channel_config in channel_configs:
-            self.set_channel(channel_config)
+            self.set_channel(*channel_config)
 
     def _timebase_options_are_impossible(self, options):
         device_max_samples_possible = self.driver.MAX_MEMORY
