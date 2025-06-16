@@ -427,6 +427,39 @@ class Device(object):
         self._buffers[channel_or_port] = self.driver.set_data_buffer(self, channel_or_port, buffer_length, segment_index, mode)
 
     @requires_open()
+    def get_values(self,start_index=0, downsample_ratio=0,
+                   downsample_ratio_mode="NONE", segment_index=0, output_dir=".", filename="data", save_to_file=False,
+                   ):
+        """Get stored data values from the scope and store it in a clean SingletonScopeDataDict object.
+
+        This function is used after data collection has stopped. It gets the stored data from the scope, with or
+        without downsampling, starting at the specified sample number.
+
+        The returned captured data is converted to mV.
+
+        Args:
+
+            samples (int): The number of samples to retrieve from the scope.
+            time_interval_sec (float): The time interval between samples in seconds. (obtained from get_timebase)
+            max_voltage (dict): The maximum voltage of the range used per channel. (obtained from set_channel)
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                               sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            segment_index (int): Memory segment index
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+            probe_attenuation (dict): The attenuation factor of the probe used per the channel (1 or 10).
+
+        Returns:
+            Tuple of (captured data including time, overflow warnings)
+        """
+        self.driver.get_values(self, self.buffers, self.max_samples, self.time_interval, self.channel_ranges,
+                               start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                               filename, save_to_file, self.probe_attenuations)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
