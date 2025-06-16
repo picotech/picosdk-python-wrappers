@@ -522,7 +522,7 @@ class Device(object):
 
         voltages = {}
 
-        max_adc = self.driver.maximum_value(self)
+        max_adc = self.max_adc if self.max_adc else self.maximum_value()
         for channel, raw_array in raw_data.items():
             array = raw_array.astype(numpy.dtype('float32'), casting='safe')
             factor = self._channel_ranges[channel] / max_adc
