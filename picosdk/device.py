@@ -216,7 +216,8 @@ class Device(object):
             try:
                 del self._channel_ranges[channel_name]
                 del self._channel_offsets[channel_name]
-            except KeyError:
+                self._enabled_sources.remove(channel_name)
+            except (KeyError, ValueError):
                 pass
             return
 
@@ -227,6 +228,8 @@ class Device(object):
                                                                      range_peak=range_peak,
                                                                      analog_offset=analog_offset)
         self._channel_offsets[channel_name] = analog_offset
+        self._enabled_sources.append(channel_name)
+
         return self._channel_ranges[channel_name]
 
     @requires_open()
@@ -242,6 +245,13 @@ class Device(object):
         if not info.variant.endswith("MSO"):
             raise FeatureNotSupportedError("This device has no digital ports.")
         self.driver.set_digital_port(device=self, port_number=port_number, enabled=enabled, voltage_level=voltage_level)
+        if enabled:
+            self._enabled_sources.append(port_number)
+        else:
+            try:
+                self._enabled_sources.remove(port_number)
+            except ValueError:
+                pass
 
     @requires_open()
     def set_channels(self, *channel_configs):
