@@ -366,6 +366,10 @@ class Device(object):
         return self._max_adc
 
     @requires_open()
+    def set_null_trigger(self):
+        self.driver.set_null_trigger()
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
