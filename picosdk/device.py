@@ -360,6 +360,12 @@ class Device(object):
         return self.driver.memory_segments(number_segments)
 
     @requires_open()
+    def maximum_value(self):
+        """Get the maximum ADC value for this device."""
+        self._max_adc = self.driver.maximum_value(self)
+        return self._max_adc
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
