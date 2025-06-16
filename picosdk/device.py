@@ -393,6 +393,12 @@ class Device(object):
 
         self.driver.set_simple_trigger(max_voltage, max_adc, enable, channel, threshold_mv, direction, delay,
                                        auto_trigger_ms)
+
+    @requires_open()
+    def run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
+        """This function starts collecting data in block mode."""
+        self.driver.run_block(pre_trigger_samples, post_trigger_samples, timebase_id, oversample, segment_index)
+
     @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
