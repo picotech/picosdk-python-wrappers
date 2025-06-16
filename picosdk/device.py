@@ -370,6 +370,30 @@ class Device(object):
         self.driver.set_null_trigger()
 
     @requires_open()
+    def set_simple_trigger(self, channel, enable=True, threshold_mv=500, direction="FALLING", delay=0,
+                           auto_trigger_ms=1000):
+        """Set a simple trigger for a channel
+
+        Args:
+            channel (str): The channel on which to trigger
+            enable (bool): False to disable the trigger, True to enable it
+            threshold_mv (int): The threshold in millivolts at which the trigger will fire.
+            direction (str): The direction in which the signal must move to cause a trigger.
+            delay (int): The time (sample periods) between the trigger occurring and the first sample.
+            auto_trigger_ms (int): The number of milliseconds the device will wait if no trigger occurs.
+                If this is set to zero, the scope device will wait indefinitely for a trigger.
+        """
+        if channel not in self.enabled_sources:
+            raise ChannelNotEnabledError(f"Channel {channel} is not enabled. Please run set_channel first.")
+        if channel not in self.channel_ranges:
+            raise InvalidRangeOfChannel(f"The range of channel {channel} is not valid or isn't correctly obtained via"
+                                        "set_channel.")
+        max_voltage = self.channel_ranges[channel]
+        max_adc = self.max_adc if self.max_adc else self.maximum_value()
+
+        self.driver.set_simple_trigger(max_voltage, max_adc, enable, channel, threshold_mv, direction, delay,
+                                       auto_trigger_ms)
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
