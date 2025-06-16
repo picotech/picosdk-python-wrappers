@@ -12,7 +12,7 @@ import numpy
 import math
 import time
 from picosdk.errors import DeviceCannotSegmentMemoryError, InvalidTimebaseError, ClosedDeviceError, \
-    NoChannelsEnabledError, NoValidTimebaseForOptionsError
+    NoChannelsEnabledError, NoValidTimebaseForOptionsError, FeatureNotSupportedError
 
 
 DEFAULT_PROBE_ATTENUATION = {
@@ -227,6 +227,20 @@ class Device(object):
                                                                      analog_offset=analog_offset)
         self._channel_offsets[channel_name] = analog_offset
         return self._channel_ranges[channel_name]
+
+    @requires_open()
+    def set_digital_port(self, port_number, enabled, voltage_level=1.8):
+        """Set the digital port
+
+        Args:
+            port_number (int): identifies the port for digital data. (e.g. 0 for digital channels 0-7)
+            enabled (bool): whether or not to enable the channel (boolean)
+            voltage_level (float): the voltage at which the state transitions between 0 and 1. Range: –5.0 to 5.0 (V).
+        """
+        info = self.info()
+        if not info.variant.endswith("MSO"):
+            raise FeatureNotSupportedError("This device has no digital ports.")
+        self.driver.set_digital_port(device=self, port_number=port_number, enabled=enabled, voltage_level=voltage_level)
 
     @requires_open()
     def set_channels(self, *channel_configs):
