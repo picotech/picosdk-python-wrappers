@@ -161,6 +161,43 @@ class Device(object):
         return False
 
     @requires_open()
+    def reset(self):
+        """
+        Closes and re-opens the connection to the PicoScope.
+        Attempts to re-open the same device by serial number if possible.
+        Resets internal cached state of this Device object.
+        Channel configurations and other settings will need to be reapplied.
+        """
+        driver = self._driver
+        current_serial = None
+        resolution_to_use = None
+
+        # Try to get serial number to re-open the same device
+        try:
+            device_info = driver.get_unit_info(self)
+            current_serial = device_info.serial
+        except Exception:
+            # If serial cannot be fetched, _python_open_unit will open the first available.
+            pass
+
+        # Use the driver's default resolution if available for re-opening.
+        if hasattr(driver, 'DEFAULT_RESOLUTION'):
+            resolution_to_use = driver.DEFAULT_RESOLUTION
+
+        self.close()
+
+        # Re-open the unit
+        try:
+            new_handle = driver._python_open_unit(serial=current_serial, resolution=resolution_to_use)
+            self._handle = new_handle
+        except Exception as e:
+            self._handle = None
+            raise ConnectionError(f"Failed to re-open device during reset: {e}")
+
+        if not self.is_open:
+            raise ConnectionError("Device reset failed: handle is invalid after re-open attempt.")
+
+    @requires_open()
     def set_channel(self, channel_name, enabled, coupling='DC', range_peak=float('inf'), analog_offset=None):
         """Configures a single analog channel.
 
