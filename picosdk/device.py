@@ -76,7 +76,7 @@ class Device(object):
         self._max_samples = None
         self._channel_ranges = {}
         self._channel_offsets = {}
-        self._enabled_sources = []
+        self._enabled_sources = set()
         self._time_interval = None
         self._probe_attenuations = DEFAULT_PROBE_ATTENUATION
 
@@ -217,7 +217,7 @@ class Device(object):
                 del self._channel_ranges[channel_name]
                 del self._channel_offsets[channel_name]
                 self._enabled_sources.remove(channel_name)
-            except (KeyError, ValueError):
+            except KeyError:
                 pass
             return
 
@@ -228,7 +228,7 @@ class Device(object):
                                                                      range_peak=range_peak,
                                                                      analog_offset=analog_offset)
         self._channel_offsets[channel_name] = analog_offset
-        self._enabled_sources.append(channel_name)
+        self._enabled_sources.add(channel_name)
 
         return self._channel_ranges[channel_name]
 
