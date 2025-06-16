@@ -15,6 +15,18 @@ from picosdk.errors import DeviceCannotSegmentMemoryError, InvalidTimebaseError,
     NoChannelsEnabledError, NoValidTimebaseForOptionsError
 
 
+DEFAULT_PROBE_ATTENUATION = {
+    'A': 10,
+    'B': 10,
+    'C': 10,
+    'D': 10,
+    'E': 10,
+    'F': 10,
+    'G': 10,
+    'H': 10,
+}
+
+
 def requires_open(error_message="This operation requires a device to be connected."):
     def check_open_decorator(method):
         def check_open_impl(self, *args, **kwargs):
@@ -55,19 +67,66 @@ class Device(object):
     unwanted behaviour (e.g. throwing an exception because no channels are enabled, when you enabled them yourself
     on the driver object.)"""
     def __init__(self, driver, handle):
-        self.driver = driver
-        self.handle = handle
-        self.is_open = handle > 0
+        self._driver = driver
+        self._handle = handle
 
         # if a channel is missing from here, it is disabled (or in an undefined state).
+        self._max_adc = None
+        self._buffers = {}
+        self._max_samples = None
         self._channel_ranges = {}
         self._channel_offsets = {}
+        self._enabled_sources = []
+        self._time_interval_ns = None
+        self._probe_attenuations = DEFAULT_PROBE_ATTENUATION
 
-    @requires_open("The device either did not initialise correctly or has already been closed.")
-    def close(self):
-        self.driver.close_unit(self)
-        self.handle = None
-        self.is_open = False
+    @property
+    def driver(self):
+        return self._driver
+
+    @property
+    def handle(self):
+        return self._handle
+
+    @property
+    def is_open(self):
+        return self.handle is not None and self.handle > 0
+
+    @property
+    def max_adc(self):
+        return self._max_adc
+
+    @property
+    def buffers(self):
+        return self._buffers
+
+    @property
+    def max_samples(self):
+        return self._max_samples
+
+    @property
+    def channel_ranges(self):
+        return self._channel_ranges
+
+    @property
+    def channel_offsets(self):
+        return self._channel_offsets
+
+    @property
+    def enabled_sources(self):
+        return self._enabled_sources
+
+    @property
+    def time_interval_ns(self):
+        return self._time_interval_ns
+
+    @property
+    def probe_attenuations(self):
+        return self._probe_attenuations
+
+    @probe_attenuations.setter
+    def probe_attenuations(self, value):
+        self._probe_attenuations = value
 
     @property
     @requires_open()
