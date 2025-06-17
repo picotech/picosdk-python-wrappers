@@ -653,8 +653,8 @@ class Library(object):
             raise NotImplementedError("This device doesn't support set_null_trigger (yet)")
 
     @requires_device()
-    def set_simple_trigger(self, device, max_voltage, max_adc=None, enable=1, channel="A", threshold_mv=500,
-                        direction="FALLING", delay=0, auto_trigger_ms=1000):
+    def set_simple_trigger(self, device, max_voltage, max_adc=None, enable=True, channel="A", threshold_mv=500,
+                           direction="FALLING", delay=0, auto_trigger_ms=1000):
         """Set a simple trigger for a channel
 
         Args:
@@ -663,7 +663,7 @@ class Library(object):
             max_adc (int): Maximum ADC value for the device (if None, obtained via `maximum_value`)
             enable (bool): False to disable the trigger, True to enable it
             channel (str): The channel on which to trigger
-            threshold_mv (int/float): The threshold in millivolts at which the trigger will fire.
+            threshold_mv (int): The threshold in millivolts at which the trigger will fire.
             direction (str): The direction in which the signal must move to cause a trigger.
             delay (int): The time (sample periods) between the trigger occurring and the first sample.
             auto_trigger_ms (int): The number of milliseconds the device will wait if no trigger occurs.
