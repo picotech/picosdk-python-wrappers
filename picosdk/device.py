@@ -477,9 +477,11 @@ class Device(object):
         Returns:
             Tuple of (captured data including time, overflow warnings)
         """
-        self.driver.set_and_load_data(self.enabled_sources, self.max_samples, self.time_interval, self.channel_ranges,
-                                      segment_index, ratio_mode, start_index, downsample_ratio, downsample_ratio_mode,
-                                      self.probe_attenuations, output_dir, filename, save_to_file)
+        for source in self.enabled_sources:
+            self.set_data_buffer(source, self.max_samples, segment_index, ratio_mode)
+
+        return self.get_values(start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                               filename, save_to_file)
 
     @requires_open()
     def set_trigger_channel_properties(self, threshold_upper, threshold_upper_hysteresis, threshold_lower,
