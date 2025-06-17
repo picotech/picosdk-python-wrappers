@@ -927,8 +927,7 @@ class Library(object):
         """
         buffers = {}
         for source in active_sources:
-            buffer = self.set_data_buffer(device, source, buffer_length, segment_index, ratio_mode)
-            buffers = buffers | buffer
+            buffers[source] = self.set_data_buffer(device, source, buffer_length, segment_index, ratio_mode)
 
         return self.get_values(device, buffers, buffer_length, time_interval_sec, max_voltage, start_index,
                                downsample_ratio, downsample_ratio_mode, segment_index, output_dir, filename,
