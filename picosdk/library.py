@@ -881,7 +881,7 @@ class Library(object):
 
         time_sec = numpy.linspace(0,
                                   (samples - 1) * time_interval_sec,
-                                  samples)
+                                  num_samples_retrieved)
         scope_data["time"] = numpy.array(time_sec)
 
         if save_to_file:
