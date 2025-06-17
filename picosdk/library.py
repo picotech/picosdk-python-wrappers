@@ -821,7 +821,7 @@ class Library(object):
         if status != self.PICO_STATUS['PICO_OK']:
             raise ArgumentOutOfRangeError(f"set_data_buffer failed ({constants.pico_tag(status)})")
 
-        return {channel_or_port: buffer}
+        return buffer
 
     @requires_device()
     def get_values(self, device, buffers, samples, time_interval_sec, max_voltage={}, start_index=0, downsample_ratio=0,
