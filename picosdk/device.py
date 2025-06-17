@@ -358,7 +358,7 @@ class Device(object):
                 so if more than one channel is in use then the number of samples available to each
                 channel is max_samples divided by the number of channels.
         """
-        return self.driver.memory_segments(number_segments)
+        return self.driver.memory_segments(self, number_segments)
 
     @requires_open()
     def maximum_value(self):
@@ -392,13 +392,13 @@ class Device(object):
         max_voltage = self.channel_ranges[channel]
         max_adc = self.max_adc if self.max_adc else self.maximum_value()
 
-        self.driver.set_simple_trigger(max_voltage, max_adc, enable, channel, threshold_mv, direction, delay,
+        self.driver.set_simple_trigger(self, max_voltage, max_adc, enable, channel, threshold_mv, direction, delay,
                                        auto_trigger_ms)
 
     @requires_open()
     def run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
         """This function starts collecting data in block mode."""
-        self.driver.run_block(pre_trigger_samples, post_trigger_samples, timebase_id, oversample, segment_index)
+        self.driver.run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample, segment_index)
 
     @requires_open()
     def is_ready(self):
@@ -413,7 +413,7 @@ class Device(object):
         Args:
             timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
         """
-        self.driver.stop_block_capture(timeout_minutes)
+        self.driver.stop_block_capture(self, timeout_minutes)
 
     @requires_open()
     def set_data_buffer(self, channel_or_port, buffer_length, segment_index=0, mode='NONE'):
@@ -452,9 +452,9 @@ class Device(object):
         Returns:
             Tuple of (captured data including time, overflow warnings)
         """
-        self.driver.get_values(self, self.buffers, self.max_samples, self.time_interval, self.channel_ranges,
-                               start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
-                               filename, save_to_file, self.probe_attenuations)
+        return self.driver.get_values(self, self.buffers, self.max_samples, self.time_interval, self.channel_ranges,
+                                      start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                                      filename, save_to_file, self.probe_attenuations)
 
     @requires_open()
     def set_and_load_data(self, segment_index=0, ratio_mode='NONE', start_index=0, downsample_ratio=0,
