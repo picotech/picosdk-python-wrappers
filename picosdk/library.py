@@ -11,7 +11,7 @@ from __future__ import print_function
 
 import json
 import sys
-from ctypes import c_int16, c_int32, c_uint32, c_float, c_double, c_void_p, create_string_buffer, byref
+from ctypes import c_int16, c_int32, c_uint32, c_float, c_void_p, create_string_buffer, byref
 from ctypes.util import find_library
 import collections
 import time
