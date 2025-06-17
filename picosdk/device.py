@@ -242,8 +242,8 @@ class Device(object):
             enabled (bool): whether or not to enable the channel (boolean)
             voltage_level (float): the voltage at which the state transitions between 0 and 1. Range: –5.0 to 5.0 (V).
         """
-        info = self.info()
-        if not info.variant.endswith("MSO"):
+        info = self.info
+        if not info.variant.decode('utf-8').endswith("MSO"):
             raise FeatureNotSupportedError("This device has no digital ports.")
         self.driver.set_digital_port(device=self, port_number=port_number, enabled=enabled, voltage_level=voltage_level)
         if enabled:
