@@ -343,7 +343,6 @@ class Device(object):
                 - segment_id: The index of the memory segment to use
         """
         timebase_info = self.driver.get_timebase(self, timebase_id, no_of_samples, oversample, segment_index)
-        self._max_samples = timebase_info.max_samples
         self._time_interval = timebase_info.time_interval
         return timebase_info
 
@@ -398,6 +397,7 @@ class Device(object):
     @requires_open()
     def run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
         """This function starts collecting data in block mode."""
+        self._max_samples = pre_trigger_samples + post_trigger_samples
         self.driver.run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample, segment_index)
 
     @requires_open()
@@ -416,7 +416,7 @@ class Device(object):
         self.driver.stop_block_capture(self, timeout_minutes)
 
     @requires_open()
-    def set_data_buffer(self, channel_or_port, buffer_length, segment_index=0, mode='NONE'):
+    def set_data_buffer(self, channel_or_port, segment_index=0, mode='NONE'):
         """Set the data buffer for a specific channel.
 
         Args:
@@ -425,6 +425,8 @@ class Device(object):
             segment_index: The number of the memory segment to be used (default is 0)
             mode: The ratio mode to be used (default is 'NONE')
         """
+        self._buffers[channel_or_port] = self.driver.set_data_buffer(self, channel_or_port, self.max_samples,
+                                                                     segment_index, mode)
         self._buffers[channel_or_port] = self.driver.set_data_buffer(self, channel_or_port, buffer_length, segment_index, mode)
 
     @requires_open()
@@ -478,7 +480,7 @@ class Device(object):
             Tuple of (captured data including time, overflow warnings)
         """
         for source in self.enabled_sources:
-            self.set_data_buffer(source, self.max_samples, segment_index, ratio_mode)
+            self.set_data_buffer(source, segment_index, ratio_mode)
 
         return self.get_values(start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
                                filename, save_to_file)
