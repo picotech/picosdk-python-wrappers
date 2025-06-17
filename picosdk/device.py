@@ -580,3 +580,30 @@ class Device(object):
             voltages[channel] = array
 
         return times, voltages, overflow_warnings
+
+    @requires_open()
+    def set_sig_gen_built_in(self, offset_voltage=0, pk_to_pk=2000000, wave_type="SINE",
+                             start_frequency=10000, stop_frequency=10000, increment=0,
+                             dwell_time=1, sweep_type="UP", operation='ES_OFF', shots=0, sweeps=0,
+                             trigger_type="RISING", trigger_source="NONE", ext_in_threshold=1):
+        """Set up the signal generator to output a built-in waveform.
+
+        Args:
+            offset_voltage: Offset voltage in microvolts (default 0)
+            pk_to_pk: Peak-to-peak voltage in microvolts (default 2000000)
+            wave_type: Type of waveform (e.g. "SINE", "SQUARE", "TRIANGLE")
+            start_frequency: Start frequency in Hz (default 1000.0)
+            stop_frequency: Stop frequency in Hz (default 1000.0)
+            increment: Frequency increment in Hz (default 0.0)
+            dwell_time: Time at each frequency in seconds (default 1.0)
+            sweep_type: Sweep type (e.g. "UP", "DOWN", "UPDOWN")
+            operation: Configures the white noise/PRBS (e.g. "ES_OFF", "WHITENOISE", "PRBS")
+            shots: Number of shots per trigger (default 1)
+            sweeps: Number of sweeps (default 1)
+            trigger_type: Type of trigger (e.g. "RISING", "FALLING")
+            trigger_source: Source of trigger (e.g. "NONE", "SCOPE_TRIG")
+            ext_in_threshold: External trigger threshold in ADC counts
+        """
+        self.driver.set_sig_gen_built_in(self, offset_voltage, pk_to_pk, wave_type, start_frequency, stop_frequency,
+                                         increment, dwell_time, sweep_type, operation, shots, sweeps, trigger_type,
+                                         trigger_source, ext_in_threshold)
