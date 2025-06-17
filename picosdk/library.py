@@ -724,6 +724,27 @@ class Library(object):
             raise NotImplementedError("This device doesn't support set_digital_channel_trigger (yet)")
 
     @requires_device()
+    def set_trigger_delay(self, device, delay):
+        """This function sets the post-trigger delay, which causes capture to start a defined time after the
+        trigger event.
+
+        For example, if delay=100 then the scope would wait 100 sample periods before sampling.
+        At a timebase of 500 MS/s, or 2 ns per sample, the total delay would then be 100 x 2 ns = 200 ns.
+
+        Args:
+            delay (int): The time between the trigger occurring and the first sample.
+        """
+        if hasattr(self, '_set_trigger_delay') and len(self._set_trigger_delay.argtypes) == 2:
+            args = (device.handle, delay)
+            converted_args = self._convert_args(self._set_trigger_delay, args)
+            status = self._set_trigger_delay(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidTriggerParameters(f"set_trigger_delay failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device doesn't support set_trigger_delay (yet)")
+
+    @requires_device()
     def run_block(self, device, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
         """tell the device to arm any triggers and start capturing in block mode now.
         returns: the approximate time (in seconds) which the device will take to capture with these settings."""

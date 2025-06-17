@@ -528,6 +528,19 @@ class Device(object):
         self.driver.set_digital_channel_trigger(self, channel_number, direction)
 
     @requires_open()
+    def set_trigger_delay(self, delay):
+        """This function sets the post-trigger delay, which causes capture to start a defined time after the
+        trigger event.
+
+        For example, if delay=100 then the scope would wait 100 sample periods before sampling.
+        At a timebase of 500 MS/s, or 2 ns per sample, the total delay would then be 100 x 2 ns = 200 ns.
+
+        Args:
+            delay (int): The time between the trigger occurring and the first sample.
+        """
+        self.driver.set_trigger_delay(self, delay)
+
+    @requires_open()
     def stop(self):
         """This function stops the scope device from sampling data.
         If this function is called before a trigger event occurs, the oscilloscope may not contain valid data.
