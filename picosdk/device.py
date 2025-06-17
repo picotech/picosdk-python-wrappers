@@ -427,7 +427,19 @@ class Device(object):
         """
         self._buffers[channel_or_port] = self.driver.set_data_buffer(self, channel_or_port, self.max_samples,
                                                                      segment_index, mode)
-        self._buffers[channel_or_port] = self.driver.set_data_buffer(self, channel_or_port, buffer_length, segment_index, mode)
+
+    @requires_open()
+    def set_all_data_buffers(self, segment_index=0, mode='NONE'):
+        """Set the data buffer for each enabled channels and ports
+
+        Args:
+            channel_or_port: Channel (e.g. 'A', 'B') or digital port (e.g. 0, 1) to set data for
+            buffer_length: The size of the buffer array (equal to no_of_samples)
+            segment_index: The number of the memory segment to be used (default is 0)
+            mode: The ratio mode to be used (default is 'NONE')
+        """
+        for channel_or_port in self.enabled_sources:
+            self.set_data_buffer(channel_or_port, segment_index, mode)
 
     @requires_open()
     def get_values(self,start_index=0, downsample_ratio=0,
@@ -479,8 +491,7 @@ class Device(object):
         Returns:
             Tuple of (captured data including time, overflow warnings)
         """
-        for source in self.enabled_sources:
-            self.set_data_buffer(source, segment_index, ratio_mode)
+        self.set_all_data_buffers(segment_index, ratio_mode)
 
         return self.get_values(start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
                                filename, save_to_file)
