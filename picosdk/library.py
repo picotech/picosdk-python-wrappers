@@ -693,6 +693,35 @@ class Library(object):
         else:
             raise NotImplementedError("This device doesn't support set_simple_trigger (yet)")
 
+    @requires_device()
+    def set_digital_channel_trigger(self, device, channel_number=15, direction="DIRECTION_RISING"):
+        """Set a simple trigger on the digital channels.
+
+        Args:
+            channel_number (int): The number of the digital channel on which to trigger.(e.g. 0 for D0, 1 for D1,...)
+            direction (str): The direction in which the signal must move to cause a trigger.
+        """
+        if (hasattr(self, '_set_trigger_digital_port_properties') and
+                len(self._set_trigger_digital_port_properties.argtypes) == 3):
+            digital_properties = getattr(self, self.name.upper() +'_DIGITAL_CHANNEL_DIRECTIONS', None)
+            digital_channels =  getattr(self, self.name.upper() +'_DIGITAL_CHANNEL', None)
+            directions = getattr(self, self.name.upper() +'_DIGITAL_DIRECTION', None)
+            if digital_properties and digital_channels and directions:
+                digital_channel = self.name.upper() + '_DIGITAL_CHANNEL_' + str(channel_number)
+                direction = self.name.upper() + '_DIGITAL_' + direction
+                digital_properties(digital_channels[digital_channel],
+                                            directions[direction])
+                args = (device.handle, digital_properties, 1)
+                converted_args = self._convert_args(self._set_trigger_digital_port_properties, args)
+                status = self._set_trigger_digital_port_properties(*converted_args)
+                if status != self.PICO_STATUS['PICO_OK']:
+                    raise InvalidTriggerParameters("set_trigger_digital_port_properties failed "
+                                                   f"({constants.pico_tag(status)})")
+            else:
+                raise PicoError("Couldn't set digital channel trigger. "
+                                f"Check if all enumerations are implemented for {self.name}")
+        else:
+            raise NotImplementedError("This device doesn't support set_digital_channel_trigger (yet)")
 
     @requires_device()
     def run_block(self, device, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):

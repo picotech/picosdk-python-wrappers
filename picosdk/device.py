@@ -518,6 +518,16 @@ class Device(object):
                                                    aux_output_enable, auto_trigger_milliseconds)
 
     @requires_open()
+    def set_digital_channel_trigger(self, channel_number=15, direction="DIRECTION_RISING"):
+        """Set a simple trigger on the digital channels.
+
+        Args:
+            channel_number (int): The number of the digital channel on which to trigger.(e.g. 0 for D0, 1 for D1,...)
+            direction (str): The direction in which the signal must move to cause a trigger.
+        """
+        self.driver.set_digital_channel_trigger(self, channel_number, direction)
+
+    @requires_open()
     def stop(self):
         """This function stops the scope device from sampling data.
         If this function is called before a trigger event occurs, the oscilloscope may not contain valid data.
