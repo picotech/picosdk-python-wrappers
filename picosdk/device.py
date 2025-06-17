@@ -247,7 +247,7 @@ class Device(object):
             raise FeatureNotSupportedError("This device has no digital ports.")
         self.driver.set_digital_port(device=self, port_number=port_number, enabled=enabled, voltage_level=voltage_level)
         if enabled:
-            self._enabled_sources.append(port_number)
+            self._enabled_sources.add(port_number)
         else:
             try:
                 self._enabled_sources.remove(port_number)
