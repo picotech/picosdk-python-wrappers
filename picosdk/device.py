@@ -457,6 +457,31 @@ class Device(object):
                                filename, save_to_file, self.probe_attenuations)
 
     @requires_open()
+    def set_and_load_data(self, segment_index=0, ratio_mode='NONE', start_index=0, downsample_ratio=0,
+                          downsample_ratio_mode="NONE", output_dir=".", filename="data", save_to_file=False):
+        """Load values from the device.
+
+        Combines set_data_buffer and get_values to load values from the device.
+
+        Args:
+            segment_index (int): Memory segment index
+            ratio_mode: The ratio mode to be used (default is 'NONE')
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            Tuple of (captured data including time, overflow warnings)
+        """
+        self.driver.set_and_load_data(self.enabled_sources, self.max_samples, self.time_interval, self.channel_ranges,
+                                      segment_index, ratio_mode, start_index, downsample_ratio, downsample_ratio_mode,
+                                      self.probe_attenuations, output_dir, filename, save_to_file)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
