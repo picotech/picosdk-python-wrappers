@@ -503,6 +503,13 @@ class Device(object):
                                                    aux_output_enable, auto_trigger_milliseconds)
 
     @requires_open()
+    def stop(self):
+        """This function stops the scope device from sampling data.
+        If this function is called before a trigger event occurs, the oscilloscope may not contain valid data.
+        """
+        self.driver.stop(self)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
