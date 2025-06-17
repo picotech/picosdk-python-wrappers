@@ -439,10 +439,6 @@ class Device(object):
         The returned captured data is converted to mV.
 
         Args:
-
-            samples (int): The number of samples to retrieve from the scope.
-            time_interval_sec (float): The time interval between samples in seconds. (obtained from get_timebase)
-            max_voltage (dict): The maximum voltage of the range used per channel. (obtained from set_channel)
             start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
                                sample intervals from the start of the buffer.
             downsample_ratio (int): The downsampling factor that will be applied to the raw data.
