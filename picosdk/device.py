@@ -200,7 +200,7 @@ class Device(object):
             raise ConnectionError("Device reset failed: handle is invalid after re-open attempt.")
 
     @requires_open()
-    def set_channel(self, channel_name, enabled, coupling='DC', range_peak=float('inf'), analog_offset=None):
+    def set_channel(self, channel_name, enabled, coupling='DC', range_peak=float('inf'), analog_offset=0):
         """Configures a single analog channel.
 
         channel_name: The channel name as a string (e.g., 'A').
