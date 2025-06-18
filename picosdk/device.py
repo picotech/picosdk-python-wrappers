@@ -83,47 +83,57 @@ class Device(object):
 
     @property
     def driver(self):
+        """picosdk.library.Library: The driver object"""
         return self._driver
 
     @property
     def handle(self):
+        """int: The device handle"""
         return self._handle
 
     @property
     def is_open(self):
+        """bool: True if the device is open, False otherwise."""
         return self.handle is not None and self.handle > 0
 
     @property
     def max_adc(self):
+        """int: The maximum ADC value for this device."""
         return self._max_adc
 
     @property
     def buffers(self):
+        """dict: A dictionary of buffers for each enabled channel or port."""
         return self._buffers
 
     @property
     def max_samples(self):
+        """int: The number of samples for capture."""
         return self._max_samples
 
     @property
     def channel_ranges(self):
+        """dict: A dictionary of channel ranges for each enabled channel."""
         return self._channel_ranges
 
     @property
     def channel_offsets(self):
+        """dict: A dictionary of channel offsets for each enabled channel."""
         return self._channel_offsets
 
     @property
     def enabled_sources(self):
+        """set: A set of enabled sources (channels and/or digital ports)."""
         return self._enabled_sources
 
     @property
     def time_interval(self):
-        """The time interval in seconds"""
+        """int/float: The time interval in seconds"""
         return self._time_interval
 
     @property
     def probe_attenuations(self):
+        """dict: A dictionary of probe attenuations for each enabled channel."""
         return self._probe_attenuations
 
     @probe_attenuations.setter
@@ -133,6 +143,7 @@ class Device(object):
     @property
     @requires_open()
     def info(self):
+        """UnitInfo: The info of the device"""
         return self.driver.get_unit_info(self)
 
     @requires_open("The device either did not initialise correctly or has already been closed.")
