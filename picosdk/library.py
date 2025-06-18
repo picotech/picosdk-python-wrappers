@@ -201,15 +201,6 @@ class SingletonScopeDataDict(dict):
         # Handle direct port access (0-3) or analog channels
         return super().__getitem__(key)
 
-    def set_port_data(self, port_number: int, data: numpy.ndarray):
-        """Set digital port data.
-
-        Args:
-            port_number: Digital port number (0-3)
-            data: Numpy array containing port data
-        """
-        self[port_number] = data
-
 
 class Library(object):
     def __init__(self, name):
