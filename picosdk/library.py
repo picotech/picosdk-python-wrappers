@@ -709,9 +709,9 @@ class Library(object):
             if digital_properties and digital_channels and directions:
                 digital_channel = self.name.upper() + '_DIGITAL_CHANNEL_' + str(channel_number)
                 direction = self.name.upper() + '_DIGITAL_' + direction
-                digital_properties(channel=digital_channels[digital_channel],
-                                   direction=directions[direction])
-                args = (device.handle, digital_properties, 1)
+                properties = digital_properties(channel=digital_channels[digital_channel],
+                                                direction=directions[direction])
+                args = (device.handle, properties, 1)
                 converted_args = self._convert_args(self._set_trigger_digital_port_properties, args)
                 status = self._set_trigger_digital_port_properties(*converted_args)
                 if status != self.PICO_STATUS['PICO_OK']:
