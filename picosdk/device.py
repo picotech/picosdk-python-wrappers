@@ -262,7 +262,7 @@ class Device(object):
         else:
             try:
                 self._enabled_sources.remove(port_number)
-            except ValueError:
+            except KeyError:
                 pass
 
     @requires_open()
