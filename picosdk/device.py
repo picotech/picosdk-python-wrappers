@@ -158,11 +158,6 @@ class Device(object):
         self._enabled_sources.clear()
         self._time_interval_ns = None
         self._probe_attenuations = DEFAULT_PROBE_ATTENUATION.copy()
-        # Reset any cached timebase information if those attributes exist from prior modifications
-        if hasattr(self, '_cached_timebase_options'):
-            self._cached_timebase_options = None
-        if hasattr(self, '_cached_timebase_info'):
-            self._cached_timebase_info = None
 
     def __enter__(self):
         return self
