@@ -368,6 +368,9 @@ class Device(object):
         This function allows you to divide the memory into a number of segments so that the scope can store several
         waveforms sequentially.
 
+        Args:
+            number_segments (int): The number of segments to divide the memory into.
+
         Returns:
             int: The number of samples available in each segment. This is the total number over all channels,
                 so if more than one channel is in use then the number of samples available to each
