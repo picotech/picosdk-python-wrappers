@@ -433,14 +433,20 @@ class Library(object):
     @requires_device("set_channel requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf'),
                     analog_offset=None):
-        """optional arguments:
-        channel_name: a single channel (e.g. 'A')
-        enabled: whether to enable the channel (boolean)
-        coupling: string of the relevant enum member for your driver less the driver name prefix. e.g. 'DC' or 'AC'.
-        range_peak: float which is the largest value you expect in the input signal. We will throw an exception if no
-                    range on the device is large enough for that value. (in Voltage)
-        analog_offset: the meaning of 0 for this channel.
-        return value: Max voltage of new range. Raises an exception in error cases."""
+        """Configures a single analog channel.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            channel_name (str): The channel name as a string (e.g., 'A').
+            enabled (bool): True to enable the channel, False to disable.
+            coupling (str): 'AC' or 'DC'. Defaults to 'DC'.
+            range_peak (int/float): Desired +/- peak voltage. The driver selects the best range.
+                                   Required if enabling the channel.
+            analog_offset (int/float): The analog offset for the channel in Volts.
+
+        Returns:
+            The range of the channel in Volts if enabled, None if disabled.
+        """
 
         excluded = ()
         reliably_resolved = False
@@ -473,6 +479,7 @@ class Library(object):
         """Set the digital port
 
         Args:
+            device (picosdk.device.Device): The device instance
             port_number (int): identifies the port for digital data. (e.g. 0 for digital channels 0-7)
             enabled (bool): whether or not to enable the channel (boolean)
             voltage_level (float): the voltage at which the state transitions between 0 and 1. Range: –5.0 to 5.0 (V).
@@ -550,6 +557,19 @@ class Library(object):
 
     @requires_device("memory_segments requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def memory_segments(self, device, number_segments):
+        """The number of segments defaults to 1, meaning that each capture fills the scope's available memory.
+        This function allows you to divide the memory into a number of segments so that the scope can store several
+        waveforms sequentially.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            number_segments (int): The number of segments to divide the memory into.
+
+        Returns:
+            int: The number of samples available in each segment. This is the total number over all channels,
+                so if more than one channel is in use then the number of samples available to each
+                channel is max_samples divided by the number of channels.
+        """
         if not hasattr(self, '_memory_segments'):
             raise DeviceCannotSegmentMemoryError()
         max_samples = c_int32(0)
@@ -561,8 +581,24 @@ class Library(object):
 
     @requires_device("get_timebase requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def get_timebase(self, device, timebase_id, no_of_samples, oversample=1, segment_index=0):
-        """query the device about what time precision modes it can handle.
-        note: the driver returns the timebase in nanoseconds, this function converts that into SI units (seconds)"""
+        """Query the device about what time precision modes it can handle.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            timebase_id (int): The timebase id.
+            no_of_samples (int): The number of samples to collect at this timebase.
+            oversample (int): The amount of oversample required. Defaults to 1.
+            segment_index (int): The memory segment index to use. Defaults to 0.
+
+        Returns:
+            namedtuple:
+                - timebase_id: The id corresponding to the timebase used
+                - time_interval: The time interval between readings at the selected timebase.
+                - time_units: The unit of time (not supported in e.g. 3000a)
+                - max_samples: The maximum number of samples available. The number may vary depending on the number of
+                    channels enabled and the timebase chosen.
+                - segment_id: The index of the memory segment to use
+        """
         nanoseconds_result = self._python_get_timebase(device.handle,
                                                        timebase_id,
                                                        no_of_samples,
@@ -614,6 +650,10 @@ class Library(object):
 
     @requires_device()
     def set_null_trigger(self, device, channel="A"):
+        """Set a null trigger on the device.
+        Trigger is not enabled, so the device will not wait for a trigger
+        before capturing data.
+        """
         auto_trigger_after_millis = 1
         if hasattr(self, '_set_trigger') and len(self._set_trigger.argtypes) == 6:
             PS2000_NONE = 5
@@ -689,6 +729,7 @@ class Library(object):
         """Set a simple trigger on the digital channels.
 
         Args:
+            device (picosdk.device.Device): The device instance
             channel_number (int): The number of the digital channel on which to trigger.(e.g. 0 for D0, 1 for D1,...)
             direction (str): The direction in which the signal must move to cause a trigger.
         """
@@ -723,6 +764,7 @@ class Library(object):
         At a timebase of 500 MS/s, or 2 ns per sample, the total delay would then be 100 x 2 ns = 200 ns.
 
         Args:
+            device (picosdk.device.Device): The device instance
             delay (int): The time between the trigger occurring and the first sample.
         """
         if hasattr(self, '_set_trigger_delay') and len(self._set_trigger_delay.argtypes) == 2:
@@ -737,8 +779,19 @@ class Library(object):
 
     @requires_device()
     def run_block(self, device, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
-        """tell the device to arm any triggers and start capturing in block mode now.
-        returns: the approximate time (in seconds) which the device will take to capture with these settings."""
+        """This function starts collecting data in block mode.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            pre_trigger_samples (int): The number of samples to collect before the trigger event.
+            post_trigger_samples (int): The number of samples to collect after the trigger event.
+            timebase_id (int): The timebase id to use for the capture.
+            oversample (int): The amount of oversample required. Defaults to 1.
+            segment_index (int): The memory segment index to use. Defaults to 0.
+
+        Returns:
+            float: The approximate time (in seconds) which the device will take to capture with these settings
+        """
         return self._python_run_block(device.handle,
                                       pre_trigger_samples,
                                       post_trigger_samples,
@@ -799,6 +852,7 @@ class Library(object):
         """Poll the driver to see if it has finished collecting the requested samples.
 
         Args:
+            device (picosdk.device.Device): The device instance
             timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
         """
         if timeout_minutes < 0:
@@ -810,7 +864,14 @@ class Library(object):
 
     @requires_device()
     def maximum_value(self, device):
-        """Get the maximum ADC value for this device."""
+        """Get the maximum ADC value for this device.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+
+        Returns:
+            int: The maximum ADC value for this device.
+        """
         if not hasattr(self, '_maximum_value'):
             return (2**15)-1
         max_adc = c_int16(0)
@@ -824,11 +885,11 @@ class Library(object):
         """Set the data buffer for a specific channel.
 
         Args:
-            device: Device instance
-            channel_or_port: Channel (e.g. 'A', 'B') or digital port (e.g. 0, 1) to set data for
-            buffer_length: The size of the buffer array (equal to no_of_samples)
-            segment_index: The number of the memory segment to be used (default is 0)
-            mode: The ratio mode to be used (default is 'NONE')
+            device (picosdk.device.Device): The device instance
+            channel_or_port (int/str): Channel (e.g. 'A', 'B') or digital port (e.g. 0, 1) to set data for
+            buffer_length (int): The size of the buffer array (equal to no_of_samples)
+            segment_index (int): The number of the memory segment to be used (default is 0)
+            mode (str): The ratio mode to be used (default is 'NONE')
 
         Raises:
             ArgumentOutOfRangeError: If parameters are invalid for device
@@ -981,22 +1042,20 @@ class Library(object):
         """Set the trigger channel properties for the device.
 
         Args:
-            device: Device instance
-            threshold_upper: Upper threshold in ADC counts
-            threshold_upper_hysteresis: Hysteresis for upper threshold in ADC counts
-            threshold_lower: Lower threshold in ADC counts
-            threshold_lower_hysteresis: Hysteresis for lower threshold in ADC counts
-            channel: Channel to set properties for (e.g. 'A', 'B', 'C', 'D')
-            threshold_mode: Threshold mode (e.g. "LEVEL", "WINDOW")
-            aux_output_enable: Enable auxiliary output (boolean) (Not used in eg. ps2000a, ps3000a, ps4000a)
-            auto_trigger_milliseconds: The number of milliseconds for which the scope device will wait for a trigger
-                before timing out. If set to zero, the scope device will wait indefinitely for a trigger
-
-        Returns:
-            None
+            device (picosdk.device.Device): Device instance
+            threshold_upper (int): Upper threshold in ADC counts
+            threshold_upper_hysteresis (int): Hysteresis for upper threshold in ADC counts
+            threshold_lower (int): Lower threshold in ADC counts
+            threshold_lower_hysteresis (int): Hysteresis for lower threshold in ADC counts
+            channel (str): Channel to set properties for (e.g. 'A', 'B', 'C', 'D')
+            threshold_mode (str): Threshold mode (e.g. "LEVEL", "WINDOW")
+            aux_output_enable (bool): Enable auxiliary output (boolean) (Not used in eg. ps2000a, ps3000a, ps4000a)
+            auto_trigger_milliseconds (int): The number of milliseconds for which the scope device will wait for a
+                trigger before timing out. If set to zero, the scope device will wait indefinitely for a trigger
 
         Raises:
-            ArgumentOutOfRangeError: If parameters are invalid for device
+            NotImplementedError: This device does not support setting trigger channel properties.
+            PicoError: If the function fails to set the properties.
         """
         if hasattr(self, '_set_trigger_channel_properties'):
             args = (device.handle, threshold_upper, threshold_upper_hysteresis,
@@ -1013,7 +1072,14 @@ class Library(object):
 
     @requires_device()
     def stop(self, device):
-        """Stop data capture."""
+        """Stop data capture.
+
+        Args:
+            device (picosdk.device.Device): Device instance
+
+        Raises:
+            InvalidCaptureParameters: If the stop operation fails or parameters are invalid.
+        """
         args = (device.handle,)
         converted_args = self._convert_args(self._stop, args)
 
@@ -1035,23 +1101,20 @@ class Library(object):
 
         Args:
             device: Device instance
-            offset_voltage: Offset voltage in microvolts (default 0)
-            pk_to_pk: Peak-to-peak voltage in microvolts (default 2000000)
-            wave_type: Type of waveform (e.g. "SINE", "SQUARE", "TRIANGLE")
-            start_frequency: Start frequency in Hz (default 1000.0)
-            stop_frequency: Stop frequency in Hz (default 1000.0)
-            increment: Frequency increment in Hz (default 0.0)
-            dwell_time: Time at each frequency in seconds (default 1.0)
-            sweep_type: Sweep type (e.g. "UP", "DOWN", "UPDOWN")
-            operation: Configures the white noise/PRBS (e.g. "ES_OFF", "WHITENOISE", "PRBS")
-            shots: Number of shots per trigger (default 1)
-            sweeps: Number of sweeps (default 1)
-            trigger_type: Type of trigger (e.g. "RISING", "FALLING")
-            trigger_source: Source of trigger (e.g. "NONE", "SCOPE_TRIG")
-            ext_in_threshold: External trigger threshold in ADC counts
-
-        Returns:
-            None
+            offset_voltage (int/float): Offset voltage in microvolts (default 0)
+            pk_to_pk (int): Peak-to-peak voltage in microvolts (default 2000000)
+            wave_type (str): Type of waveform (e.g. "SINE", "SQUARE", "TRIANGLE")
+            start_frequency (int): Start frequency in Hz (default 1000.0)
+            stop_frequency (int): Stop frequency in Hz (default 1000.0)
+            increment (int): Frequency increment in Hz (default 0.0)
+            dwell_time (int/float): Time at each frequency in seconds (default 1.0)
+            sweep_type (str): Sweep type (e.g. "UP", "DOWN", "UPDOWN")
+            operation (str): Configures the white noise/PRBS (e.g. "ES_OFF", "WHITENOISE", "PRBS")
+            shots (int): Number of shots per trigger (default 1)
+            sweeps (int): Number of sweeps (default 1)
+            trigger_type (str): Type of trigger (e.g. "RISING", "FALLING")
+            trigger_source (str): Source of trigger (e.g. "NONE", "SCOPE_TRIG")
+            ext_in_threshold (int): External trigger threshold in ADC counts
 
         Raises:
             ArgumentOutOfRangeError: If parameters are invalid for device
