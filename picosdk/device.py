@@ -209,12 +209,16 @@ class Device(object):
     def set_channel(self, channel_name, enabled, coupling='DC', range_peak=float('inf'), analog_offset=0):
         """Configures a single analog channel.
 
-        channel_name (str): The channel name as a string (e.g., 'A').
-        enabled (bool): True to enable the channel, False to disable.
-        coupling (str): 'AC' or 'DC'. Defaults to 'DC'.
-        range_peak (int/float): Desired +/- peak voltage. The driver selects the best range.
-                               Required if enabling the channel.
-        analog_offset (int/float): The analog offset for the channel in Volts.
+        Args:
+            channel_name (str): The channel name as a string (e.g., 'A').
+            enabled (bool): True to enable the channel, False to disable.
+            coupling (str): 'AC' or 'DC'. Defaults to 'DC'.
+            range_peak (int/float): Desired +/- peak voltage. The driver selects the best range.
+                                   Required if enabling the channel.
+            analog_offset (int/float): The analog offset for the channel in Volts.
+
+        Returns:
+            The range of the channel in Volts if enabled, None if disabled.
         """
         if not enabled:
             self.driver.set_channel(self,
