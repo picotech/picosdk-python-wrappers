@@ -11,7 +11,7 @@ import sys
 import os.path
 
 
-signalfile = ".sdkwarning"
+signalfile = "~\\.sdkwarning"
 if not os.path.exists(signalfile):
     name = 'ps2000'
     try:
@@ -27,7 +27,7 @@ if not os.path.exists(signalfile):
 
 with open("README.md") as f:
     readme = f.read()
-    
+
 setup(
     name='picosdk',
     packages=['picosdk'],
