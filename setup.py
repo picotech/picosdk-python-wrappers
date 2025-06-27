@@ -12,7 +12,7 @@ import os.path
 
 
 signalfile = "~\\.sdkwarning"
-if not os.path.exists(signalfile):
+if not os.path.exists(os.path.expanduser(signalfile)):
     name = 'ps2000'
     try:
         if sys.platform == 'win32':
