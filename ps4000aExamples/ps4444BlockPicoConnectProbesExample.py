@@ -23,9 +23,6 @@ def PicoConnectProbe_callback(handle, pico_status, probes_ptr, nProbes):
     PicoConnectProbewasCalledBack = True
 
     print("Number of PicoConnectProbes events is ", nProbes)
-    # cProbes = ctypes.c_uint32(probes)
-    # probeUpdates = (ps.PS4000A_USER_PROBE_INTERACTIONS*nProbes) ()
-    # probeUpdates = ctypes.byref(cProbes)
     print(probes_ptr)
     
     for i in range(nProbes):
