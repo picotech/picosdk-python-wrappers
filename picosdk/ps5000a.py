@@ -38,6 +38,11 @@ ps5000a.PS5000A_COUPLING = make_enum([
 # Just use AC and DC.
 ps5000a.PICO_COUPLING = {k[-2:]: v for k, v in ps5000a.PS5000A_COUPLING.items()}
 
+ps5000a.PS5000A_BANDWIDTH_LIMITER = make_enum([
+    'PS5000A_BW_FULL',
+    'PS5000A_BW_20MHZ',
+])
+
 def _define_channel():
     PS5000A_CHANNEL_A = 0
     PS5000A_CHANNEL_B = 1
