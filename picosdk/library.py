@@ -179,7 +179,7 @@ class SingletonScopeDataDict(dict):
             ValueError: If digital channel number is invalid
         """
         # Handle digital channels (D0-D15)
-        if isinstance(key, str) and key.upper().startswith('D'):
+        if isinstance(key, str) and key.upper().startswith('D') and key[1:].isdigit():
             try:
                 digital_number = int(key[1:])
                 if not 0 <= digital_number <= 15:
