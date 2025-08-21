@@ -10,6 +10,7 @@ this type and attach the missing methods.
 from __future__ import print_function
 
 import json
+import re
 import sys
 from ctypes import c_int16, c_int32, c_uint32, c_float, c_void_p, create_string_buffer, byref
 from ctypes.util import find_library
@@ -178,22 +179,28 @@ class SingletonScopeDataDict(dict):
             KeyError: If channel doesn't exist
             ValueError: If digital channel number is invalid
         """
-        # Handle digital channels (D0-D15)
-        if isinstance(key, str) and key.upper().startswith('D') and key[1:].isdigit():
+        if isinstance(key, str):
+            match = re.match(r"D(?P<channel_num>\d+)", key, re.IGNORECASE)
+        else:
+            match = None
+
+        if match:
             try:
-                digital_number = int(key[1:])
+                digital_number = int(match.group('channel_num'))
                 if not 0 <= digital_number <= 15:
                     raise ValueError(f"Digital channel number must be 0-15, got {digital_number}")
 
-                # Calculate which port and bit
+                # Calculate which port and which row (bit) in the port's data array
                 port_number = digital_number // 8  # Port 0 = D0-D7, Port 1 = D8-D15
-                bit_number = 7 - (digital_number % 8)  # Reverse bit order within port
 
-                # Get port data
+                # Reverse bit order within port: Assuming D7 is the first row (index 0) and D0 is the last row (index 7)
+                row_index = 7 - (digital_number % 8)
+
+                # Get the data for the entire port
                 port_data = super().__getitem__(port_number)
 
-                # Extract individual channel data
-                return (port_data >> bit_number) & 0x1
+                # Select the correct row from the numpy array.
+                return port_data[row_index]
 
             except (IndexError, ValueError) as e:
                 raise ValueError(f"Invalid digital channel {key}: {str(e)}")
