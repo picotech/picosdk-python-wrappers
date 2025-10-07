@@ -187,8 +187,6 @@ class SingletonScopeDataDict(dict):
         if match:
             try:
                 digital_number = int(match.group('channel_num'))
-                if not 0 <= digital_number <= 15:
-                    raise ValueError(f"Digital channel number must be 0-15, got {digital_number}")
 
                 # Calculate which port and which row (bit) in the port's data array
                 port_number = digital_number // 8  # Port 0 = D0-D7, Port 1 = D8-D15
@@ -202,7 +200,7 @@ class SingletonScopeDataDict(dict):
                 # Select the correct row from the numpy array.
                 return port_data[row_index]
 
-            except (IndexError, ValueError) as e:
+            except (IndexError, ValueError, KeyError) as e:
                 raise ValueError(f"Invalid digital channel {key}: {str(e)}")
 
         # Handle direct port access (0-3) or analog channels
