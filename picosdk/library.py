@@ -44,7 +44,7 @@ DEFAULT_PROBE_ATTENUATION = {
 """TimebaseInfo: A type for holding the particulars of a timebase configuration.
 """
 TimebaseInfo = collections.namedtuple('TimebaseInfo', ['timebase_id',
-                                                       'time_interval',
+                                                       'time_interval_ns',
                                                        'time_units',
                                                        'max_samples',
                                                        'segment_id'])
@@ -598,7 +598,7 @@ class Library(object):
         Returns:
             namedtuple:
                 - timebase_id: The id corresponding to the timebase used
-                - time_interval: The time interval between readings at the selected timebase.
+                - time_interval_ns: The time interval between readings at the selected timebase.
                 - time_units: The unit of time (not supported in e.g. 3000a)
                 - max_samples: The maximum number of samples available. The number may vary depending on the number of
                     channels enabled and the timebase chosen.
@@ -610,7 +610,7 @@ class Library(object):
                                                        oversample,
                                                        segment_index)
         return TimebaseInfo(nanoseconds_result.timebase_id,
-                            nanoseconds_result.time_interval * 1.e-9,
+                            nanoseconds_result.time_interval_ns,
                             nanoseconds_result.time_units,
                             nanoseconds_result.max_samples,
                             nanoseconds_result.segment_id)
@@ -619,28 +619,28 @@ class Library(object):
         # We use get_timebase on ps2000 and ps3000 and parse the nanoseconds-int into a float.
         # on other drivers, we use get_timebase2, which gives us a float in the first place.
         if len(self._get_timebase.argtypes) == 7 and self._get_timebase.argtypes[1] == c_int16:
-            time_interval = c_int32(0)
+            time_interval_ns = c_int32(0)
             time_units = c_int16(0)
             max_samples = c_int32(0)
 
-            args = (handle, timebase_id, no_of_samples, time_interval,
-                   time_units, oversample, max_samples)
+            args = (handle, timebase_id, no_of_samples, time_interval_ns,
+                    time_units, oversample, max_samples)
             converted_args = self._convert_args(self._get_timebase, args)
             return_code = self._get_timebase(*converted_args)
 
             if return_code == 0:
                 raise InvalidTimebaseError()
 
-            return TimebaseInfo(timebase_id, float(time_interval.value), time_units.value, max_samples.value, None)
+            return TimebaseInfo(timebase_id, float(time_interval_ns.value), time_units.value, max_samples.value, None)
         elif hasattr(self, '_get_timebase2') and self._get_timebase2.argtypes[1] == c_uint32:
-            time_interval = c_float(0.0)
+            time_interval_ns = c_float(0.0)
             max_samples = c_int32(0)
             if len(self._get_timebase2.argtypes) == 7:
-                args = (handle, timebase_id, no_of_samples, time_interval,
+                args = (handle, timebase_id, no_of_samples, time_interval_ns,
                         oversample, max_samples, segment_index)
                 converted_args = self._convert_args(self._get_timebase2, args)
             elif len(self._get_timebase2.argtypes) == 6:
-                args = (handle, timebase_id, no_of_samples, time_interval, max_samples, segment_index)
+                args = (handle, timebase_id, no_of_samples, time_interval_ns, max_samples, segment_index)
                 converted_args = self._convert_args(self._get_timebase2, args)
             else:
                 raise NotImplementedError("_get_timebase2 is not implemented for this driver yet")
@@ -649,7 +649,7 @@ class Library(object):
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidTimebaseError(f"get_timebase2 failed ({constants.pico_tag(status)})")
 
-            return TimebaseInfo(timebase_id, time_interval.value, None, max_samples.value, segment_index)
+            return TimebaseInfo(timebase_id, time_interval_ns.value, None, max_samples.value, segment_index)
         else:
             raise NotImplementedError("_get_timebase2 or _get_timebase is not implemented for this driver yet")
 

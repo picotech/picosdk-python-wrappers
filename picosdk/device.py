@@ -78,7 +78,7 @@ class Device(object):
         self._channel_ranges = {}
         self._channel_offsets = {}
         self._enabled_sources = set()
-        self._time_interval = None
+        self._time_interval_ns = None
         self._probe_attenuations = DEFAULT_PROBE_ATTENUATION
 
     @property
@@ -127,9 +127,9 @@ class Device(object):
         return self._enabled_sources
 
     @property
-    def time_interval(self):
+    def time_interval_ns(self):
         """int/float: The time interval in seconds"""
-        return self._time_interval
+        return self._time_interval_ns
 
     @property
     def probe_attenuations(self):
@@ -157,7 +157,7 @@ class Device(object):
         self._channel_ranges.clear()
         self._channel_offsets.clear()
         self._enabled_sources.clear()
-        self._time_interval = None
+        self._time_interval_ns = None
         self._probe_attenuations = DEFAULT_PROBE_ATTENUATION.copy()
 
     def __enter__(self):
@@ -303,14 +303,15 @@ class Device(object):
     @staticmethod
     def _validate_timebase(timebase_options, timebase_info):
         """validate whether a timebase result matches the options requested."""
+        time_interval_s = timebase_info.time_interval_ns / 1e9
         if timebase_options.max_time_interval is not None:
-            if timebase_info.time_interval > timebase_options.max_time_interval:
+            if time_interval_s > timebase_options.max_time_interval:
                 return False
         if timebase_options.no_of_samples is not None:
             if timebase_options.no_of_samples > timebase_info.max_samples:
                 return False
         if timebase_options.min_collection_time is not None:
-            if timebase_options.min_collection_time > timebase_info.max_samples * timebase_info.time_interval:
+            if timebase_options.min_collection_time > timebase_info.max_samples * time_interval_s:
                 return False
         return True
 
@@ -353,14 +354,14 @@ class Device(object):
         Returns:
             namedtuple:
                 - timebase_id: The id corresponding to the timebase used
-                - time_interval: The time interval between readings at the selected timebase.
+                - time_interval_ns: The time interval between readings at the selected timebase.
                 - time_units: The unit of time (not supported in e.g. 3000a)
                 - max_samples: The maximum number of samples available. The number may vary depending on the number of
                     channels enabled and the timebase chosen.
                 - segment_id: The index of the memory segment to use
         """
         timebase_info = self.driver.get_timebase(self, timebase_id, no_of_samples, oversample, segment_index)
-        self._time_interval = timebase_info.time_interval
+        self._time_interval_ns = timebase_info.time_interval_ns
         return timebase_info
 
     @requires_open()
@@ -498,7 +499,8 @@ class Device(object):
         Returns:
             Tuple of (captured data including time, overflow warnings)
         """
-        return self.driver.get_values(self, self.buffers, self.max_samples, self.time_interval, self.channel_ranges,
+        time_interval_sec = self.time_interval_ns / 1e9 if self.time_interval_ns else None
+        return self.driver.get_values(self, self.buffers, self.max_samples, time_interval_sec, self.channel_ranges,
                                       start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
                                       filename, save_to_file, self.probe_attenuations)
 
@@ -606,12 +608,13 @@ class Device(object):
 
         # get_timebase
         timebase_info = self.find_timebase(timebase_options)
+        time_interval_s = timebase_info.time_interval_ns / 1e9
 
         post_trigger_samples = timebase_options.no_of_samples
         pre_trigger_samples = 0
 
         if post_trigger_samples is None:
-            post_trigger_samples = int(math.ceil(timebase_options.min_collection_time / timebase_info.time_interval))
+            post_trigger_samples = int(math.ceil(timebase_options.min_collection_time / time_interval_s))
 
         self.driver.set_null_trigger(self)
 
@@ -636,7 +639,7 @@ class Device(object):
         self.driver.stop(self)
 
         times = numpy.linspace(0.,
-                               post_trigger_samples * timebase_info.time_interval,
+                               post_trigger_samples * time_interval_s,
                                post_trigger_samples,
                                dtype=numpy.dtype('float32'))
 
