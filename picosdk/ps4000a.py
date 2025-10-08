@@ -242,53 +242,53 @@ ps4000a.PS4000A_TIME_UNITS = make_enum([
 ])
 
 ps4000a.PS4000A_WAVE_TYPE = make_enum([
-	'PS4000A_SINE',
-	'PS4000A_SQUARE',
-	'PS4000A_TRIANGLE',
-	'PS4000A_RAMP_UP',
-	'PS4000A_RAMP_DOWN',
-	'PS4000A_SINC',
-	'PS4000A_GAUSSIAN',
-	'PS4000A_HALF_SINE',
-	'PS4000A_DC_VOLTAGE',
-	'PS4000A_WHITE_NOISE',
-	'PS4000A_MAX_WAVE_TYPES',
+    'PS4000A_SINE',
+    'PS4000A_SQUARE',
+    'PS4000A_TRIANGLE',
+    'PS4000A_RAMP_UP',
+    'PS4000A_RAMP_DOWN',
+    'PS4000A_SINC',
+    'PS4000A_GAUSSIAN',
+    'PS4000A_HALF_SINE',
+    'PS4000A_DC_VOLTAGE',
+    'PS4000A_WHITE_NOISE',
+    'PS4000A_MAX_WAVE_TYPES',
 ])
 
 ps4000a.PS4000A_SWEEP_TYPE = make_enum([
-	'PS4000A_UP',
-	'PS4000A_DOWN',
-	'PS4000A_UPDOWN',
-	'PS4000A_DOWNUP',
-	'PS4000A_MAX_SWEEP_TYPES',
+    'PS4000A_UP',
+    'PS4000A_DOWN',
+    'PS4000A_UPDOWN',
+    'PS4000A_DOWNUP',
+    'PS4000A_MAX_SWEEP_TYPES',
 ])
 
 ps4000a.PS4000A_SIGGEN_TRIG_TYPE = make_enum([
-	'PS4000A_SIGGEN_RISING',
-	'PS4000A_SIGGEN_FALLING',
-	'PS4000A_SIGGEN_GATE_HIGH',
-	'PS4000A_SIGGEN_GATE_LOW',
+    'PS4000A_SIGGEN_RISING',
+    'PS4000A_SIGGEN_FALLING',
+    'PS4000A_SIGGEN_GATE_HIGH',
+    'PS4000A_SIGGEN_GATE_LOW',
 ])
 
 ps4000a.PS4000A_SIGGEN_TRIG_SOURCE = make_enum([
-	'PS4000A_SIGGEN_NONE',
-	'PS4000A_SIGGEN_SCOPE_TRIG',
-	'PS4000A_SIGGEN_AUX_IN',
-	'PS4000A_SIGGEN_EXT_IN',
-	'PS4000A_SIGGEN_SOFT_TRIG',
+    'PS4000A_SIGGEN_NONE',
+    'PS4000A_SIGGEN_SCOPE_TRIG',
+    'PS4000A_SIGGEN_AUX_IN',
+    'PS4000A_SIGGEN_EXT_IN',
+    'PS4000A_SIGGEN_SOFT_TRIG',
 ])
 
 ps4000a.PS4000A_INDEX_MODE = make_enum([
-	'PS4000A_SINGLE',
-	'PS4000A_DUAL',
-	'PS4000A_QUAD',
-	'PS4000A_MAX_INDEX_MODES',
+    'PS4000A_SINGLE',
+    'PS4000A_DUAL',
+    'PS4000A_QUAD',
+    'PS4000A_MAX_INDEX_MODES',
 ])
 
 ps4000a.PS4000A_EXTRA_OPERATIONS = make_enum([
-	'PS4000A_ES_OFF',
-	'PS4000A_WHITENOISE',
-	'PS4000A_PRBS',
+    'PS4000A_ES_OFF',
+    'PS4000A_WHITENOISE',
+    'PS4000A_PRBS',
 ])
 
 def _define_conditions_info():
@@ -333,9 +333,9 @@ ps4000a.PS4000A_PULSE_WIDTH_TYPE = make_enum([
 ])
 
 class PS4000A_CONDITION (Structure):
-	_pack_ = 1
-	_fields_ = [("source", c_int32),
-	("condition", c_int32)]
+    _pack_ = 1
+    _fields_ = [("source", c_int32),
+    ("condition", c_int32)]
 
 ps4000a.PS4000A_CONDITION = PS4000A_CONDITION
 
@@ -965,7 +965,7 @@ ps4000a.make_symbol("_maximum_value", "ps4000aMaximumValue", c_uint32, [c_int16,
 
 doc = """ PICO_STATUS ps4000aMinimumValue
     (
-        int16_t		handle,
+        int16_t   handle,
         int16_t * value
     ); """
 ps4000a.make_symbol("_minimum_value", "ps4000aMinimumValue", c_uint32, [c_int16, c_void_p], doc)
@@ -1076,39 +1076,39 @@ ps4000a.make_symbol("_set_frequency_counter", "ps4000aSetFrequencyCounter", c_ui
 
 doc = """ PICO_STATUS ps4000aOpenUnitWithResolution
     (
-	    int16_t    *handle,
-		int8_t     *serial,
-		PS4000A_DEVICE_RESOLUTION    resolution
-	); """
+        int16_t    *handle,
+        int8_t     *serial,
+        PS4000A_DEVICE_RESOLUTION    resolution
+    ); """
 ps4000a.make_symbol("_open_unit_with_resolution", "ps4000aOpenUnitWithResolution", c_uint32, [c_void_p, c_void_p, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aGetDeviceResolution
     (
-	    int16_t    handle,
-		PS4000A_DEVICE_RESOLUTION    *resolution
-	); """
+        int16_t    handle,
+        PS4000A_DEVICE_RESOLUTION    *resolution
+    ); """
 ps4000a.make_symbol("_get_resolution", "ps4000aGetDeviceResolution", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ PICO_STATUS ps4000aSetDeviceResolution
     (
-	    int16_t    handle,
-		PS4000A_DEVICE_RESOLUTION    resolution
-	); """
+        int16_t    handle,
+        PS4000A_DEVICE_RESOLUTION    resolution
+    ); """
 ps4000a.make_symbol("_set_resolution", "ps4000aSetDeviceResolution", c_uint32, [c_int16, c_int32], doc)
 
 doc = """ PICO_STATUS ps4000aSetProbeInteractionCallback
     (
-	    int16_t    handle,
-		ps4000aProbeInteractions callback
-	); """
+        int16_t    handle,
+        ps4000aProbeInteractions callback
+    ); """
 ps4000a.make_symbol("_set_probe_interaction_callback", "ps4000aSetProbeInteractionCallback", c_uint32, [c_int16, c_void_p], doc)
 
 doc = """ void *ps4000aProbeInteractions
     (
-		int16_t    												handle,
-		PICO_STATUS												status,
-		PS4000A_USER_PROBE_INTERACTIONS * probes,
-		uint32_t													nProbes
+        int16_t                           handle,
+        PICO_STATUS                       status,
+        PS4000A_USER_PROBE_INTERACTIONS * probes,
+        uint32_t                          nProbes
     );
     define a python function which accepts the correct arguments, and pass it to the constructor of this type.
     """
