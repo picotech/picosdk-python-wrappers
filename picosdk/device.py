@@ -149,6 +149,7 @@ class Device(object):
     @requires_open("The device either did not initialise correctly or has already been closed.")
     def close(self):
         self.driver.close_unit(self)
+        self._driver = None
         self._handle = None
         self._max_adc = None
         self._buffers.clear()
@@ -156,7 +157,7 @@ class Device(object):
         self._channel_ranges.clear()
         self._channel_offsets.clear()
         self._enabled_sources.clear()
-        self._time_interval_ns = None
+        self._time_interval = None
         self._probe_attenuations = DEFAULT_PROBE_ATTENUATION.copy()
 
     def __enter__(self):
