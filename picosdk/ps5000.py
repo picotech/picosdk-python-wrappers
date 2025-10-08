@@ -406,8 +406,8 @@ doc = """ PICO_STATUS ps5000SetSigGenArbitrary
 		SIGGEN_TRIG_SOURCE  triggerSource,
 		short  extInThreshold
 	); """
-ps5000.make_symbol("_SetSigGenArbitrary", "ps5000SetSigGenArbitrary", c_uint32, 
-					[c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p, 
+ps5000.make_symbol("_SetSigGenArbitrary", "ps5000SetSigGenArbitrary", c_uint32,
+					[c_int16, c_int32, c_uint32, c_uint32, c_uint32, c_uint32, c_uint32, c_void_p,
 						c_int32, c_int32, c_int16, c_int32, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps5000SetSigGenBuiltIn
@@ -428,7 +428,7 @@ doc = """ PICO_STATUS ps5000SetSigGenBuiltIn
 		SIGGEN_TRIG_SOURCE  triggerSource,
 		short  extInThreshold
 	); """
-ps5000.make_symbol("_SetSigGenBuiltIn", "ps5000SetSigGenBuiltIn", c_uint32, 
+ps5000.make_symbol("_SetSigGenBuiltIn", "ps5000SetSigGenBuiltIn", c_uint32,
 					[c_int16, c_int32, c_uint32, c_int16, c_int64, c_int64, c_int64, c_int64, c_int64, c_int32, c_int16, c_uint32, c_uint32, c_int32, c_int32, c_int16], doc)
 
 doc = """ PICO_STATUS ps5000SetSimpleTrigger
