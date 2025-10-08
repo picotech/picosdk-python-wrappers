@@ -111,7 +111,7 @@ action = clear|add # PICO_ACTION["PICO_CLEAR_WAVEFORM_CLEAR_ALL"] | PICO_ACTION[
 status["setDataChABuffers"] = ps.ps6000aSetDataBuffers(chandle, channelA, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), nSamples, dataType, waveform, downSampleMode, action)
 assert_pico_ok(status["setDataChABuffers"])
 
-status["setDataDP0Buffers"] = ps.ps6000aSetDataBuffers(chandle, port, ctypes.byref(bufferDPort0Max), ctypes.byref(bufferDPort0Min), nSamples, dataType, waveform, downSampleMode, action)
+status["setDataDP0Buffers"] = ps.ps6000aSetDataBuffers(chandle, port, ctypes.byref(bufferDPort0Max), ctypes.byref(bufferDPort0Min), nSamples, dataType, waveform, downSampleMode, add)
 assert_pico_ok(status["setDataDP0Buffers"])
 
 # Run block capture
