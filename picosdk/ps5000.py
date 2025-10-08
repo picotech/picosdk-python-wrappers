@@ -54,7 +54,7 @@ ps5000.PS5000_TIME_UNITS = make_enum([
 	"PS5000_S",
 	"PS5000_MAX_TIME_UNITS",
 ])
-	
+
 
 class PWQ_CONDITIONS (Structure):
 	_pack_ = 1
@@ -76,7 +76,7 @@ class TRIGGER_CONDITIONS (Structure):
 				("external", c_int32),
 				("aux", c_int32),
 				("pulseWidthQualifier", c_int32)]
-				
+
 ps5000.TRIGGER_CONDITIONS = TRIGGER_CONDITIONS
 
 class TRIGGER_CHANNEL_PROPERTIES (Structure):
@@ -86,9 +86,9 @@ class TRIGGER_CHANNEL_PROPERTIES (Structure):
 				("hysteresis", c_uint16),
 				("channel", c_int32),
 				("thresholdMode", c_int32)]
-				
+
 ps5000.TRIGGER_CHANNEL_PROPERTIES = TRIGGER_CHANNEL_PROPERTIES
-				
+
 doc = """ PICO_STATUS ps5000CloseUnit
     (
         short  handle
@@ -504,7 +504,7 @@ ps5000.BlockReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
 													c_int16,
 													c_uint32,
 													c_void_p)
-													
+
 ps5000.BlockReadyType.__doc__ = doc
 
 doc = """ void (CALLBACK *ps5000DataReady)
@@ -516,7 +516,7 @@ doc = """ void (CALLBACK *ps5000DataReady)
 		short  triggered,
 		void  *pParameter
 	); """
-	
+
 ps5000.DataReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
 													c_int16,
 													c_int32,
@@ -524,7 +524,7 @@ ps5000.DataReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
 													c_uint32,
 													c_int16,
 													c_void_p)
-													
+
 ps5000.DataReadyType.__doc__ = doc
 
 doc = """ void (CALLBACK *ps5000StreamingReady)
@@ -542,11 +542,11 @@ doc = """ void (CALLBACK *ps5000StreamingReady)
 ps5000.StreamingReadyType = C_CALLBACK_FUNCTION_FACTORY(None,
 														c_int16,
 														c_int32,
-														c_uint32, 
+														c_uint32,
 														c_int16,
 														c_uint32,
 														c_int16,
 														c_int16,
 														c_void_p)
-														
+
 ps5000.StreamingReadyType.__doc__ = doc
