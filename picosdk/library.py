@@ -859,13 +859,16 @@ class Library(object):
         Args:
             device (picosdk.device.Device): The device instance
             timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
+
+        Raises:
+            TimeoutError: If the device is not ready within the specified timeout.
         """
         if timeout_minutes < 0:
             raise ArgumentOutOfRangeError("timeout_minutes must be non-negative.")
-        timeout = time.time() + timeout_minutes*60
+        timeout = time.time() + timeout_minutes * 60
         while not self.is_ready(device):
             if time.time() > timeout:
-                break
+                raise TimeoutError(f"Picoscope not ready within {timeout_minutes} minute(s).")
 
     @requires_device()
     def maximum_value(self, device):
