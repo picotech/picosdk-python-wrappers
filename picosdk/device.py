@@ -434,7 +434,8 @@ class Device(object):
             float: The approximate time (in seconds) which the device will take to capture with these settings
         """
         self._max_samples = pre_trigger_samples + post_trigger_samples
-        return self.driver.run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample, segment_index)
+        return self.driver.run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample,
+                                     segment_index)
 
     @requires_open()
     def is_ready(self):
@@ -444,7 +445,7 @@ class Device(object):
 
     @requires_open()
     def stop_block_capture(self, timeout_minutes=5):
-        """Poll the driver to see if it has finished collecting the requested samples.
+        """Poll the driver to see if it has finished collecting the requested samples and then stops the capture.
 
         Args:
             timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
@@ -475,7 +476,7 @@ class Device(object):
             self.set_data_buffer(channel_or_port, segment_index, mode)
 
     @requires_open()
-    def get_values(self,start_index=0, downsample_ratio=0, downsample_ratio_mode="NONE", segment_index=0,
+    def get_values(self, start_index=0, downsample_ratio=0, downsample_ratio_mode="NONE", segment_index=0,
                    output_dir=".", filename="data", save_to_file=False):
         """Get stored data values from the scope and store it in a clean SingletonScopeDataDict object.
 
