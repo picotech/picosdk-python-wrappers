@@ -980,18 +980,16 @@ class Library(object):
         else:
             raise NotImplementedError("not done other driver types yet")
 
-        num_samples_retrieved = no_of_samples.value
-        for channel, arr in buffers.items():
-            data = arr[:num_samples_retrieved]
+        for channel, buffer in buffers.items():
             if isinstance(channel, int) or channel.isnumeric():
-                scope_data[channel] = numpy.asarray(split_mso_data_fast(no_of_samples, data))
+                scope_data[channel] = numpy.asarray(split_mso_data_fast(no_of_samples, buffer))
             else:
-                scope_data[channel] = numpy.array(adc_to_mv(data, max_voltage[channel],
+                scope_data[channel] = numpy.array(adc_to_mv(buffer, max_voltage[channel],
                                                             self.maximum_value(device))) * probe_attenuation[channel]
 
         time_sec = numpy.linspace(0,
                                   (samples - 1) * time_interval_sec,
-                                  num_samples_retrieved)
+                                  samples)
         scope_data["time"] = numpy.array(time_sec)
 
         if save_to_file:
