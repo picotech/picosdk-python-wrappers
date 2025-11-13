@@ -1,0 +1,74 @@
+from concurrent.futures import wait
+import socket 
+import threading 
+import json
+
+
+
+class Settings:
+    def __init__(self, voltage=5.0, frequency=50.0, time=1.0, pulses=10):
+        self.voltage = voltage
+        self.frequency = frequency
+        self.time = time
+        self.pulses = pulses
+    
+    def dictionary(self):
+        return {
+            "voltage": self.voltage,
+            "frequency": self.frequency,
+            "time": self.time,
+            "pulses": self.pulses
+        }
+
+
+request = ""
+
+
+# localhost
+bind_ip = "127.0.0.1" 
+bind_port = 9999
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+server.bind((bind_ip, bind_port)) 
+# we tell the server to start listening with 
+# a maximum backlog of connections set to 5
+server.listen(5) 
+
+
+print(f"[+] Listening on port {bind_ip} : {bind_port}")                            
+
+
+
+#client handling thread
+def handle_client(client_socket): 
+    #printing what the client sends
+    global request
+    request = client_socket.recv(1024)
+    print(f"[+] Recieved: {request}") 
+    #sending back the packet 
+    client_socket.send("Ping recevied".encode()) 
+    client_socket.close()
+
+def handle_response():
+    data = json.loads(request)
+    response = Settings(
+        voltage=data["voltage"],
+        frequency=data["frequency"],
+        time=data["time"],
+        pulses=data["pulses"]
+    )
+    print(f"[+] Response: {response.dictionary()}")
+
+while True: 
+    # When a client connects we receive the 
+    # client socket into the client variable, and 
+    # the remote connection details into the addr variable
+    client, addr = server.accept() 
+    print(f"[+] Accepted connection from: {addr[0]}:{addr[1]}")
+    #spin up our client thread to handle the incoming data 
+    client_handler = threading.Thread(target=handle_client, args=(client,))
+    client_handler.start() 
+    # handle the response
+    client_handler.join()
+    handle_response()
+

@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 SAMPLES = 2000
 OVERSAMPLING = 1
 
-
 def get_timebase(device, wanted_time_interval):
     current_timebase = 1
 

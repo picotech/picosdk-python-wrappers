@@ -1,0 +1,33 @@
+import socket
+import json
+import signal
+
+class Settings:
+    def __init__(self, voltage=1.0, frequency=52.0, time=3.0, pulses=80):
+        self.voltage = voltage
+        self.frequency = frequency
+        self.time = time
+        self.pulses = pulses
+    
+    def dictionary(self):
+        return {
+            "voltage": self.voltage,
+            "frequency": self.frequency,
+            "time": self.time,
+            "pulses": self.pulses
+        }
+
+target_host = "127.0.0.1"
+target_port = 9999
+print("hello")
+#creating socket object
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#connecting the client
+client.connect((target_host, target_port))
+#sending data
+example = Settings()
+object = json.dumps(example.dictionary())
+client.send(object.encode())
+#receiving the data 
+response = client.recv(4096)
+print(response.decode())

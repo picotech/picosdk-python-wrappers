@@ -1,0 +1,15 @@
+
+class Settings:
+    def __init__(self, voltage=5.0, frequency=50.0, time=1.0, pulses=10):
+        self.voltage = voltage
+        self.frequency = frequency
+        self.time = time
+        self.pulses = pulses
+    
+    def dictionary(self):
+        return {
+            "voltage": self.voltage,
+            "frequency": self.frequency,
+            "time": self.time,
+            "pulses": self.pulses
+        }
