@@ -1041,6 +1041,43 @@ class Library(object):
                                downsample_ratio, downsample_ratio_mode, segment_index, output_dir, filename,
                                save_to_file, probe_attenuation)
 
+    @requires_device()
+    def set_trigger_conditions(self, device, trigger_input):
+        """Sets up trigger conditions on the scope's inputs.
+        Sets trigger state to TRUE for given `trigger_input`, the rest will be DONT CARE
+
+        Args:
+            device (picosdk.device.Device): Device instance
+            trigger (str): What to trigger (e.g. channelA, channelB, external, aux, pulseWidthQualifier, digital)
+        """
+
+        if hasattr(self, '_set_trigger_channel_conditions_v2'):
+            trigger_conditions = getattr(self, self.name.upper() + '_TRIGGER_CONDITIONS_V2', None)
+            trigger_state = getattr(self, self.name.upper() + '_TRIGGER_STATE', None)
+
+            if not trigger_conditions or not trigger_state:
+                raise PicoError(f"Trigger conditions not fully defined for {self.name} driver.")
+
+            trigger_dont_care = trigger_state[self.name.upper() + '_CONDITION_DONT_CARE']
+            trigger_true = trigger_state[self.name.upper() + '_CONDITION_TRUE']
+            kwargs = {field[0]: trigger_dont_care for field in trigger_conditions._fields_}
+
+            if trigger_input in kwargs:
+                kwargs[trigger_input] = trigger_true
+            else:
+                raise ArgumentOutOfRangeError(f"Invalid trigger source: '{trigger_input}'. "
+                                              f"Valid sources are: {list(kwargs.keys())}")
+
+            conditions = trigger_conditions(**kwargs)
+            args = (device.handle, byref(conditions), 1)
+            converted_args = self._convert_args(self._set_trigger_channel_conditions_v2, args)
+            status = self._set_trigger_channel_conditions_v2(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise PicoError(f"set_trigger_channel_conditions_v2 failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device does not support setting trigger conditions via V2 struct.")
+
     @requires_device("set_trigger_channel_properties requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def set_trigger_channel_properties(self, device, threshold_upper, threshold_upper_hysteresis, threshold_lower,
                                        threshold_lower_hysteresis, channel, threshold_mode, aux_output_enable,
