@@ -579,8 +579,8 @@ class Library(object):
             raise DeviceCannotSegmentMemoryError()
         max_samples = c_int32(0)
         args = (device.handle, number_segments, max_samples)
-        converted_args = self._convert_args(self._get_max_segments, args)
-        status = self._get_max_segments(*converted_args)
+        converted_args = self._convert_args(self._memory_segments, args)
+        status = self._memory_segments(*converted_args)
         if status != self.PICO_STATUS['PICO_OK']:
             raise InvalidMemorySegmentsError("could not segment the device memory into (%s) segments (%s)" % (
                                               number_segments, constants.pico_tag(status)))
