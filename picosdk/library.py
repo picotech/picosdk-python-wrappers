@@ -586,6 +586,26 @@ class Library(object):
                                               number_segments, constants.pico_tag(status)))
         return max_samples.value
 
+    @requires_device()
+    def get_max_segments(self, device):
+        """Get the maximum number of memory segments supported by the device.
+
+        Returns:
+            int: The maximum number of memory segments supported by the device.
+        """
+        if not hasattr(self, '_get_max_segments'):
+            raise NotImplementedError("This device doesn't support getting maximum segments")
+
+        max_segments = c_int32(0)
+        args = (device.handle, max_segments)
+        converted_args = self._convert_args(self._get_max_segments, args)
+        status = self._get_max_segments(*converted_args)
+
+        if status != self.PICO_STATUS['PICO_OK']:
+            raise PicoError(f"get_max_segments failed ({constants.pico_tag(status)})")
+
+        return max_segments.value
+
     @requires_device("get_timebase requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def get_timebase(self, device, timebase_id, no_of_samples, oversample=1, segment_index=0):
         """Query the device about what time precision modes it can handle.

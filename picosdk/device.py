@@ -381,6 +381,15 @@ class Device(object):
         return self.driver.memory_segments(self, number_segments)
 
     @requires_open()
+    def get_max_segments(self):
+        """Get the maximum number of memory segments supported by the device.
+
+        Returns:
+            int: The maximum number of memory segments supported by the device.
+        """
+        return self.driver.get_max_segments(self)
+
+    @requires_open()
     def maximum_value(self):
         """Get the maximum ADC value for this device."""
         self._max_adc = self.driver.maximum_value(self)
