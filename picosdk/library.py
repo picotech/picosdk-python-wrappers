@@ -997,6 +997,9 @@ class Library(object):
             converted_args = self._convert_args(self._get_values, args)
             status = self._get_values(*converted_args)
 
+            if samples != no_of_samples.value:
+                raise InvalidCaptureParameters("get_values could not retrieve the requested number of samples. "
+                                               f"Requested: {samples}, Retrieved: {no_of_samples.value}")
             if status != self.PICO_STATUS['PICO_OK']:
                 raise InvalidCaptureParameters(f"get_values failed ({constants.pico_tag(status)})")
         else:
