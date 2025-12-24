@@ -1064,7 +1064,7 @@ class Library(object):
                                save_to_file, probe_attenuation)
 
     @requires_device()
-    def set_trigger_conditions(self, device, trigger_input):
+    def set_trigger_conditions_v2(self, device, trigger_input):
         """Sets up trigger conditions on the scope's inputs.
         Sets trigger state to TRUE for given `trigger_input`, the rest will be DONT CARE
 
