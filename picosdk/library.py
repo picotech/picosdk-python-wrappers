@@ -77,21 +77,27 @@ def voltage_to_logic_level(voltage):
 
 
 def split_mso_data_fast(data_length, data):
-    """Return a tuple of 8 arrays, each of which is the values over time of a different digital channel.
+    """Split port data into individual digital channels.
 
-    The tuple contains the channels in order (D7, D6, D5, ... D0) or equivalently (D15, D14, D13, ... D8).
+    The tuple contains the channels in order (D0, D1, D2, ... D7) or equivalently (D8, D9, D10, ... D15).
 
     Args:
         data_length (c_int32): The length of the data array.
         data (c_int16 array): The data array containing the digital port values.
+
+    Returns:
+        tuple: A tuple of 8 numpy arrays, each containing the digital channel values over time
     """
     num_samples = data_length.value
     # Makes an array for each digital channel
     buffer_binary_dj = tuple(numpy.empty(num_samples, dtype=numpy.uint8) for _ in range(8))
     # Splits out the individual bits from the port into the binary values for each digital channel/pin.
     for i in range(num_samples):
+        val = data[i]
         for j in range(8):
-            buffer_binary_dj[j][i] = 1 if (data[i] & (1 << (7-j))) else 0
+            # map bit j direct to buffer j
+            # bit 0 -> D0 (or D8), bit 1 -> D1 (or D9), ..., bit 7 -> D7 (or D15)
+            buffer_binary_dj[j][i] = (val >> j) & 1
 
     return buffer_binary_dj
 
@@ -181,29 +187,26 @@ class SingletonScopeDataDict(dict):
         """
         if isinstance(key, str):
             match = re.match(r"D(?P<channel_num>\d+)", key, re.IGNORECASE)
-        else:
-            match = None
+            if match:
+                try:
+                    digital_number = int(match.group('channel_num'))
 
-        if match:
-            try:
-                digital_number = int(match.group('channel_num'))
+                    # Calculate which port and which row (bit) in the port's data array
+                    port_number = digital_number // 8  # Port 0 = D0-D7, Port 1 = D8-D15
 
-                # Calculate which port and which row (bit) in the port's data array
-                port_number = digital_number // 8  # Port 0 = D0-D7, Port 1 = D8-D15
+                    # D0: 0 % 8 = index 0; D8: 8 % 8 = index 0
+                    row_index = digital_number % 8
 
-                # Reverse bit order within port: Assuming D7 is the first row (index 0) and D0 is the last row (index 7)
-                row_index = 7 - (digital_number % 8)
+                    # Get the data for the entire port
+                    port_data = super().__getitem__(port_number)
 
-                # Get the data for the entire port
-                port_data = super().__getitem__(port_number)
+                    # Select the correct row from the numpy array.
+                    return port_data[row_index]
 
-                # Select the correct row from the numpy array.
-                return port_data[row_index]
+                except (IndexError, ValueError, KeyError) as e:
+                    raise ValueError(f"Invalid digital channel {key}: {str(e)}")
 
-            except (IndexError, ValueError, KeyError) as e:
-                raise ValueError(f"Invalid digital channel {key}: {str(e)}")
-
-        # Handle direct port access (0-3) or analog channels
+        # Handle direct port access (0-1) or analog channels
         return super().__getitem__(key)
 
 
