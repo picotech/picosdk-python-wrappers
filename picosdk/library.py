@@ -1249,4 +1249,3 @@ class Library(object):
             else:
                 converted.append(None)
         return tuple(converted)
-
