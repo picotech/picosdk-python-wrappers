@@ -6,9 +6,6 @@ Definition of the Library class, which is the abstract representation of a picot
 Note: Many of the functions in this class are missing: these are populated by the psN000(a).py modules, which subclass
 this type and attach the missing methods.
 """
-
-from __future__ import print_function
-
 import json
 import re
 import sys
