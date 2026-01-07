@@ -762,7 +762,7 @@ class Library(object):
         if (hasattr(self, '_set_trigger_digital_port_properties') and
                 len(self._set_trigger_digital_port_properties.argtypes) == 3):
             digital_properties = getattr(self, self.name.upper() + '_DIGITAL_CHANNEL_DIRECTIONS', None)
-            digital_channels =  getattr(self, self.name.upper() + '_DIGITAL_CHANNEL', None)
+            digital_channels = getattr(self, self.name.upper() + '_DIGITAL_CHANNEL', None)
             directions = getattr(self, self.name.upper() + '_DIGITAL_DIRECTION', None)
             if digital_properties and digital_channels and directions:
                 digital_channel = self.name.upper() + '_DIGITAL_CHANNEL_' + str(channel_number)
@@ -943,7 +943,7 @@ class Library(object):
 
         if mode not in self.PICO_RATIO_MODE:
             raise ArgumentOutOfRangeError(f"Invalid ratio mode '{mode}' for {self.name} driver"
-                                        "or PICO_RATIO_MODE doesn't exist for this driver")
+                                          "or PICO_RATIO_MODE doesn't exist for this driver")
         buffer = (c_int16 * buffer_length)()
         args = (device.handle, id, buffer, buffer_length, segment_index, self.PICO_RATIO_MODE[mode])
         converted_args = self._convert_args(self._set_data_buffer, args)
