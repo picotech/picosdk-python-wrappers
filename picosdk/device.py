@@ -127,6 +127,11 @@ class Device(object):
         return self._enabled_sources
 
     @property
+    def timebase(self):
+        """int: The timebase id used for the last capture."""
+        return self._timebase
+
+    @property
     def time_interval_ns(self):
         """int/float: The time interval in seconds"""
         return self._time_interval_ns
@@ -157,6 +162,7 @@ class Device(object):
         self._channel_ranges.clear()
         self._channel_offsets.clear()
         self._enabled_sources.clear()
+        self._timebase = None
         self._time_interval_ns = None
         self._probe_attenuations = DEFAULT_PROBE_ATTENUATION.copy()
 
@@ -361,6 +367,7 @@ class Device(object):
                 - segment_id: The index of the memory segment to use
         """
         timebase_info = self.driver.get_timebase(self, timebase_id, no_of_samples, oversample, segment_index)
+        self._timebase = timebase_info.timebase_id
         self._time_interval_ns = timebase_info.time_interval_ns
         return timebase_info
 
