@@ -128,8 +128,14 @@ class Device(object):
 
     @property
     def timebase(self):
-        """int: The timebase id used for the last capture."""
+        """int: The timebase id used for the (last) capture."""
         return self._timebase
+
+    @timebase.setter
+    def timebase(self, value):
+        if value <= 0:
+            raise ValueError(f"Timebase can not be {value!r}, must be greater than 0")
+        self._timebase = value
 
     @property
     def time_interval_ns(self):
@@ -367,7 +373,7 @@ class Device(object):
                 - segment_id: The index of the memory segment to use
         """
         timebase_info = self.driver.get_timebase(self, timebase_id, no_of_samples, oversample, segment_index)
-        self._timebase = timebase_info.timebase_id
+        self.timebase = timebase_info.timebase_id
         self._time_interval_ns = timebase_info.time_interval_ns
         return timebase_info
 
@@ -460,7 +466,8 @@ class Device(object):
             float: The approximate time (in seconds) which the device will take to capture with these settings
         """
         self._max_samples = pre_trigger_samples + post_trigger_samples
-        return self.driver.run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample,
+        self.timebase = timebase_id
+        return self.driver.run_block(self, pre_trigger_samples, post_trigger_samples, self.timebase, oversample,
                                      segment_index)
 
     @requires_open()
