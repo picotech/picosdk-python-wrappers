@@ -442,14 +442,14 @@ class Device(object):
                                        auto_trigger_ms)
 
     @requires_open()
-    def set_trigger_conditions(self, trigger_input):
+    def set_trigger_conditions_v2(self, trigger_input):
         """Sets up trigger conditions on the scope's inputs.
         Sets trigger state to TRUE for given `trigger_input`, the rest will be DONT CARE
 
         Args:
             trigger (str): What to trigger (e.g. channelA, channelB, external, aux, pulseWidthQualifier, digital)
         """
-        return self.driver.set_trigger_conditions(self, trigger_input)
+        return self.driver.set_trigger_conditions_v2(self, trigger_input)
 
     @requires_open()
     def run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
