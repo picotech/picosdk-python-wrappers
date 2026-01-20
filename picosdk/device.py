@@ -11,8 +11,21 @@ import collections
 import numpy
 import math
 import time
-from picosdk.errors import DeviceCannotSegmentMemoryError, InvalidTimebaseError, ClosedDeviceError, \
-    NoChannelsEnabledError, NoValidTimebaseForOptionsError
+from picosdk.errors import (DeviceCannotSegmentMemoryError, InvalidTimebaseError, ClosedDeviceError,
+    NoChannelsEnabledError, NoValidTimebaseForOptionsError, FeatureNotSupportedError, ChannelNotEnabledError,
+    InvalidRangeOfChannel)
+
+
+DEFAULT_PROBE_ATTENUATION = {
+    'A': 10,
+    'B': 10,
+    'C': 10,
+    'D': 10,
+    'E': 10,
+    'F': 10,
+    'G': 10,
+    'H': 10,
+}
 
 
 def requires_open(error_message="This operation requires a device to be connected."):
@@ -31,12 +44,12 @@ enabled = bool indicating whether the channel should be enabled or disabled.
 coupling (optional) = 'AC' or 'DC', default is 'DC'.
 range_peak (optional) = +/- max volts, the highest precision range which includes your value will be selected.
 analog_offset (optional) = the meaning of 0 for this channel."""
-ChannelConfig = collections.namedtuple('ChannelConfig', ['name', 'enabled', 'coupling', 'range_peak', 'analog_offset'])
-ChannelConfig.__new__.__defaults__ = (None, None, None)
+ChannelConfig = collections.namedtuple('ChannelConfig', 'name enabled coupling range_peak analog_offset',
+                                       defaults=['DC', float('inf'), None])
 
 
 """TimebaseOptions: A type for specifying timebase constraints (pass to Device.find_timebase or Device.capture_*)
-All are optional. Please specify the options which matter to you: 
+All are optional. Please specify the options which matter to you:
   - the maximum time interval (if you want the fastest/most precise timebase you can get),
   - the number of samples in one buffer,
   - the minimum total collection time (if you want at least x.y seconds of uninterrupted capture data)
@@ -55,24 +68,109 @@ class Device(object):
     unwanted behaviour (e.g. throwing an exception because no channels are enabled, when you enabled them yourself
     on the driver object.)"""
     def __init__(self, driver, handle):
-        self.driver = driver
-        self.handle = handle
-        self.is_open = handle > 0
+        self._driver = driver
+        self._handle = handle
 
         # if a channel is missing from here, it is disabled (or in an undefined state).
+        self._max_adc = None
+        self._buffers = {}
+        self._max_samples = None
         self._channel_ranges = {}
         self._channel_offsets = {}
+        self._enabled_sources = set()
+        self._time_interval_ns = None
+        self._probe_attenuations = DEFAULT_PROBE_ATTENUATION
 
-    @requires_open("The device either did not initialise correctly or has already been closed.")
-    def close(self):
-        self.driver.close_unit(self)
-        self.handle = None
-        self.is_open = False
+    @property
+    def driver(self):
+        """picosdk.library.Library: The driver object"""
+        return self._driver
+
+    @property
+    def handle(self):
+        """int: The device handle"""
+        return self._handle
+
+    @property
+    def is_open(self):
+        """bool: True if the device is open, False otherwise."""
+        return self.handle is not None and self.handle > 0
+
+    @property
+    def max_adc(self):
+        """int: The maximum ADC value for this device."""
+        return self._max_adc
+
+    @property
+    def buffers(self):
+        """dict: A dictionary of buffers for each enabled channel or port."""
+        return self._buffers
+
+    @property
+    def max_samples(self):
+        """int: The number of samples for capture."""
+        return self._max_samples
+
+    @property
+    def channel_ranges(self):
+        """dict: A dictionary of channel ranges for each enabled channel."""
+        return self._channel_ranges
+
+    @property
+    def channel_offsets(self):
+        """dict: A dictionary of channel offsets for each enabled channel."""
+        return self._channel_offsets
+
+    @property
+    def enabled_sources(self):
+        """set: A set of enabled sources (channels and/or digital ports)."""
+        return self._enabled_sources
+
+    @property
+    def timebase(self):
+        """int: The timebase id used for the (last) capture."""
+        return self._timebase
+
+    @timebase.setter
+    def timebase(self, value):
+        if value <= 0:
+            raise ValueError(f"Timebase can not be {value!r}, must be greater than 0")
+        self._timebase = value
+
+    @property
+    def time_interval_ns(self):
+        """int/float: The time interval in seconds"""
+        return self._time_interval_ns
+
+    @property
+    def probe_attenuations(self):
+        """dict: A dictionary of probe attenuations for each enabled channel."""
+        return self._probe_attenuations
+
+    @probe_attenuations.setter
+    def probe_attenuations(self, value):
+        self._probe_attenuations = value
 
     @property
     @requires_open()
     def info(self):
+        """UnitInfo: The info of the device"""
         return self.driver.get_unit_info(self)
+
+    @requires_open("The device either did not initialise correctly or has already been closed.")
+    def close(self):
+        self.driver.close_unit(self)
+        self._driver = None
+        self._handle = None
+        self._max_adc = None
+        self._buffers.clear()
+        self._max_samples = None
+        self._channel_ranges.clear()
+        self._channel_offsets.clear()
+        self._enabled_sources.clear()
+        self._timebase = None
+        self._time_interval_ns = None
+        self._probe_attenuations = DEFAULT_PROBE_ATTENUATION.copy()
 
     def __enter__(self):
         return self
@@ -84,34 +182,107 @@ class Device(object):
         return False
 
     @requires_open()
-    def set_channel(self, channel_config):
-        name = channel_config.name
-        if not channel_config.enabled:
+    def reset(self):
+        """
+        Closes and re-opens the connection to the PicoScope.
+        Attempts to re-open the same device by serial number if possible.
+        Resets internal cached state of this Device object.
+        Channel configurations and other settings will need to be reapplied.
+        """
+        driver = self._driver
+        current_serial = None
+        resolution_to_use = None
+
+        # Try to get serial number to re-open the same device
+        try:
+            device_info = driver.get_unit_info(self)
+            current_serial = device_info.serial
+        except Exception:
+            # If serial cannot be fetched, _python_open_unit will open the first available.
+            pass
+
+        # Use the driver's default resolution if available for re-opening.
+        if hasattr(driver, 'DEFAULT_RESOLUTION'):
+            resolution_to_use = driver.DEFAULT_RESOLUTION
+
+        self.close()
+
+        # Re-open the unit
+        try:
+            new_handle = driver._python_open_unit(serial=current_serial, resolution=resolution_to_use)
+            self._handle = new_handle
+        except Exception as e:
+            self._handle = None
+            raise ConnectionError(f"Failed to re-open device during reset: {e}")
+
+        if not self.is_open:
+            raise ConnectionError("Device reset failed: handle is invalid after re-open attempt.")
+
+    @requires_open()
+    def set_channel(self, channel_name, enabled, coupling='DC', range_peak=float('inf'), analog_offset=0):
+        """Configures a single analog channel.
+
+        Args:
+            channel_name (str): The channel name as a string (e.g., 'A').
+            enabled (bool): True to enable the channel, False to disable.
+            coupling (str): 'AC' or 'DC'. Defaults to 'DC'.
+            range_peak (int/float): Desired +/- peak voltage. The driver selects the best range.
+                                   Required if enabling the channel.
+            analog_offset (int/float): The analog offset for the channel in Volts.
+
+        Returns:
+            The range of the channel in Volts if enabled, None if disabled.
+        """
+        if not enabled:
             self.driver.set_channel(self,
-                                    channel_name=name,
-                                    enabled=channel_config.enabled)
+                                    channel_name=channel_name,
+                                    enabled=enabled)
             try:
-                del self._channel_ranges[name]
-                del self._channel_offsets[name]
+                del self._channel_ranges[channel_name]
+                del self._channel_offsets[channel_name]
+                self._enabled_sources.remove(channel_name)
             except KeyError:
                 pass
             return
-        # if enabled, we pass through the values from the channel config:
-        self._channel_ranges[name] = self.driver.set_channel(self,
-                                                             channel_name=name,
-                                                             enabled=channel_config.enabled,
-                                                             coupling=channel_config.coupling,
-                                                             range_peak=channel_config.range_peak,
-                                                             analog_offset=channel_config.analog_offset)
-        self._channel_offsets[name] = channel_config.analog_offset
-        return self._channel_ranges[name]
+
+        self._channel_ranges[channel_name] = self.driver.set_channel(device=self,
+                                                                     channel_name=channel_name,
+                                                                     enabled=enabled,
+                                                                     coupling=coupling,
+                                                                     range_peak=range_peak,
+                                                                     analog_offset=analog_offset)
+        self._channel_offsets[channel_name] = analog_offset
+        self._enabled_sources.add(channel_name)
+
+        return self._channel_ranges[channel_name]
+
+    @requires_open()
+    def set_digital_port(self, port_number, enabled, voltage_level=1.8):
+        """Set the digital port
+
+        Args:
+            port_number (int): identifies the port for digital data. (e.g. 0 for digital channels 0-7)
+            enabled (bool): whether or not to enable the channel (boolean)
+            voltage_level (int/float): the voltage at which the state transitions between 0 and 1. Range: –5.0 to 5.0 (V).
+        """
+        info = self.info
+        if not info.variant.decode('utf-8').endswith("MSO"):
+            raise FeatureNotSupportedError("This device has no digital ports.")
+        self.driver.set_digital_port(device=self, port_number=port_number, enabled=enabled, voltage_level=voltage_level)
+        if enabled:
+            self._enabled_sources.add(port_number)
+        else:
+            try:
+                self._enabled_sources.remove(port_number)
+            except KeyError:
+                pass
 
     @requires_open()
     def set_channels(self, *channel_configs):
-        """ set_channels(self, *channel_configs)
-        An alternative to calling set_channel for each one, you can call this method with some channel configs.
+        """An alternative to calling set_channel for each channel, you can call this method with
+        one ore more ChannelConfig.
         This method will also disable any missing channels from the passed configs, and disable ALL channels if the
-        collection is empty. """
+        collection is empty."""
         # Add channels which are missing as "disabled".
         if len(channel_configs) < len(self.driver.PICO_CHANNEL):
             channel_configs = list(channel_configs)
@@ -121,7 +292,7 @@ class Device(object):
                 channel_configs.append(ChannelConfig(channel_name, False))
 
         for channel_config in channel_configs:
-            self.set_channel(channel_config)
+            self.set_channel(*channel_config)
 
     def _timebase_options_are_impossible(self, options):
         device_max_samples_possible = self.driver.MAX_MEMORY
@@ -144,14 +315,15 @@ class Device(object):
     @staticmethod
     def _validate_timebase(timebase_options, timebase_info):
         """validate whether a timebase result matches the options requested."""
+        time_interval_s = timebase_info.time_interval_ns / 1e9
         if timebase_options.max_time_interval is not None:
-            if timebase_info.time_interval > timebase_options.max_time_interval:
+            if time_interval_s > timebase_options.max_time_interval:
                 return False
         if timebase_options.no_of_samples is not None:
             if timebase_options.no_of_samples > timebase_info.max_samples:
                 return False
         if timebase_options.min_collection_time is not None:
-            if timebase_options.min_collection_time > timebase_info.max_samples * timebase_info.time_interval:
+            if timebase_options.min_collection_time > timebase_info.max_samples * time_interval_s:
                 return False
         return True
 
@@ -182,6 +354,268 @@ class Device(object):
         raise NoValidTimebaseForOptionsError(*args)
 
     @requires_open()
+    def get_timebase(self, timebase_id, no_of_samples, oversample=1, segment_index=0):
+        """Query the device about what time precision modes it can handle.
+
+        Args:
+            timebase_id (int): The timebase id.
+            no_of_samples (int): The number of samples to collect at this timebase.
+            oversample (int): The amount of oversample required. Defaults to 1.
+            segment_index (int): The memory segment index to use. Defaults to 0.
+
+        Returns:
+            namedtuple:
+                - timebase_id: The id corresponding to the timebase used
+                - time_interval_ns: The time interval between readings at the selected timebase.
+                - time_units: The unit of time (not supported in e.g. 3000a)
+                - max_samples: The maximum number of samples available. The number may vary depending on the number of
+                    channels enabled and the timebase chosen.
+                - segment_id: The index of the memory segment to use
+        """
+        timebase_info = self.driver.get_timebase(self, timebase_id, no_of_samples, oversample, segment_index)
+        self.timebase = timebase_info.timebase_id
+        self._time_interval_ns = timebase_info.time_interval_ns
+        return timebase_info
+
+    @requires_open()
+    def memory_segments(self, number_segments):
+        """The number of segments defaults to 1, meaning that each capture fills the scope's available memory.
+        This function allows you to divide the memory into a number of segments so that the scope can store several
+        waveforms sequentially.
+
+        Args:
+            number_segments (int): The number of segments to divide the memory into.
+
+        Returns:
+            int: The number of samples available in each segment. This is the total number over all channels,
+                so if more than one channel is in use then the number of samples available to each
+                channel is max_samples divided by the number of channels.
+        """
+        return self.driver.memory_segments(self, number_segments)
+
+    @requires_open()
+    def get_max_segments(self):
+        """Get the maximum number of memory segments supported by the device.
+
+        Returns:
+            int: The maximum number of memory segments supported by the device.
+        """
+        return self.driver.get_max_segments(self)
+
+    @requires_open()
+    def maximum_value(self):
+        """Get the maximum ADC value for this device."""
+        self._max_adc = self.driver.maximum_value(self)
+        return self._max_adc
+
+    @requires_open()
+    def set_null_trigger(self):
+        """Set a null trigger on the device.
+        Trigger is not enabled, so the device will not wait for a trigger
+        before capturing data.
+        """
+        self.driver.set_null_trigger()
+
+    @requires_open()
+    def set_simple_trigger(self, channel, enable=True, threshold_mv=500, direction="FALLING", delay=0,
+                           auto_trigger_ms=1000):
+        """Set a simple trigger for a channel
+
+        Args:
+            channel (str): The channel on which to trigger
+            enable (bool): False to disable the trigger, True to enable it
+            threshold_mv (int): The threshold in millivolts at which the trigger will fire.
+            direction (str): The direction in which the signal must move to cause a trigger.
+            delay (int): The time (sample periods) between the trigger occurring and the first sample.
+            auto_trigger_ms (int): The number of milliseconds the device will wait if no trigger occurs.
+                If this is set to zero, the scope device will wait indefinitely for a trigger.
+        """
+        if channel not in self.enabled_sources:
+            raise ChannelNotEnabledError(f"Channel {channel} is not enabled. Please run set_channel first.")
+        if channel not in self.channel_ranges:
+            raise InvalidRangeOfChannel(f"The range of channel {channel} is not valid or isn't correctly obtained via"
+                                        "set_channel.")
+        max_voltage = self.channel_ranges[channel]
+        max_adc = self.max_adc if self.max_adc else self.maximum_value()
+
+        self.driver.set_simple_trigger(self, max_voltage, max_adc, enable, channel, threshold_mv, direction, delay,
+                                       auto_trigger_ms)
+
+    @requires_open()
+    def set_trigger_conditions_v2(self, trigger_input):
+        """Sets up trigger conditions on the scope's inputs.
+        Sets trigger state to TRUE for given `trigger_input`, the rest will be DONT CARE
+
+        Args:
+            trigger (str): What to trigger (e.g. channelA, channelB, external, aux, pulseWidthQualifier, digital)
+        """
+        return self.driver.set_trigger_conditions_v2(self, trigger_input)
+
+    @requires_open()
+    def run_block(self, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
+        """This function starts collecting data in block mode.
+
+        Args:
+            pre_trigger_samples (int): The number of samples to collect before the trigger event.
+            post_trigger_samples (int): The number of samples to collect after the trigger event.
+            timebase_id (int): The timebase id to use for the capture.
+            oversample (int): The amount of oversample required. Defaults to 1.
+            segment_index (int): The memory segment index to use. Defaults to 0.
+
+        Returns:
+            float: The approximate time (in seconds) which the device will take to capture with these settings
+        """
+        self._max_samples = pre_trigger_samples + post_trigger_samples
+        self.timebase = timebase_id
+        return self.driver.run_block(self, pre_trigger_samples, post_trigger_samples, self.timebase, oversample,
+                                     segment_index)
+
+    @requires_open()
+    def is_ready(self):
+        """Poll this function to find out when block mode is ready or has triggered.
+        returns: True if data is ready, False otherwise."""
+        return self.driver.is_ready(self)
+
+    @requires_open()
+    def stop_block_capture(self, timeout_minutes=5):
+        """Poll the driver to see if it has finished collecting the requested samples and then stops the capture.
+
+        Args:
+            timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
+        """
+        self.driver.stop_block_capture(self, timeout_minutes)
+
+    @requires_open()
+    def set_data_buffer(self, channel_or_port, segment_index=0, mode='NONE'):
+        """Set the data buffer for a specific channel.
+
+        Args:
+            channel_or_port (str/int): Channel (e.g. 'A', 'B') or digital port (e.g. 0, 1) to set data for
+            segment_index (int): The number of the memory segment to be used (default is 0)
+            mode (str): The ratio mode to be used (default is 'NONE')
+        """
+        self._buffers[channel_or_port] = self.driver.set_data_buffer(self, channel_or_port, self.max_samples,
+                                                                     segment_index, mode)
+
+    @requires_open()
+    def set_all_data_buffers(self, segment_index=0, mode='NONE'):
+        """Set the data buffer for each enabled channels and ports
+
+        Args:
+            segment_index (int): The number of the memory segment to be used (default is 0)
+            mode (str): The ratio mode to be used (default is 'NONE')
+        """
+        for channel_or_port in self.enabled_sources:
+            self.set_data_buffer(channel_or_port, segment_index, mode)
+
+    @requires_open()
+    def get_values(self, start_index=0, downsample_ratio=0, downsample_ratio_mode="NONE", segment_index=0,
+                   output_dir=".", filename="data", save_to_file=False):
+        """Get stored data values from the scope and store it in a clean SingletonScopeDataDict object.
+
+        This function is used after data collection has stopped. It gets the stored data from the scope, with or
+        without downsampling, starting at the specified sample number.
+
+        The returned captured data is converted to mV.
+
+        Note: don't forget to change the probe attenuations of the used channels if they differ from 10 (default)
+
+        Args:
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                               sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            segment_index (int): Memory segment index
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            Tuple of (captured data including time, overflow warnings)
+        """
+        time_interval_sec = self.time_interval_ns / 1e9 if self.time_interval_ns else None
+        return self.driver.get_values(self, self.buffers, self.max_samples, time_interval_sec, self.channel_ranges,
+                                      start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                                      filename, save_to_file, self.probe_attenuations)
+
+    @requires_open()
+    def set_and_load_data(self, segment_index=0, ratio_mode='NONE', start_index=0, downsample_ratio=0,
+                          downsample_ratio_mode="NONE", output_dir=".", filename="data", save_to_file=False):
+        """Load values from the device.
+
+        Combines set_data_buffer and get_values to load values from the device.
+
+        Args:
+            segment_index (int): Memory segment index
+            ratio_mode: The ratio mode to be used (default is 'NONE')
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            Tuple of (captured data including time, overflow warnings)
+        """
+        self.set_all_data_buffers(segment_index, ratio_mode)
+
+        return self.get_values(start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                               filename, save_to_file)
+
+    @requires_open()
+    def set_trigger_channel_properties(self, threshold_upper, threshold_upper_hysteresis, threshold_lower,
+                                       threshold_lower_hysteresis, channel, threshold_mode, aux_output_enable,
+                                       auto_trigger_milliseconds):
+        """Set the trigger channel properties for the device.
+
+        Args:
+            threshold_upper (int): Upper threshold in ADC counts
+            threshold_upper_hysteresis (int): Hysteresis for upper threshold in ADC counts
+            threshold_lower (int): Lower threshold in ADC counts
+            threshold_lower_hysteresis (int): Hysteresis for lower threshold in ADC counts
+            channel (str): Channel to set properties for (e.g. 'A', 'B', 'C', 'D')
+            threshold_mode (str): Threshold mode (e.g. "LEVEL", "WINDOW")
+            aux_output_enable (bool): Enable auxiliary output (boolean) (Not used in eg. ps2000a, ps3000a, ps4000a)
+            auto_trigger_milliseconds (int): The number of milliseconds for which the scope device will wait for a
+                trigger before timing out. If set to zero, the scope device will wait indefinitely for a trigger
+        """
+        self.driver.set_trigger_channel_properties(self, threshold_upper, threshold_upper_hysteresis, threshold_lower,
+                                                   threshold_lower_hysteresis, channel, threshold_mode,
+                                                   aux_output_enable, auto_trigger_milliseconds)
+
+    @requires_open()
+    def set_digital_channel_trigger(self, channel_number=15, direction="DIRECTION_RISING"):
+        """Set a simple trigger on the digital channels.
+
+        Args:
+            channel_number (int): The number of the digital channel on which to trigger.(e.g. 0 for D0, 1 for D1,...)
+            direction (str): The direction in which the signal must move to cause a trigger.
+        """
+        self.driver.set_digital_channel_trigger(self, channel_number, direction)
+
+    @requires_open()
+    def set_trigger_delay(self, delay):
+        """This function sets the post-trigger delay, which causes capture to start a defined time after the
+        trigger event.
+
+        For example, if delay=100 then the scope would wait 100 sample periods before sampling.
+        At a timebase of 500 MS/s, or 2 ns per sample, the total delay would then be 100 x 2 ns = 200 ns.
+
+        Args:
+            delay (int): The time between the trigger occurring and the first sample.
+        """
+        self.driver.set_trigger_delay(self, delay)
+
+    @requires_open()
+    def stop(self):
+        """This function stops the scope device from sampling data.
+        If this function is called before a trigger event occurs, the oscilloscope may not contain valid data.
+        """
+        self.driver.stop(self)
+
+    @requires_open()
     def capture_block(self, timebase_options, channel_configs=()):
         """device.capture_block(timebase_options, channel_configs)
         timebase_options: TimebaseOptions object, specifying at least 1 constraint, and optionally oversample.
@@ -208,12 +642,13 @@ class Device(object):
 
         # get_timebase
         timebase_info = self.find_timebase(timebase_options)
+        time_interval_s = timebase_info.time_interval_ns / 1e9
 
         post_trigger_samples = timebase_options.no_of_samples
         pre_trigger_samples = 0
 
         if post_trigger_samples is None:
-            post_trigger_samples = int(math.ceil(timebase_options.min_collection_time / timebase_info.time_interval))
+            post_trigger_samples = int(math.ceil(timebase_options.min_collection_time / time_interval_s))
 
         self.driver.set_null_trigger(self)
 
@@ -238,13 +673,13 @@ class Device(object):
         self.driver.stop(self)
 
         times = numpy.linspace(0.,
-                               post_trigger_samples * timebase_info.time_interval,
+                               post_trigger_samples * time_interval_s,
                                post_trigger_samples,
                                dtype=numpy.dtype('float32'))
 
         voltages = {}
 
-        max_adc = self.driver.maximum_value(self)
+        max_adc = self.max_adc if self.max_adc else self.maximum_value()
         for channel, raw_array in raw_data.items():
             array = raw_array.astype(numpy.dtype('float32'), casting='safe')
             factor = self._channel_ranges[channel] / max_adc
@@ -252,3 +687,30 @@ class Device(object):
             voltages[channel] = array
 
         return times, voltages, overflow_warnings
+
+    @requires_open()
+    def set_sig_gen_built_in(self, offset_voltage=0, pk_to_pk=2000000, wave_type="SINE",
+                             start_frequency=10000, stop_frequency=10000, increment=0,
+                             dwell_time=1, sweep_type="UP", operation='ES_OFF', shots=0, sweeps=0,
+                             trigger_type="RISING", trigger_source="NONE", ext_in_threshold=1):
+        """Set up the signal generator to output a built-in waveform.
+
+        Args:
+            offset_voltage (int/float): Offset voltage in microvolts (default 0)
+            pk_to_pk (int): Peak-to-peak voltage in microvolts (default 2000000)
+            wave_type (str): Type of waveform (e.g. "SINE", "SQUARE", "TRIANGLE")
+            start_frequency (int): Start frequency in Hz (default 1000.0)
+            stop_frequency (int): Stop frequency in Hz (default 1000.0)
+            increment (int): Frequency increment in Hz (default 0.0)
+            dwell_time (int/float): Time at each frequency in seconds (default 1.0)
+            sweep_type (str): Sweep type (e.g. "UP", "DOWN", "UPDOWN")
+            operation (str): Configures the white noise/PRBS (e.g. "ES_OFF", "WHITENOISE", "PRBS")
+            shots (int): Number of shots per trigger (default 1)
+            sweeps (int): Number of sweeps (default 1)
+            trigger_type (str): Type of trigger (e.g. "RISING", "FALLING")
+            trigger_source (str): Source of trigger (e.g. "NONE", "SCOPE_TRIG")
+            ext_in_threshold (int): External trigger threshold in ADC counts
+        """
+        self.driver.set_sig_gen_built_in(self, offset_voltage, pk_to_pk, wave_type, start_frequency, stop_frequency,
+                                         increment, dwell_time, sweep_type, operation, shots, sweeps, trigger_type,
+                                         trigger_source, ext_in_threshold)

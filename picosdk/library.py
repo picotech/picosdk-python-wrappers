@@ -6,17 +6,20 @@ Definition of the Library class, which is the abstract representation of a picot
 Note: Many of the functions in this class are missing: these are populated by the psN000(a).py modules, which subclass
 this type and attach the missing methods.
 """
-
-from __future__ import print_function
-
+import json
+import re
 import sys
-from ctypes import c_int16, c_int32, c_uint32, c_float, create_string_buffer, byref
+from ctypes import c_int16, c_int32, c_uint32, c_float, c_void_p, create_string_buffer, byref
 from ctypes.util import find_library
 import collections
+import time
+import gc
 import picosdk.constants as constants
+from base64 import b64encode
 import numpy
+from numpy.lib.format import dtype_to_descr
 
-from picosdk.errors import CannotFindPicoSDKError, CannotOpenPicoSDKError, DeviceNotFoundError, \
+from picosdk.errors import PicoError, CannotFindPicoSDKError, CannotOpenPicoSDKError, DeviceNotFoundError, \
     ArgumentOutOfRangeError, ValidRangeEnumValueNotValidForThisDevice, DeviceCannotSegmentMemoryError, \
     InvalidMemorySegmentsError, InvalidTimebaseError, InvalidTriggerParameters, InvalidCaptureParameters
 
@@ -24,10 +27,21 @@ from picosdk.errors import CannotFindPicoSDKError, CannotOpenPicoSDKError, Devic
 from picosdk.device import Device
 
 
+DEFAULT_PROBE_ATTENUATION = {
+    'A': 10,
+    'B': 10,
+    'C': 10,
+    'D': 10,
+    'E': 10,
+    'F': 10,
+    'G': 10,
+    'H': 10,
+}
+
 """TimebaseInfo: A type for holding the particulars of a timebase configuration.
 """
 TimebaseInfo = collections.namedtuple('TimebaseInfo', ['timebase_id',
-                                                       'time_interval',
+                                                       'time_interval_ns',
                                                        'time_units',
                                                        'max_samples',
                                                        'segment_id'])
@@ -41,6 +55,156 @@ def requires_device(error_message="This method requires a Device instance regist
             return method(self, device, *args, **kwargs)
         return check_device_impl
     return check_device_decorator
+
+
+def voltage_to_logic_level(voltage):
+    """Convert a voltage value into logic level for digital channels.
+
+    Range: –32767 (–5 V) to 32767 (5 V).
+
+    Args:
+        voltage (float): Voltage in volts.
+
+    Returns:
+        int: The calculated logic level count.
+    """
+    clamped_voltage = min(max(-5, voltage), 5)
+    logic_level = int((clamped_voltage) * (32767 / 5))
+    return logic_level
+
+
+def split_mso_data_fast(data_length, data):
+    """Split port data into individual digital channels.
+
+    The tuple contains the channels in order (D0, D1, D2, ... D7) or equivalently (D8, D9, D10, ... D15).
+
+    Args:
+        data_length (c_int32): The length of the data array.
+        data (c_int16 array): The data array containing the digital port values.
+
+    Returns:
+        tuple: A tuple of 8 numpy arrays, each containing the digital channel values over time
+    """
+    num_samples = data_length.value
+    # Makes an array for each digital channel
+    buffer_binary_dj = tuple(numpy.empty(num_samples, dtype=numpy.uint8) for _ in range(8))
+    # Splits out the individual bits from the port into the binary values for each digital channel/pin.
+    for i in range(num_samples):
+        val = data[i]
+        for j in range(8):
+            # map bit j direct to buffer j
+            # bit 0 -> D0 (or D8), bit 1 -> D1 (or D9), ..., bit 7 -> D7 (or D15)
+            buffer_binary_dj[j][i] = (val >> j) & 1
+
+    return buffer_binary_dj
+
+
+def adc_to_mv(buffer_adc, channel_range, max_adc):
+    """Convert a buffer of raw adc count values into millivolts.
+
+    Args:
+        buffer_adc (c_short_Array): The buffer of ADC count values.
+        channel_range (int): The channel range in V.
+        max_adc (int): The maximum ADC count.
+
+    Returns:
+        list: The buffer in millivolts.
+    """
+    buffer_mv = [(x * channel_range * 1000) / max_adc for x in buffer_adc]
+    return buffer_mv
+
+
+def mv_to_adc(millivolts, channel_range, max_adc):
+    """Convert a voltage value into an ADC count.
+
+    Args:
+        millivolts (float): Voltage in millivolts.
+        channel_range (int): The channel range in V.
+        max_adc (c_int16): The maximum ADC count.
+
+    Returns:
+        int: The ADC count.
+    """
+    adc_value = round((millivolts * max_adc) / (channel_range * 1000))
+    return adc_value
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """Module specific json encoder class."""
+    def default(self, o):
+        """Default json encoder override.
+
+        Code inspired from https://github.com/Crimson-Crow/json-numpy/blob/main/json_numpy.py
+        """
+        if isinstance(o, (numpy.ndarray, numpy.generic)):
+            return {
+                "__numpy__": b64encode(o.data if o.flags.c_contiguous else o.tobytes()).decode(),
+                "dtype": dtype_to_descr(o.dtype),
+                "shape": o.shape,
+            }
+        return super().default(o)
+
+
+class SingletonScopeDataDict(dict):
+    """SingletonScopeDataDict is a singleton dictionary object for sharing picoscope data between multiple classes.
+
+    It handles both analog and digital data with uniform access patterns:
+    - Analog channels are accessed by their letter (e.g. 'A', 'B', 'C', 'D')
+    - Digital channels are accessed as 'D0'-'D15' (MSB channel D15 to LSB channel D0)
+    - Digital ports are accessed by their number (e.g. 0, 1)
+    """
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        """Create new singleton dictionary instance or return existing one."""
+        if cls._instance is None:
+            cls._instance = super(SingletonScopeDataDict, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
+    def clean_dict(self):
+        """Remove all data from the singleton dictionary and run garbage collection."""
+        self.clear()
+        gc.collect()
+
+    def __getitem__(self, key: str):
+        """Get data with uniform access pattern for analog and digital channels.
+
+        Args:
+            key: Channel identifier:
+                - 'A', 'B', 'C', 'D' for analog channels
+                - 'D0'-'D15' for digital channels
+                - 0-3 for digital ports
+
+        Returns:
+            numpy array containing the channel data
+
+        Raises:
+            KeyError: If channel doesn't exist
+            ValueError: If digital channel number is invalid
+        """
+        if isinstance(key, str):
+            match = re.match(r"D(?P<channel_num>\d+)", key, re.IGNORECASE)
+            if match:
+                try:
+                    digital_number = int(match.group('channel_num'))
+
+                    # Calculate which port and which row (bit) in the port's data array
+                    port_number = digital_number // 8  # Port 0 = D0-D7, Port 1 = D8-D15
+
+                    # D0: 0 % 8 = index 0; D8: 8 % 8 = index 0
+                    row_index = digital_number % 8
+
+                    # Get the data for the entire port
+                    port_data = super().__getitem__(port_number)
+
+                    # Select the correct row from the numpy array.
+                    return port_data[row_index]
+
+                except (IndexError, ValueError, KeyError) as e:
+                    raise ValueError(f"Invalid digital channel {key}: {str(e)}")
+
+        # Handle direct port access (0-1) or analog channels
+        return super().__getitem__(key)
 
 
 class Library(object):
@@ -103,13 +267,15 @@ class Library(object):
         # AND if the function is camel case, add an "underscore-ized" version:
         if python_name.lower() != python_name:
             acc = []
-            for c in python_name[1:]:
+            python_name = python_name.lstrip('_')
+            for c in python_name:
                 # Be careful to exclude both digits (lower index) and lower case (higher index).
                 if ord('A') <= ord(c) <= ord('Z'):
                     c = "_" + c.lower()
                 acc.append(c)
-            if acc[:2] == ['_', '_']:
-                acc = acc[1:]
+            new_python_name = "".join(acc)
+            if not new_python_name.startswith('_'):
+                new_python_name = "_" + new_python_name
             setattr(self, "".join(acc), c_function)
 
     def list_units(self):
@@ -272,14 +438,20 @@ class Library(object):
     @requires_device("set_channel requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def set_channel(self, device, channel_name='A', enabled=True, coupling='DC', range_peak=float('inf'),
                     analog_offset=None):
-        """optional arguments:
-        channel_name: a single channel (e.g. 'A')
-        enabled: whether to enable the channel (boolean)
-        coupling: string of the relevant enum member for your driver less the driver name prefix. e.g. 'DC' or 'AC'.
-        range_peak: float which is the largest value you expect in the input signal. We will throw an exception if no
-                    range on the device is large enough for that value.
-        analog_offset: the meaning of 0 for this channel.
-        return value: Max voltage of new range. Raises an exception in error cases."""
+        """Configures a single analog channel.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            channel_name (str): The channel name as a string (e.g., 'A').
+            enabled (bool): True to enable the channel, False to disable.
+            coupling (str): 'AC' or 'DC'. Defaults to 'DC'.
+            range_peak (int/float): Desired +/- peak voltage. The driver selects the best range.
+                                   Required if enabling the channel.
+            analog_offset (int/float): The analog offset for the channel in Volts.
+
+        Returns:
+            The range of the channel in Volts if enabled, None if disabled.
+        """
 
         excluded = ()
         reliably_resolved = False
@@ -307,6 +479,34 @@ class Library(object):
 
         return max_voltage
 
+    @requires_device("set_digital_port requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def set_digital_port(self, device, port_number=0, enabled=True, voltage_level=1.8):
+        """Set the digital port
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            port_number (int): identifies the port for digital data. (e.g. 0 for digital channels 0-7)
+            enabled (bool): whether or not to enable the channel (boolean)
+            voltage_level (float): the voltage at which the state transitions between 0 and 1. Range: –5.0 to 5.0 (V).
+        Raises:
+            NotImplementedError: This device doesn't support digital ports.
+            PicoError: set_digital_port failed
+        """
+        if hasattr(self, '_set_digital_port') and len(self._set_digital_port.argtypes) == 4:
+            logic_level = voltage_to_logic_level(voltage_level)
+            digital_ports = getattr(self, self.name.upper() + '_DIGITAL_PORT', None)
+            if not digital_ports:
+                raise NotImplementedError("This device doesn't support digital ports")
+            port_id = digital_ports[self.name.upper() + "_DIGITAL_PORT" + str(port_number)]
+            args = (device.handle, port_id, 1 if enabled else 0, logic_level)
+            converted_args = self._convert_args(self._set_digital_port, args)
+            status = self._set_digital_port(*converted_args)
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise PicoError(
+                    f"set_digital_port failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device doesn't support digital ports or is not implemented yet")
+
     def _resolve_range(self, signal_peak, exclude=()):
         # we use >= so that someone can specify the range they want precisely.
         # we allow exclude so that if the smallest range in the header file isn't available on this device (or in this
@@ -324,69 +524,115 @@ class Library(object):
         if len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int16:
             if analog_offset is not None:
                 raise ArgumentOutOfRangeError("This device doesn't support analog offset")
-            return_code = self._set_channel(c_int16(handle),
-                                            c_int16(channel_id),
-                                            c_int16(enabled),
-                                            c_int16(coupling_id),
-                                            c_int16(range_id))
+
+            args = (handle, channel_id, enabled, coupling_id, range_id)
+            converted_args = self._convert_args(self._set_channel, args)
+            return_code = self._set_channel(*converted_args)
+
             if return_code == 0:
-                raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
-                    self.PICO_VOLTAGE_RANGE[range_id]))
+                raise ValidRangeEnumValueNotValidForThisDevice(
+                    f"{self.PICO_VOLTAGE_RANGE[range_id]}V is out of range for this device.")
         elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32 or (
              len(self._set_channel.argtypes) == 6):
             status = self.PICO_STATUS['PICO_OK']
             if len(self._set_channel.argtypes) == 6:
                 if analog_offset is None:
                     analog_offset = 0.0
-                status = self._set_channel(c_int16(handle),
-                                           c_int32(channel_id),
-                                           c_int16(enabled),
-                                           c_int32(coupling_id),
-                                           c_int32(range_id),
-                                           c_float(analog_offset))
+                args = (handle, channel_id, enabled, coupling_id, range_id, analog_offset)
+                converted_args = self._convert_args(self._set_channel, args)
+                status = self._set_channel(*converted_args)
+
             elif len(self._set_channel.argtypes) == 5 and self._set_channel.argtypes[1] == c_int32:
                 if analog_offset is not None:
                     raise ArgumentOutOfRangeError("This device doesn't support analog offset")
-                status = self._set_channel(c_int16(handle),
-                                           c_int32(channel_id),
-                                           c_int16(enabled),
-                                           c_int16(coupling_id),
-                                           c_int32(range_id))
+                args = (handle, channel_id, enabled, coupling_id, range_id)
+                converted_args = self._convert_args(self._set_channel, args)
+                status = self._set_channel(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
                 if status == self.PICO_STATUS['PICO_INVALID_VOLTAGE_RANGE']:
-                    raise ValidRangeEnumValueNotValidForThisDevice("%sV is out of range for this device." % (
-                        self.PICO_VOLTAGE_RANGE[range_id]))
+                    raise ValidRangeEnumValueNotValidForThisDevice(
+                        f"{self.PICO_VOLTAGE_RANGE[range_id]}V is out of range for this device.")
                 if status == self.PICO_STATUS['PICO_INVALID_CHANNEL'] and not enabled:
                     # don't throw errors if the user tried to disable a missing channel.
                     return
-                raise ArgumentOutOfRangeError("problem configuring channel (%s)" % constants.pico_tag(status))
-
+                raise ArgumentOutOfRangeError(f"problem configuring channel ({constants.pico_tag(status)})")
         else:
             raise NotImplementedError("not done other driver types yet")
 
     @requires_device("memory_segments requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def memory_segments(self, device, number_segments):
+        """The number of segments defaults to 1, meaning that each capture fills the scope's available memory.
+        This function allows you to divide the memory into a number of segments so that the scope can store several
+        waveforms sequentially.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            number_segments (int): The number of segments to divide the memory into.
+
+        Returns:
+            int: The number of samples available in each segment. This is the total number over all channels,
+                so if more than one channel is in use then the number of samples available to each
+                channel is max_samples divided by the number of channels.
+        """
         if not hasattr(self, '_memory_segments'):
             raise DeviceCannotSegmentMemoryError()
         max_samples = c_int32(0)
-        status = self._memory_segments(c_int16(device.handle), c_uint32(number_segments), byref(max_samples))
+        args = (device.handle, number_segments, max_samples)
+        converted_args = self._convert_args(self._memory_segments, args)
+        status = self._memory_segments(*converted_args)
         if status != self.PICO_STATUS['PICO_OK']:
             raise InvalidMemorySegmentsError("could not segment the device memory into (%s) segments (%s)" % (
                                               number_segments, constants.pico_tag(status)))
-        return max_samples
+        return max_samples.value
+
+    @requires_device()
+    def get_max_segments(self, device):
+        """Get the maximum number of memory segments supported by the device.
+
+        Returns:
+            int: The maximum number of memory segments supported by the device.
+        """
+        if not hasattr(self, '_get_max_segments'):
+            raise NotImplementedError("This device doesn't support getting maximum segments")
+
+        max_segments = c_int32(0)
+        args = (device.handle, max_segments)
+        converted_args = self._convert_args(self._get_max_segments, args)
+        status = self._get_max_segments(*converted_args)
+
+        if status != self.PICO_STATUS['PICO_OK']:
+            raise PicoError(f"get_max_segments failed ({constants.pico_tag(status)})")
+
+        return max_segments.value
 
     @requires_device("get_timebase requires a picosdk.device.Device instance, passed to the correct owning driver.")
     def get_timebase(self, device, timebase_id, no_of_samples, oversample=1, segment_index=0):
-        """query the device about what time precision modes it can handle.
-        note: the driver returns the timebase in nanoseconds, this function converts that into SI units (seconds)"""
+        """Query the device about what time precision modes it can handle.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            timebase_id (int): The timebase id.
+            no_of_samples (int): The number of samples to collect at this timebase.
+            oversample (int): The amount of oversample required. Defaults to 1.
+            segment_index (int): The memory segment index to use. Defaults to 0.
+
+        Returns:
+            namedtuple:
+                - timebase_id: The id corresponding to the timebase used
+                - time_interval_ns: The time interval between readings at the selected timebase.
+                - time_units: The unit of time (not supported in e.g. 3000a)
+                - max_samples: The maximum number of samples available. The number may vary depending on the number of
+                    channels enabled and the timebase chosen.
+                - segment_id: The index of the memory segment to use
+        """
         nanoseconds_result = self._python_get_timebase(device.handle,
                                                        timebase_id,
                                                        no_of_samples,
                                                        oversample,
                                                        segment_index)
-
         return TimebaseInfo(nanoseconds_result.timebase_id,
-                            nanoseconds_result.time_interval * 1.e-9,
+                            nanoseconds_result.time_interval_ns,
                             nanoseconds_result.time_units,
                             nanoseconds_result.max_samples,
                             nanoseconds_result.segment_id)
@@ -395,69 +641,183 @@ class Library(object):
         # We use get_timebase on ps2000 and ps3000 and parse the nanoseconds-int into a float.
         # on other drivers, we use get_timebase2, which gives us a float in the first place.
         if len(self._get_timebase.argtypes) == 7 and self._get_timebase.argtypes[1] == c_int16:
-            time_interval = c_int32(0)
+            time_interval_ns = c_int32(0)
             time_units = c_int16(0)
             max_samples = c_int32(0)
-            return_code = self._get_timebase(c_int16(handle),
-                                             c_int16(timebase_id),
-                                             c_int32(no_of_samples),
-                                             byref(time_interval),
-                                             byref(time_units),
-                                             c_int16(oversample),
-                                             byref(max_samples))
+
+            args = (handle, timebase_id, no_of_samples, time_interval_ns,
+                    time_units, oversample, max_samples)
+            converted_args = self._convert_args(self._get_timebase, args)
+            return_code = self._get_timebase(*converted_args)
+
             if return_code == 0:
                 raise InvalidTimebaseError()
 
-            return TimebaseInfo(timebase_id, float(time_interval.value), time_units.value, max_samples.value, None)
-        elif hasattr(self, '_get_timebase2') and (
-                     len(self._get_timebase2.argtypes) == 7 and self._get_timebase2.argtypes[1] == c_uint32):
-            time_interval = c_float(0.0)
+            return TimebaseInfo(timebase_id, float(time_interval_ns.value), time_units.value, max_samples.value, None)
+        elif hasattr(self, '_get_timebase2') and self._get_timebase2.argtypes[1] == c_uint32:
+            time_interval_ns = c_float(0.0)
             max_samples = c_int32(0)
-            status = self._get_timebase2(c_int16(handle),
-                                         c_uint32(timebase_id),
-                                         c_int32(no_of_samples),
-                                         byref(time_interval),
-                                         c_int16(oversample),
-                                         byref(max_samples),
-                                         c_uint32(segment_index))
-            if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidTimebaseError("get_timebase2 failed (%s)" % constants.pico_tag(status))
+            if len(self._get_timebase2.argtypes) == 7:
+                args = (handle, timebase_id, no_of_samples, time_interval_ns,
+                        oversample, max_samples, segment_index)
+                converted_args = self._convert_args(self._get_timebase2, args)
+            elif len(self._get_timebase2.argtypes) == 6:
+                args = (handle, timebase_id, no_of_samples, time_interval_ns, max_samples, segment_index)
+                converted_args = self._convert_args(self._get_timebase2, args)
+            else:
+                raise NotImplementedError("_get_timebase2 is not implemented for this driver yet")
+            status = self._get_timebase2(*converted_args)
 
-            return TimebaseInfo(timebase_id, time_interval.value, None, max_samples.value, segment_index)
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidTimebaseError(f"get_timebase2 failed ({constants.pico_tag(status)})")
+
+            return TimebaseInfo(timebase_id, time_interval_ns.value, None, max_samples.value, segment_index)
         else:
-            raise NotImplementedError("not done other driver types yet")
+            raise NotImplementedError("_get_timebase2 or _get_timebase is not implemented for this driver yet")
 
     @requires_device()
-    def set_null_trigger(self, device):
+    def set_null_trigger(self, device, channel="A"):
+        """Set a null trigger on the device.
+        Trigger is not enabled, so the device will not wait for a trigger
+        before capturing data.
+        """
         auto_trigger_after_millis = 1
         if hasattr(self, '_set_trigger') and len(self._set_trigger.argtypes) == 6:
             PS2000_NONE = 5
-            return_code = self._set_trigger(c_int16(device.handle),
-                                            c_int16(PS2000_NONE),
-                                            c_int16(0),
-                                            c_int16(0),
-                                            c_int16(0),
-                                            c_int16(auto_trigger_after_millis))
+            args = (device.handle, PS2000_NONE, 0, 0, 0, auto_trigger_after_millis)
+            converted_args = self._convert_args(self._set_trigger, args)
+            return_code = self._set_trigger(*converted_args)
+
             if return_code == 0:
                 raise InvalidTriggerParameters()
         elif hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
-            enabled = False
-            status = self._set_simple_trigger(c_int16(device.handle),
-                                              c_int16(int(enabled)),
-                                              c_int32(self.PICO_CHANNEL['A']),
-                                              c_int16(0),
-                                              c_int32(self.PICO_THRESHOLD_DIRECTION['NONE']),
-                                              c_uint32(0),
-                                              c_int16(auto_trigger_after_millis))
+            threshold_direction_id = None
+            if self.PICO_THRESHOLD_DIRECTION:
+                threshold_direction_id = self.PICO_THRESHOLD_DIRECTION['NONE']
+            else:
+                threshold_directions = getattr(self, self.name.upper() + '_THRESHOLD_DIRECTION', None)
+                if threshold_directions:
+                    threshold_direction_id = threshold_directions[self.name.upper() + '_NONE']
+                else:
+                    raise NotImplementedError("This device doesn't support threshold direction")
+            args = (device.handle, False, self.PICO_CHANNEL[channel], 0,
+                   threshold_direction_id, 0, auto_trigger_after_millis)
+            converted_args = self._convert_args(self._set_simple_trigger, args)
+            status = self._set_simple_trigger(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidTriggerParameters("set_simple_trigger failed (%s)" % constants.pico_tag(status))
+                raise InvalidTriggerParameters(f"set_simple_trigger failed ({constants.pico_tag(status)})")
         else:
-            raise NotImplementedError("not done other driver types yet")
+            raise NotImplementedError("This device doesn't support set_null_trigger (yet)")
+
+    @requires_device()
+    def set_simple_trigger(self, device, max_voltage, max_adc=None, enable=True, channel="A", threshold_mv=500,
+                           direction="FALLING", delay=0, auto_trigger_ms=1000):
+        """Set a simple trigger for a channel
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            max_voltage (int/float): The maximum voltage of the range used by the channel. (obtained from `set_channel`)
+            max_adc (int): Maximum ADC value for the device (if None, obtained via `maximum_value`)
+            enable (bool): False to disable the trigger, True to enable it
+            channel (str): The channel on which to trigger
+            threshold_mv (int): The threshold in millivolts at which the trigger will fire.
+            direction (str): The direction in which the signal must move to cause a trigger.
+            delay (int): The time (sample periods) between the trigger occurring and the first sample.
+            auto_trigger_ms (int): The number of milliseconds the device will wait if no trigger occurs.
+                If this is set to zero, the scope device will wait indefinitely for a trigger.
+        """
+        if hasattr(self, '_set_simple_trigger') and len(self._set_simple_trigger.argtypes) == 7:
+            if not max_adc:
+                max_adc = self.maximum_value(device)
+            adc_threshold = mv_to_adc(threshold_mv, max_voltage, max_adc)
+            threshold_direction_id = None
+            if self.PICO_THRESHOLD_DIRECTION:
+                threshold_direction_id = self.PICO_THRESHOLD_DIRECTION[direction]
+            else:
+                threshold_directions = getattr(self, self.name.upper() + '_THRESHOLD_DIRECTION', None)
+                if threshold_directions:
+                    threshold_direction_id = threshold_directions[self.name.upper() + f'_{direction.upper()}']
+                else:
+                    raise NotImplementedError("This device doesn't support threshold direction")
+            args = (device.handle, 1 if enable else 0, self.PICO_CHANNEL[channel], adc_threshold,
+                    threshold_direction_id, delay, auto_trigger_ms)
+            converted_args = self._convert_args(self._set_simple_trigger, args)
+            status = self._set_simple_trigger(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidTriggerParameters(f"set_simple_trigger failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device doesn't support set_simple_trigger (yet)")
+
+    @requires_device()
+    def set_digital_channel_trigger(self, device, channel_number=15, direction="DIRECTION_RISING"):
+        """Set a simple trigger on the digital channels.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            channel_number (int): The number of the digital channel on which to trigger.(e.g. 0 for D0, 1 for D1,...)
+            direction (str): The direction in which the signal must move to cause a trigger.
+        """
+        if (hasattr(self, '_set_trigger_digital_port_properties') and
+                len(self._set_trigger_digital_port_properties.argtypes) == 3):
+            digital_properties = getattr(self, self.name.upper() + '_DIGITAL_CHANNEL_DIRECTIONS', None)
+            digital_channels = getattr(self, self.name.upper() + '_DIGITAL_CHANNEL', None)
+            directions = getattr(self, self.name.upper() + '_DIGITAL_DIRECTION', None)
+            if digital_properties and digital_channels and directions:
+                digital_channel = self.name.upper() + '_DIGITAL_CHANNEL_' + str(channel_number)
+                direction = self.name.upper() + '_DIGITAL_' + direction
+                properties = digital_properties(channel=digital_channels[digital_channel],
+                                                direction=directions[direction])
+                args = (device.handle, properties, 1)
+                converted_args = self._convert_args(self._set_trigger_digital_port_properties, args)
+                status = self._set_trigger_digital_port_properties(*converted_args)
+                if status != self.PICO_STATUS['PICO_OK']:
+                    raise InvalidTriggerParameters("set_trigger_digital_port_properties failed "
+                                                   f"({constants.pico_tag(status)})")
+            else:
+                raise PicoError("Couldn't set digital channel trigger. "
+                                f"Check if all enumerations are implemented for {self.name}")
+        else:
+            raise NotImplementedError("This device doesn't support set_digital_channel_trigger (yet)")
+
+    @requires_device()
+    def set_trigger_delay(self, device, delay):
+        """This function sets the post-trigger delay, which causes capture to start a defined time after the
+        trigger event.
+
+        For example, if delay=100 then the scope would wait 100 sample periods before sampling.
+        At a timebase of 500 MS/s, or 2 ns per sample, the total delay would then be 100 x 2 ns = 200 ns.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            delay (int): The time between the trigger occurring and the first sample.
+        """
+        if hasattr(self, '_set_trigger_delay') and len(self._set_trigger_delay.argtypes) == 2:
+            args = (device.handle, delay)
+            converted_args = self._convert_args(self._set_trigger_delay, args)
+            status = self._set_trigger_delay(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidTriggerParameters(f"set_trigger_delay failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device doesn't support set_trigger_delay (yet)")
 
     @requires_device()
     def run_block(self, device, pre_trigger_samples, post_trigger_samples, timebase_id, oversample=1, segment_index=0):
-        """tell the device to arm any triggers and start capturing in block mode now.
-        returns: the approximate time (in seconds) which the device will take to capture with these settings."""
+        """This function starts collecting data in block mode.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            pre_trigger_samples (int): The number of samples to collect before the trigger event.
+            post_trigger_samples (int): The number of samples to collect after the trigger event.
+            timebase_id (int): The timebase id to use for the capture.
+            oversample (int): The amount of oversample required. Defaults to 1.
+            segment_index (int): The memory segment index to use. Defaults to 0.
+
+        Returns:
+            float: The approximate time (in seconds) which the device will take to capture with these settings
+        """
         return self._python_run_block(device.handle,
                                       pre_trigger_samples,
                                       post_trigger_samples,
@@ -465,28 +825,33 @@ class Library(object):
                                       oversample,
                                       segment_index)
 
-    def _python_run_block(self, handle, pre_samples, post_samples, timebase_id, oversample, segment_index):
+    def _python_run_block(self, handle, pre_trigger_samples, post_trigger_samples, timebase_id, oversample,
+                          segment_index):
         time_indisposed = c_int32(0)
         if len(self._run_block.argtypes) == 5:
-            return_code = self._run_block(c_int16(handle),
-                                          c_int32(pre_samples + post_samples),
-                                          c_int16(timebase_id),
-                                          c_int16(oversample),
-                                          byref(time_indisposed))
+            args = (handle, pre_trigger_samples + post_trigger_samples, timebase_id,
+                   oversample, time_indisposed)
+            converted_args = self._convert_args(self._run_block, args)
+            return_code = self._run_block(*converted_args)
+
             if return_code == 0:
                 raise InvalidCaptureParameters()
-        elif len(self._run_block.argtypes) == 9:
-            status = self._run_block(c_int16(handle),
-                                     c_int32(pre_samples),
-                                     c_int32(post_samples),
-                                     c_uint32(timebase_id),
-                                     c_int16(oversample),
-                                     byref(time_indisposed),
-                                     c_uint32(segment_index),
-                                     None,
-                                     None)
+        elif len(self._run_block.argtypes) == 8:
+            args = (handle, pre_trigger_samples, post_trigger_samples, timebase_id,
+                    time_indisposed, segment_index, None, None)
+            converted_args = self._convert_args(self._run_block, args)
+            status = self._run_block(*converted_args)
+
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidCaptureParameters("run_block failed (%s)" % constants.pico_tag(status))
+                raise InvalidCaptureParameters(f"run_block failed ({constants.pico_tag(status)})")
+        elif len(self._run_block.argtypes) == 9:
+            args = (handle, pre_trigger_samples, post_trigger_samples, timebase_id,
+                   oversample, time_indisposed, segment_index, None, None)
+            converted_args = self._convert_args(self._run_block, args)
+            status = self._run_block(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise InvalidCaptureParameters(f"run_block failed ({constants.pico_tag(status)})")
         else:
             raise NotImplementedError("not done other driver types yet")
 
@@ -509,73 +874,377 @@ class Library(object):
             raise NotImplementedError("not done other driver types yet")
 
     @requires_device()
+    def stop_block_capture(self, device, timeout_minutes=5):
+        """Poll the driver to see if it has finished collecting the requested samples.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+            timeout_minutes (int/float): The timeout in minutes. If the time exceeds the timeout, the poll stops.
+
+        Raises:
+            TimeoutError: If the device is not ready within the specified timeout.
+        """
+        if timeout_minutes < 0:
+            raise ArgumentOutOfRangeError("timeout_minutes must be non-negative.")
+        timeout = time.time() + timeout_minutes * 60
+        while not self.is_ready(device):
+            if time.time() > timeout:
+                raise TimeoutError(f"Picoscope not ready within {timeout_minutes} minute(s).")
+
+    @requires_device()
     def maximum_value(self, device):
+        """Get the maximum ADC value for this device.
+
+        Args:
+            device (picosdk.device.Device): The device instance
+
+        Returns:
+            int: The maximum ADC value for this device.
+        """
         if not hasattr(self, '_maximum_value'):
             return (2**15)-1
         max_adc = c_int16(0)
-        self._maximum_value(c_int16(device.handle), byref(max_adc))
+        args = (device.handle, max_adc)
+        converted_args = self._convert_args(self._maximum_value, args)
+        self._maximum_value(*converted_args)
         return max_adc.value
 
     @requires_device()
-    def get_values(self, device, active_channels, num_samples, segment_index=0):
-        # Initialise buffers to hold the data:
-        results = {channel: numpy.empty(num_samples, numpy.dtype('int16')) for channel in active_channels}
+    def set_data_buffer(self, device, channel_or_port, buffer_length, segment_index=0, mode='NONE'):
+        """Set the data buffer for a specific channel.
 
+        Args:
+            device (picosdk.device.Device): The device instance
+            channel_or_port (int/str): Channel (e.g. 'A', 'B') or digital port (e.g. 0, 1) to set data for
+            buffer_length (int): The size of the buffer array (equal to no_of_samples)
+            segment_index (int): The number of the memory segment to be used (default is 0)
+            mode (str): The ratio mode to be used (default is 'NONE')
+
+        Raises:
+            ArgumentOutOfRangeError: If parameters are invalid for device
+        """
+        if not hasattr(self, '_set_data_buffer'):
+            raise NotImplementedError("This device doesn't support setting data buffers")
+        if len(self._set_data_buffer.argtypes) != 6:
+            raise NotImplementedError("set_data_buffer is not implemented for this driver")
+        if isinstance(channel_or_port, str) and channel_or_port.upper() in self.PICO_CHANNEL:
+            id = self.PICO_CHANNEL[channel_or_port]
+        else:
+            try:
+                port_num = int(channel_or_port)
+                digital_ports = getattr(self, self.name.upper() + '_DIGITAL_PORT', None)
+                if digital_ports:
+                    digital_port = self.name.upper() + '_DIGITAL_PORT' + str(port_num)
+                    if digital_port not in digital_ports:
+                        raise ArgumentOutOfRangeError(f"Invalid digital port number {port_num}")
+                    id = digital_ports[digital_port]
+            except ValueError:
+                raise ArgumentOutOfRangeError(f"Invalid digital port number {port_num}")
+
+        if mode not in self.PICO_RATIO_MODE:
+            raise ArgumentOutOfRangeError(f"Invalid ratio mode '{mode}' for {self.name} driver"
+                                          "or PICO_RATIO_MODE doesn't exist for this driver")
+        buffer = (c_int16 * buffer_length)()
+        args = (device.handle, id, buffer, buffer_length, segment_index, self.PICO_RATIO_MODE[mode])
+        converted_args = self._convert_args(self._set_data_buffer, args)
+        status = self._set_data_buffer(*converted_args)
+
+        if status != self.PICO_STATUS['PICO_OK']:
+            raise ArgumentOutOfRangeError(f"set_data_buffer failed ({constants.pico_tag(status)})")
+
+        return buffer
+
+    @requires_device()
+    def get_values(self, device, buffers, samples, time_interval_sec, max_voltage={}, start_index=0, downsample_ratio=0,
+                   downsample_ratio_mode="NONE", segment_index=0, output_dir=".", filename="data", save_to_file=False,
+                   probe_attenuation=DEFAULT_PROBE_ATTENUATION):
+        """Get stored data values from the scope and store it in a clean SingletonScopeDataDict object.
+
+        This function is used after data collection has stopped. It gets the stored data from the scope, with or
+        without downsampling, starting at the specified sample number.
+
+        The returned captured data is converted to mV.
+
+        Args:
+            device (picosdk.device.Device): Device instance
+            buffers (dict): Dictionary of buffers where the data will be stored. The keys are channel names or
+                            port numbers, and the values are numpy arrays.
+            samples (int): The number of samples to retrieve from the scope.
+            time_interval_sec (float): The time interval between samples in seconds. (obtained from get_timebase)
+            max_voltage (dict): The maximum voltage of the range used per channel. (obtained from set_channel)
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                               sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            segment_index (int): Memory segment index
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+            probe_attenuation (dict): The attenuation factor of the probe used per the channel (1 or 10).
+
+        Returns:
+            Tuple of (captured data including time, overflow warnings)
+        """
+        scope_data = SingletonScopeDataDict()
+        scope_data.clean_dict()
         overflow = c_int16(0)
+        no_of_samples = c_uint32(samples)
 
-        if len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_int16:
-            inputs = {k: None for k in 'ABCD'}
-            for k, arr in results.items():
-                inputs[k] = arr.ctypes.data
-            return_code = self._get_values(c_int16(device.handle),
-                                           inputs['A'],
-                                           inputs['B'],
-                                           inputs['C'],
-                                           inputs['D'],
-                                           byref(overflow),
-                                           c_int32(num_samples))
-            if return_code == 0:
-                raise InvalidCaptureParameters()
-        elif len(self._get_values.argtypes) == 7 and self._get_timebase.argtypes[1] == c_uint32:
-            # For this function pattern, we first call a function (self._set_data_buffer) to register each buffer. Then,
-            # we can call self._get_values to actually populate them.
-            for channel, array in results.items():
-                status = self._set_data_buffer(c_int16(device.handle),
-                                               c_int32(self.PICO_CHANNEL[channel]),
-                                               array.ctypes.data,
-                                               c_int32(num_samples),
-                                               c_uint32(segment_index),
-                                               c_int32(self.PICO_RATIO_MODE['NONE']))
-                if status != self.PICO_STATUS['PICO_OK']:
-                    raise InvalidCaptureParameters("set_data_buffer failed (%s)" % constants.pico_tag(status))
+        if len(self._get_values.argtypes) == 7:
+            args = (device.handle, start_index, no_of_samples, downsample_ratio,
+                    self.PICO_RATIO_MODE[downsample_ratio_mode], segment_index, overflow)
+            converted_args = self._convert_args(self._get_values, args)
+            status = self._get_values(*converted_args)
 
-            samples_collected = c_uint32(num_samples)
-            status = self._get_values(c_int16(device.handle),
-                                      c_uint32(0),
-                                      byref(samples_collected),
-                                      c_uint32(1),
-                                      c_int32(self.PICO_RATIO_MODE['NONE']),
-                                      c_uint32(segment_index),
-                                      byref(overflow))
+            if samples != no_of_samples.value:
+                raise InvalidCaptureParameters("get_values could not retrieve the requested number of samples. "
+                                               f"Requested: {samples}, Retrieved: {no_of_samples.value}")
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidCaptureParameters("get_values failed (%s)" % constants.pico_tag(status))
+                raise InvalidCaptureParameters(f"get_values failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("not done other driver types yet")
+
+        for channel, buffer in buffers.items():
+            if isinstance(channel, int) or channel.isnumeric():
+                scope_data[channel] = numpy.asarray(split_mso_data_fast(no_of_samples, buffer))
+            else:
+                scope_data[channel] = numpy.array(adc_to_mv(buffer, max_voltage[channel],
+                                                            self.maximum_value(device))) * probe_attenuation[channel]
+
+        time_sec = numpy.linspace(0,
+                                  (samples - 1) * time_interval_sec,
+                                  samples)
+        scope_data["time"] = numpy.array(time_sec)
+
+        if save_to_file:
+            with open(f"{output_dir}/{filename}.json", "w", encoding="utf-8") as json_file:
+                json.dump(scope_data, json_file, indent=4, cls=NumpyEncoder)
 
         overflow_warning = {}
         if overflow.value:
-            for channel in results.keys():
+            for channel in buffers.keys():
                 if overflow.value & (1 >> self.PICO_CHANNEL[channel]):
                     overflow_warning[channel] = True
 
-        return results, overflow_warning
+        return scope_data, overflow_warning
+
+    @requires_device()
+    def set_and_load_data(self, device, active_sources, buffer_length, time_interval_sec, max_voltage={},
+                    segment_index=0, ratio_mode='NONE', start_index=0,
+                    downsample_ratio=0, downsample_ratio_mode="NONE", probe_attenuation=DEFAULT_PROBE_ATTENUATION,
+                    output_dir=".", filename="data", save_to_file=False):
+        """Load values from the device.
+
+        Combines set_data_buffer and get_values to load values from the device.
+
+        Args:
+            device (picosdk.device.Device): Device instance
+            active_sources (lsit[str/int]): List of active channels and/or ports
+            buffer_length: The size of the buffer array (equal to the number of samples)
+            time_interval_sec (float): The time interval between samples in seconds. (obtained from get_timebase)
+            max_voltage (dict): The maximum voltage of the range used per channel. (obtained from set_channel)
+            segment_index (int): Memory segment index
+            ratio_mode: The ratio mode to be used (default is 'NONE')
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            probe_attenuation (dict): The attenuation factor of the probe used per the channel (1 or 10).
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            Tuple of (captured data including time, overflow warnings)
+        """
+        buffers = {}
+        for source in active_sources:
+            buffers[source] = self.set_data_buffer(device, source, buffer_length, segment_index, ratio_mode)
+
+        return self.get_values(device, buffers, buffer_length, time_interval_sec, max_voltage, start_index,
+                               downsample_ratio, downsample_ratio_mode, segment_index, output_dir, filename,
+                               save_to_file, probe_attenuation)
+
+    @requires_device()
+    def set_trigger_conditions_v2(self, device, trigger_input):
+        """Sets up trigger conditions on the scope's inputs.
+        Sets trigger state to TRUE for given `trigger_input`, the rest will be DONT CARE
+
+        Args:
+            device (picosdk.device.Device): Device instance
+            trigger (str): What to trigger (e.g. channelA, channelB, external, aux, pulseWidthQualifier, digital)
+        """
+
+        if hasattr(self, '_set_trigger_channel_conditions_v2'):
+            trigger_conditions = getattr(self, self.name.upper() + '_TRIGGER_CONDITIONS_V2', None)
+            trigger_state = getattr(self, self.name.upper() + '_TRIGGER_STATE', None)
+
+            if not trigger_conditions or not trigger_state:
+                raise PicoError(f"Trigger conditions not fully defined for {self.name} driver.")
+
+            trigger_dont_care = trigger_state[self.name.upper() + '_CONDITION_DONT_CARE']
+            trigger_true = trigger_state[self.name.upper() + '_CONDITION_TRUE']
+            kwargs = {field[0]: trigger_dont_care for field in trigger_conditions._fields_}
+
+            if trigger_input in kwargs:
+                kwargs[trigger_input] = trigger_true
+            else:
+                raise ArgumentOutOfRangeError(f"Invalid trigger source: '{trigger_input}'. "
+                                              f"Valid sources are: {list(kwargs.keys())}")
+
+            conditions = trigger_conditions(**kwargs)
+            args = (device.handle, conditions, 1)
+            converted_args = self._convert_args(self._set_trigger_channel_conditions_v2, args)
+            status = self._set_trigger_channel_conditions_v2(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise PicoError(f"set_trigger_channel_conditions_v2 failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device does not support setting trigger conditions via V2 struct.")
+
+    @requires_device("set_trigger_channel_properties requires a picosdk.device.Device instance, passed to the correct owning driver.")
+    def set_trigger_channel_properties(self, device, threshold_upper, threshold_upper_hysteresis, threshold_lower,
+                                       threshold_lower_hysteresis, channel, threshold_mode, aux_output_enable,
+                                       auto_trigger_milliseconds):
+        """Set the trigger channel properties for the device.
+
+        Args:
+            device (picosdk.device.Device): Device instance
+            threshold_upper (int): Upper threshold in ADC counts
+            threshold_upper_hysteresis (int): Hysteresis for upper threshold in ADC counts
+            threshold_lower (int): Lower threshold in ADC counts
+            threshold_lower_hysteresis (int): Hysteresis for lower threshold in ADC counts
+            channel (str): Channel to set properties for (e.g. 'A', 'B', 'C', 'D')
+            threshold_mode (str): Threshold mode (e.g. "LEVEL", "WINDOW")
+            aux_output_enable (bool): Enable auxiliary output (boolean) (Not used in eg. ps2000a, ps3000a, ps4000a)
+            auto_trigger_milliseconds (int): The number of milliseconds for which the scope device will wait for a
+                trigger before timing out. If set to zero, the scope device will wait indefinitely for a trigger
+
+        Raises:
+            NotImplementedError: This device does not support setting trigger channel properties.
+            PicoError: If the function fails to set the properties.
+        """
+        if hasattr(self, '_set_trigger_channel_properties'):
+            args = (device.handle, threshold_upper, threshold_upper_hysteresis,
+                    threshold_lower, threshold_lower_hysteresis,
+                    self.PICO_CHANNEL[channel], self.PICO_THRESHOLD_DIRECTION[threshold_mode],
+                    1 if aux_output_enable else 0, auto_trigger_milliseconds)
+            converted_args = self._convert_args(self._set_trigger_channel_properties, args)
+            status = self._set_trigger_channel_properties(*converted_args)
+
+            if status != self.PICO_STATUS['PICO_OK']:
+                raise PicoError(f"set_trigger_channel_properties failed ({constants.pico_tag(status)})")
+        else:
+            raise NotImplementedError("This device does not support setting trigger channel properties.")
 
     @requires_device()
     def stop(self, device):
+        """Stop data capture.
+
+        Args:
+            device (picosdk.device.Device): Device instance
+
+        Raises:
+            InvalidCaptureParameters: If the stop operation fails or parameters are invalid.
+        """
+        args = (device.handle,)
+        converted_args = self._convert_args(self._stop, args)
+
         if self._stop.restype == c_int16:
-            return_code = self._stop(c_int16(device.handle))
-            if isinstance(return_code, c_int16):
-                if return_code == 0:
-                    raise InvalidCaptureParameters()
+            return_code = self._stop(*converted_args)
+            if isinstance(return_code, c_int16) and return_code == 0:
+                raise InvalidCaptureParameters()
         else:
-            status = self._stop(c_int16(device.handle))
+            status = self._stop(*converted_args)
             if status != self.PICO_STATUS['PICO_OK']:
-                raise InvalidCaptureParameters("stop failed (%s)" % constants.pico_tag(status))
+                raise InvalidCaptureParameters(f"stop failed ({constants.pico_tag(status)})")
+
+    @requires_device()
+    def set_sig_gen_built_in(self, device, offset_voltage=0, pk_to_pk=2000000, wave_type="SINE",
+                             start_frequency=10000, stop_frequency=10000, increment=0,
+                             dwell_time=1, sweep_type="UP", operation='ES_OFF', shots=0, sweeps=0,
+                             trigger_type="RISING", trigger_source="NONE", ext_in_threshold=1):
+        """Set up the signal generator to output a built-in waveform.
+
+        Args:
+            device: Device instance
+            offset_voltage (int/float): Offset voltage in microvolts (default 0)
+            pk_to_pk (int): Peak-to-peak voltage in microvolts (default 2000000)
+            wave_type (str): Type of waveform (e.g. "SINE", "SQUARE", "TRIANGLE")
+            start_frequency (int): Start frequency in Hz (default 1000.0)
+            stop_frequency (int): Stop frequency in Hz (default 1000.0)
+            increment (int): Frequency increment in Hz (default 0.0)
+            dwell_time (int/float): Time at each frequency in seconds (default 1.0)
+            sweep_type (str): Sweep type (e.g. "UP", "DOWN", "UPDOWN")
+            operation (str): Configures the white noise/PRBS (e.g. "ES_OFF", "WHITENOISE", "PRBS")
+            shots (int): Number of shots per trigger (default 1)
+            sweeps (int): Number of sweeps (default 1)
+            trigger_type (str): Type of trigger (e.g. "RISING", "FALLING")
+            trigger_source (str): Source of trigger (e.g. "NONE", "SCOPE_TRIG")
+            ext_in_threshold (int): External trigger threshold in ADC counts
+
+        Raises:
+            ArgumentOutOfRangeError: If parameters are invalid for device
+        """
+        prefix = self.name.upper()
+
+        # Convert string parameters to enum values
+        try:
+            wave_type_val = getattr(self, f"{prefix}_WAVE_TYPE")[f"{prefix}_{wave_type.upper()}"]
+            sweep_type_val = getattr(self, f"{prefix}_SWEEP_TYPE")[f"{prefix}_{sweep_type.upper()}"]
+        except (AttributeError, KeyError) as e:
+            raise ArgumentOutOfRangeError(f"Invalid wave_type or sweep_type for this device: {e}")
+
+        # Check function signature and call appropriate version
+        if len(self._set_sig_gen_built_in.argtypes) == 10:
+            args = (device.handle, offset_voltage, pk_to_pk, wave_type_val,
+                   start_frequency, stop_frequency, increment, dwell_time,
+                   sweep_type_val, sweeps)
+            converted_args = self._convert_args(self._set_sig_gen_built_in, args)
+            status = self._set_sig_gen_built_in(*converted_args)
+
+        elif len(self._set_sig_gen_built_in.argtypes) == 15:
+            try:
+                trigger_type_val = getattr(self, f"{prefix}_SIGGEN_TRIG_TYPE")[f"{prefix}_SIGGEN_{trigger_type.upper()}"]
+                trigger_source_val = getattr(self, f"{prefix}_SIGGEN_TRIG_SOURCE")[f"{prefix}_SIGGEN_{trigger_source.upper()}"]
+                extra_ops_val = getattr(self, f"{prefix}_EXTRA_OPERATIONS")[f"{prefix}_{operation.upper()}"]
+            except (AttributeError, KeyError) as e:
+                raise ArgumentOutOfRangeError(f"Invalid trigger parameters for this device: {e}")
+
+            args = (device.handle, offset_voltage, pk_to_pk, wave_type_val,
+                   start_frequency, stop_frequency, increment, dwell_time,
+                   sweep_type_val, extra_ops_val, shots, sweeps,
+                   trigger_type_val, trigger_source_val, ext_in_threshold)
+            converted_args = self._convert_args(self._set_sig_gen_built_in, args)
+            status = self._set_sig_gen_built_in(*converted_args)
+
+        else:
+            raise NotImplementedError("Signal generator not supported on this device")
+
+        if status != self.PICO_STATUS["PICO_OK"]:
+            raise PicoError(f"set_sig_gen_built_in failed: {constants.pico_tag(status)}")
+
+    def _convert_args(self, func, args):
+        """Convert arguments to match function argtypes.
+
+        Args:
+            func: The C function with argtypes defined
+            args: Tuple of arguments to convert
+
+        Returns:
+            Tuple of converted arguments matching argtypes
+        """
+        if not hasattr(func, 'argtypes'):
+            return args
+
+        converted = []
+        for arg, argtype in zip(args, func.argtypes):
+            # Handle byref parameters
+            if argtype == c_void_p and arg is not None:
+                converted.append(byref(arg))
+            # Handle normal parameters
+            elif arg is not None:
+                converted.append(argtype(arg))
+            else:
+                converted.append(None)
+        return tuple(converted)
