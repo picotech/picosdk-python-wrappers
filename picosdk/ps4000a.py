@@ -19,6 +19,13 @@ class Ps4000alib(Library):
 
 ps4000a = Ps4000alib()
 
+ps4000a.PS4000A_BANDWIDTH_LIMITER = make_enum([
+    'PS4000A_BW_FULL',
+    'PS4000A_BW_20KHZ',
+    'PS4000A_BW_100KHZ',
+    'PS4000A_BW_1MHZ',
+])
+
 ps4000a.PS4000A_COUPLING = make_enum([
     'PS4000A_AC',
     'PS4000A_DC',
@@ -190,11 +197,10 @@ ps4000a.PICO_VOLTAGE_RANGE = process_enum(ps4000a.PICO_CONNECT_PROBE_RANGE)
 class PS4000A_USER_PROBE_INTERACTIONS(Structure):
     _pack_ = 1
     _fields_ = [    ("connected", c_uint16),
-                
-                    ("channel", c_int32),
+                    ("channel", c_uint32),
                     ("enabled", c_uint16),
 
-                    ("probeName", c_uint32),
+                    ("probeName", c_int32),
 
                     ("requiresPower_", c_uint8),
                     ("isPowered_", c_uint8),  
@@ -210,7 +216,6 @@ class PS4000A_USER_PROBE_INTERACTIONS(Structure):
                     ("couplingFirst_", c_uint32),
                     ("couplingLast_", c_uint32),
                     ("couplingCurrent_", c_uint32),
-                    ("couplingLast_", c_uint32),
 
                     ("filterFlags_", c_uint32),
                     ("filterCurrent_", c_uint32),
@@ -1108,7 +1113,7 @@ doc = """ void *ps4000aProbeInteractions
 ps4000a.ps4000aProbeInteractions = C_CALLBACK_FUNCTION_FACTORY(None,
                                                          c_int16,
                                                         c_uint32,
-                                                        c_void_p,
+                                                        POINTER(PS4000A_USER_PROBE_INTERACTIONS),
                                                         c_uint32
                                                         )
 

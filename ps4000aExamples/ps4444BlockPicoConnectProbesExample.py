@@ -1,9 +1,8 @@
 #
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
-# PS4824 BLOCK MODE EXAMPLE
-# This example opens a 4000a driver device, sets up two channels and a trigger then collects a block of data.
-# This data is then plotted as mV against time in ns.
+# PS4444 PICOCONNECT PROBE, BLOCK MODE EXAMPLE
+# This example opens a 4444 device, and demos PicoConnectProbes events.
 
 import ctypes
 from array import array
@@ -12,31 +11,35 @@ import numpy as np
 from picosdk.ps4000a import ps4000a as ps
 import matplotlib.pyplot as plt
 from picosdk.functions import adc2mV, assert_pico_ok, adc2mVpl1000, mV2adcpl1000
+from pynput import keyboard
 
 # Create chandle and status ready for use
 chandle = ctypes.c_int16()
 status = {}
+probes = (ps.PS4000A_USER_PROBE_INTERACTIONS * 4)()  #
 
 # Calback for PicoConnectProbes events
 def PicoConnectProbe_callback(handle, pico_status, probes_ptr, nProbes):
     global PicoConnectProbewasCalledBack
     PicoConnectProbewasCalledBack = True
-
+    print("PicoConnectProbes pico_status ", pico_status)
     print("Number of PicoConnectProbes events is ", nProbes)
-    print(probes_ptr)
-    
-    for i in range(nProbes):
-        probe = probes_ptr[i]  # index into the array
-        print(f"Probe {i}:")
-        print(f"  Channel: {probe.channel}")
-        print(f"  Connected: {probe.connected}")
-        print(f"  Enabled: {probe.enabled}")
-        print(f"  Status: {probe.status}")
-        print(f"  Range: {probe.rangeCurrent_}")
-        print(f"  Coupling: {probe.couplingCurrent_}")
-        # Add more fields as needed
-    
+    #print(probes_ptr)
 
+    # If probes_ptr is an integer (raw address), cast it to a pointer
+    if isinstance(probes_ptr, int):
+        probes_ptr = ctypes.cast(probes_ptr, ctypes.POINTER( (ps.PS4000A_USER_PROBE_INTERACTIONS) ))
+
+    n_probes = nProbes
+    if n_probes > 0 and probes_ptr:
+        # Iterate over the pointer using the count provided by n_probes
+        for i in range(n_probes):
+            # Access the struct at index i
+            probes[(probes_ptr[i].channel)] = probes_ptr[i]
+    else:
+        print("No probe interactions recorded.")
+
+###########################################################
 # Convert the python function into a C function pointer.
 cFuncPtr2 = ps.ps4000aProbeInteractions(PicoConnectProbe_callback)
 
@@ -61,16 +64,14 @@ except: # PicoNotOkError:
 status["SetProbeInteractionCallback"] = ps.ps4000aSetProbeInteractionCallback(chandle, cFuncPtr2)
 assert_pico_ok(status["SetProbeInteractionCallback"])
 
-time.sleep(4) # Delay for first Probe callback events to trigger 
+time.sleep(1.0) # Delay for first Probe callback events to trigger 
 
-# Set up channel A
-# handle = chandle
-# channel = PS4000a_CHANNEL_A = 0
-# enabled = 1
-# coupling type = PS4000a_DC = 1
-# range = PS4000a_2V = 7
-# analogOffset = 0 V
-chARange = ps.PICO_CONNECT_PROBE_RANGE["PICO_X1_PROBE_1V"]
+status["setChA"] = ps.ps4000aSetChannel(chandle, 0, 1, ps.PS4000A_COUPLING["PS4000A_DC"], ps.PICO_CONNECT_PROBE_RANGE["PICO_X1_PROBE_1V"], 0)
+status["setChA"] = ps.ps4000aSetChannel(chandle, 1, 1, ps.PS4000A_COUPLING["PS4000A_DC"], ps.PICO_CONNECT_PROBE_RANGE["PICO_X1_PROBE_1V"], 0)
+status["setChA"] = ps.ps4000aSetChannel(chandle, 2, 1, ps.PS4000A_COUPLING["PS4000A_DC"], ps.PICO_CONNECT_PROBE_RANGE["PICO_X1_PROBE_1V"], 0)
+status["setChA"] = ps.ps4000aSetChannel(chandle, 3, 1, ps.PS4000A_COUPLING["PS4000A_DC"], ps.PICO_CONNECT_PROBE_RANGE["PICO_X1_PROBE_1V"], 0)
+
+##################################################
 # Look in \picosdk\ps4000a.py for all "PICO_CONNECT_PROBE_RANGE" defines for your Probe.
 
 # The 4444 PicoConnect current clamps don't have auto zero offset.
@@ -78,56 +79,44 @@ chARange = ps.PICO_CONNECT_PROBE_RANGE["PICO_X1_PROBE_1V"]
 # If you measuring AC current you can just AC couple the channel to remove any offset.
 # You can find out the max. and min. analogoffset values that can be set for any probe range by calling-
 # ps4000aGetAnalogueOffset().
-status["setChA"] = ps.ps4000aSetChannel(chandle, 0, 1, 1, chARange, 0)
-assert_pico_ok(status["setChA"])
 
-# Set up channel B
-# handle = chandle
-# channel = PS4000a_CHANNEL_B = 1
-# enabled = 1
-# coupling type = PS4000a_DC = 1
-# range = PS4000a_2V = 7
-# analogOffset = 0 V
-chBRange = 7
-status["setChB"] = ps.ps4000aSetChannel(chandle, 1, 1, 1, chBRange, 0)
-assert_pico_ok(status["setChB"])
+##################################################
+print("Press 'Enter' to exit the Probe update loop!")
+keep_going=keyboard.Listener(lambda key: False if key==keyboard.Key.enter else True)
+keep_going.start()
+while keep_going.is_alive():
+    if (PicoConnectProbewasCalledBack == True):
+        PicoConnectProbewasCalledBack = False
+        print("DEBUG all probe status:")
 
-# Set up channel C
-# handle = chandle
-# channel = PS4000a_CHANNEL_C = 2
-# enabled = 1
-# coupling type = PS4000a_DC = 1
-# range = PS4000a_2V = 7
-# analogOffset = 0 V
-chCRange = 7
-status["setChC"] = ps.ps4000aSetChannel(chandle, 2, 0, 1, chCRange, 0)
-assert_pico_ok(status["setChC"])
+        for i in range(4):
+            #probe = probes_ptr[i]  # index into the array
+            if (probes[i].connected):
+                status["setChannel"] = ps.ps4000aSetChannel(chandle,
+                                                            i, # channel
+                                                            1, # enabled
+                                                            ps.PS4000A_COUPLING["PS4000A_DC"], # coupling
+                                                            (probes[i].rangeLast_), # probes[i].rangeFirst_, # ps.PICO_CONNECT_PROBE_RANGE[probes[i].rangeFirst_],
+                                                            0) # offset
+            else:
+                status["setChannel"] = ps.ps4000aSetChannel(chandle, i, 0, ps.PS4000A_COUPLING["PS4000A_DC"], ps.PICO_CONNECT_PROBE_RANGE["PICO_CONNECT_PROBE_OFF"], 0)
+            assert_pico_ok(status["setChannel"])
+            
+            #for i in range(4):
+            print(f"Channel {i}:")
+            print(f"  Connected: {probes[i].connected}")
+            print(f"  probeName: {probes[i].probeName}")
+            #print(f"  Status: {probes[i].status}")
+            print(f"  Coupling: {probes[i].couplingCurrent_}")
+                # Add more fields as needed      
+    time.sleep(0.1)
 
-# Set up channel D
-# handle = chandle
-# channel = PS4000a_CHANNEL_D = 3
-# enabled = 1
-# coupling type = PS4000a_DC = 1
-# range = PS4000a_2V = 7
-# analogOffset = 0 V
-chDRange = 7
-status["setChD"] = ps.ps4000aSetChannel(chandle, 3, 0, 1, chDRange, 0)
-assert_pico_ok(status["setChD"])
-
-# Set up single trigger
-# handle = chandle
-# enabled = 1
-# source = PS4000a_CHANNEL_A = 0
-# threshold = 1024 ADC counts
-# direction = PS4000a_RISING = 2
-# delay = 0 s
-# auto Trigger = 1000 ms
-status["trigger"] = ps.ps4000aSetSimpleTrigger(chandle, 1, 0, 1024, 2, 0, 100)
-assert_pico_ok(status["trigger"])
+#status["trigger"] = ps.ps4000aSetSimpleTrigger(chandle, 1, 0, 1024, 2, 0, 100)
+#assert_pico_ok(status["trigger"])
 
 # Set number of pre and post trigger samples to be collected
-preTriggerSamples = 2500
-postTriggerSamples = 2500
+preTriggerSamples = 25000
+postTriggerSamples = 25000
 maxSamples = preTriggerSamples + postTriggerSamples
 
 # Get timebase information
@@ -167,6 +156,10 @@ bufferAMax = (ctypes.c_int16 * maxSamples)()
 bufferAMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't in the scope of this example
 bufferBMax = (ctypes.c_int16 * maxSamples)()
 bufferBMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't in the scope of this example
+bufferCMax = (ctypes.c_int16 * maxSamples)()
+bufferCMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't in the scope of this example
+bufferDMax = (ctypes.c_int16 * maxSamples)()
+bufferDMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't in the scope of this example
 
 # Set data buffer location for data collection from channel A
 # handle = chandle
@@ -179,16 +172,14 @@ bufferBMin = (ctypes.c_int16 * maxSamples)() # used for downsampling which isn't
 status["setDataBuffersA"] = ps.ps4000aSetDataBuffers(chandle, 0, ctypes.byref(bufferAMax), ctypes.byref(bufferAMin), maxSamples, 0 , 0)
 assert_pico_ok(status["setDataBuffersA"])
 
-# Set data buffer location for data collection from channel B
-# handle = chandle
-# source = PS4000a_CHANNEL_B = 1
-# pointer to buffer max = ctypes.byref(bufferBMax)
-# pointer to buffer min = ctypes.byref(bufferBMin)
-# buffer length = maxSamples
-# segementIndex = 0
-# mode = PS4000A_RATIO_MODE_NONE = 0
 status["setDataBuffersB"] = ps.ps4000aSetDataBuffers(chandle, 1, ctypes.byref(bufferBMax), ctypes.byref(bufferBMin), maxSamples, 0 , 0)
 assert_pico_ok(status["setDataBuffersB"])
+
+status["setDataBuffersC"] = ps.ps4000aSetDataBuffers(chandle, 2, ctypes.byref(bufferCMax), ctypes.byref(bufferCMin), maxSamples, 0 , 0)
+assert_pico_ok(status["setDataBuffersC"])
+
+status["setDataBuffersD"] = ps.ps4000aSetDataBuffers(chandle, 3, ctypes.byref(bufferDMax), ctypes.byref(bufferDMin), maxSamples, 0 , 0)
+assert_pico_ok(status["setDataBuffersD"])
 
 # create overflow loaction
 overflow = ctypes.c_int16()
@@ -205,36 +196,33 @@ cmaxSamples = ctypes.c_int32(maxSamples)
 status["getValues"] = ps.ps4000aGetValues(chandle, 0, ctypes.byref(cmaxSamples), 0, 0, 0, ctypes.byref(overflow))
 assert_pico_ok(status["getValues"])
 
-
 # find maximum ADC count value
 # handle = chandle
 # pointer to value = ctypes.byref(maxADC)
 maxADC = ctypes.c_int16(32767)
 
-# convert ADC counts data to mV
-# adc2mVChAMax =  adc2mV(bufferAMax, chARange, maxADC)
-# adc2mVChBMax =  adc2mV(bufferBMax, chBRange, maxADC)
-
-adc2mVChAMax = bufferAMax # Just copy ADC values for now
-
 # Scale for ps.PICO_CONNECT_PROBE_RANGE["PICO_CURRENT_CLAMP_40A_5A"] range -> scale to +/-5A
 # adc2ProbeRangeChAMax = [(float(x) * 5 ) / float(maxADC.value) for x in float(bufferAMax)]
 # Just use adc2mVpl1000() to do this, and pass the range value scale to.
-adc2ProbeRangeChAMax = adc2mVpl1000(bufferAMax, 5 , maxADC)
 
+# Just scale to 100 for percentage, for this demo
+adc2ProbeRangeChAMax = adc2mVpl1000(bufferAMax, 100 , maxADC)
+adc2ProbeRangeChBMax = adc2mVpl1000(bufferBMax, 100 , maxADC)
+adc2ProbeRangeChCMax = adc2mVpl1000(bufferCMax, 100 , maxADC)
+adc2ProbeRangeChDMax = adc2mVpl1000(bufferDMax, 100 , maxADC)
 # NICE TO HAVE A FUNCTION AND LOOK TABLE/ARRAY TO TRANSLATE PROBE ENUMS TO SCALING VALUES, rather than passing in constant above.
 
 # Create time data
 time = np.linspace(0, (cmaxSamples.value - 1) * timeIntervalns.value, cmaxSamples.value)
 
-# plot data from channel A
-# plt.plot(time, bufferAMax[:])
+# plot data
 plt.plot(time, adc2ProbeRangeChAMax[:])
-
-# plt.plot(time, adc2mVChBMax[:])
+plt.plot(time, adc2ProbeRangeChBMax[:])
+plt.plot(time, adc2ProbeRangeChCMax[:])
+plt.plot(time, adc2ProbeRangeChDMax[:])
 
 plt.xlabel('Time (ns)')
-plt.ylabel('Channel range units (?)')
+plt.ylabel('Channel range (+/-100%)')
 plt.show()
 
 # Stop the scope
