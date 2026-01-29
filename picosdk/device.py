@@ -529,11 +529,14 @@ class Device(object):
             output_dir (str): The output directory where the json file will be saved.
             filename (str): The name of the json file where the data will be stored
             save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            overflow warnings (dict): A dictionary indicating which channels had an overflow.
         """
         time_interval_sec = self.time_interval_ns / 1e9 if self.time_interval_ns else None
-        self.driver.get_values(self, self.buffers, self.max_samples, time_interval_sec, self.channel_ranges,
-                               start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
-                               filename, save_to_file, self.probe_attenuations)
+        return self.driver.get_values(self, self.buffers, self.max_samples, time_interval_sec, self.channel_ranges,
+                                      start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                                      filename, save_to_file, self.probe_attenuations)
 
     @requires_open()
     def set_and_load_data(self, segment_index=0, ratio_mode='NONE', start_index=0, downsample_ratio=0,
@@ -552,10 +555,13 @@ class Device(object):
             output_dir (str): The output directory where the json file will be saved.
             filename (str): The name of the json file where the data will be stored
             save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            overflow warnings (dict): A dictionary indicating which channels had an overflow.
         """
         self.set_all_data_buffers(segment_index, ratio_mode)
-        self.get_values(start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
-                        filename, save_to_file)
+        return self.get_values(start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                               filename, save_to_file)
 
     @requires_open()
     def set_trigger_channel_properties(self, threshold_upper, threshold_upper_hysteresis, threshold_lower,

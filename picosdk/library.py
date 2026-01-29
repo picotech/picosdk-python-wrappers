@@ -981,6 +981,9 @@ class Library(object):
             filename (str): The name of the json file where the data will be stored
             save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
             probe_attenuation (dict): The attenuation factor of the probe used per the channel (1 or 10).
+
+        Returns:
+            overflow warnings (dict): A dictionary indicating which channels had an overflow.
         """
         scope_data = SingletonScopeDataDict()
         scope_data.clean_dict()
@@ -1023,6 +1026,8 @@ class Library(object):
                 if overflow.value & (1 >> self.PICO_CHANNEL[channel]):
                     overflow_warning[channel] = True
 
+        return overflow_warning
+
     @requires_device()
     def set_and_load_data(self, device, active_sources, buffer_length, time_interval_sec, max_voltage={},
                           segment_index=0, ratio_mode='NONE', start_index=0,
@@ -1048,14 +1053,17 @@ class Library(object):
             output_dir (str): The output directory where the json file will be saved.
             filename (str): The name of the json file where the data will be stored
             save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            overflow warnings (dict): A dictionary indicating which channels had an overflow.
         """
         buffers = {}
         for source in active_sources:
             buffers[source] = self.set_data_buffer(device, source, buffer_length, segment_index, ratio_mode)
 
-        self.get_values(device, buffers, buffer_length, time_interval_sec, max_voltage, start_index,
-                        downsample_ratio, downsample_ratio_mode, segment_index, output_dir, filename,
-                        save_to_file, probe_attenuation)
+        return self.get_values(device, buffers, buffer_length, time_interval_sec, max_voltage, start_index,
+                               downsample_ratio, downsample_ratio_mode, segment_index, output_dir, filename,
+                               save_to_file, probe_attenuation)
 
     @requires_device()
     def set_trigger_conditions_v2(self, device, trigger_input):
