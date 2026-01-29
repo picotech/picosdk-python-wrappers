@@ -531,12 +531,36 @@ class Device(object):
             save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
 
         Returns:
-            overflow warnings (dict): A dictionary indicating which channels had an overflow.
+            scope_data (SingletonScopeDataDict): The captured scope data.
+            overflow_warning (dict): A dictionary indicating which channels had an overflow.
         """
         time_interval_sec = self.time_interval_ns / 1e9 if self.time_interval_ns else None
         return self.driver.get_values(self, self.buffers, self.max_samples, time_interval_sec, self.channel_ranges,
                                       start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
                                       filename, save_to_file, self.probe_attenuations)
+
+    @requires_open()
+    def store_values(self, start_index=0, downsample_ratio=0, downsample_ratio_mode="NONE", segment_index=0,
+                     output_dir=".", filename="data", save_to_file=False):
+        """Same as `get_values` but only returns overflow warnings and keeps the data stored in SingletonScopeDataDict.
+
+        Args:
+            start_index (int): A zero-based index that indicates the start point for data collection. It is measured in
+                               sample intervals from the start of the buffer.
+            downsample_ratio (int): The downsampling factor that will be applied to the raw data.
+            downsample_ratio_mode (str): Which downsampling mode to use.
+            segment_index (int): Memory segment index
+            output_dir (str): The output directory where the json file will be saved.
+            filename (str): The name of the json file where the data will be stored
+            save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
+
+        Returns:
+            overflow_warning (dict): A dictionary indicating which channels had an overflow.
+        """
+        time_interval_sec = self.time_interval_ns / 1e9 if self.time_interval_ns else None
+        return self.driver.store_values(self, self.buffers, self.max_samples, time_interval_sec, self.channel_ranges,
+                                        start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
+                                        filename, save_to_file, self.probe_attenuations)
 
     @requires_open()
     def set_and_load_data(self, segment_index=0, ratio_mode='NONE', start_index=0, downsample_ratio=0,
