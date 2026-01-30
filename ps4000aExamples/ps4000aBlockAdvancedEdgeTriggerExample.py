@@ -62,7 +62,9 @@ channelAConditions =  ps.PS4000A_CONDITION(ps.PS4000A_CHANNEL["PS4000A_CHANNEL_A
 #conditions.channelA.condition = ps.PS4000A_TRIGGER_STATE["PS4000A_TRUE"]
 
 nConditions = 1
-info = 1 #ps.PS4000A_CONDITIONS_INFO["PS4000A_ADD"]
+clear = ps.PS4000A_CONDITIONS_INFO["PS4000A_CLEAR"]
+add = ps.PS4000A_CONDITIONS_INFO["PS4000A_ADD"] 
+info = clear|add
 status["setTriggerChannelConditions"] = ps.ps4000aSetTriggerChannelConditions(chandle, ctypes.byref(channelAConditions), nConditions, info)
 assert_pico_ok(status["setTriggerChannelConditions"])
 
@@ -107,12 +109,27 @@ oversample = ctypes.c_int16(1)
 status["getTimebase2"] = ps.ps4000aGetTimebase2(chandle, timebase, maxSamples, ctypes.byref(timeIntervalns), ctypes.byref(returnedMaxSamples), 0)
 assert_pico_ok(status["getTimebase2"])
 
-triggerEnabled = ctypes.c_int16(3)
-pulseEnabled = ctypes.c_int16(3)
+triggerEnabled = ctypes.c_int16(0)
+pulseWidthQualifierEnabled = ctypes.c_int16(0)
 
-ps.ps4000aIsTriggerOrPulseWidthQualifierEnabled(chandle, ctypes.byref(triggerEnabled), ctypes.byref(pulseEnabled))
-print(triggerEnabled.value)
-print(pulseEnabled.value)
+status["isTriggerOrPulseWidthQualifierEnabled"] = ps.ps4000aIsTriggerOrPulseWidthQualifierEnabled(
+    chandle, 
+    ctypes.byref(triggerEnabled), 
+    ctypes.byref(pulseWidthQualifierEnabled)
+)
+
+if status["isTriggerOrPulseWidthQualifierEnabled"] == 0:
+    if triggerEnabled.value != 0:
+        print("Trigger is enabled.")
+    else:
+        print("Trigger is disabled.")
+
+    if pulseWidthQualifierEnabled.value != 0:
+        print("Pulse width qualifier is enabled.")
+    else:
+        print("Pulse width qualifier is disabled.")
+else:
+    print("Error checking trigger/pulse width qualifier status.")
 
 # Run block capture
 # handle = chandle
