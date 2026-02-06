@@ -562,6 +562,11 @@ class Device(object):
         Returns:
             overflow_warning (dict): A dictionary indicating which channels had an overflow.
         """
+        if not self.time_interval_ns:
+            if self.timebase:
+                self.get_timebase(self.timebase, self.max_samples)
+            else:
+                raise InvalidTimebaseError("Timebase is not set. Please call get_timebase before get_values.")
         time_interval_sec = self.time_interval_ns / 1e9 if self.time_interval_ns else None
         return self.driver.store_values(self, self.buffers, self.max_samples, time_interval_sec, self.channel_ranges,
                                         start_index, downsample_ratio, downsample_ratio_mode, segment_index, output_dir,
