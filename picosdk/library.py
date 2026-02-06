@@ -201,7 +201,21 @@ class SingletonScopeDataDict(dict):
                     return port_data[row_index]
 
                 except (IndexError, ValueError, KeyError) as e:
-                    raise ValueError(f"Invalid digital channel {key}: {str(e)}")
+                    if isinstance(e, KeyError):
+                        available_keys = ", ".join(map(str, sorted(self.keys()))) if self.keys() else "None"
+                        raise ValueError(
+                            f"Could not retrieve data for digital channel {key}. The data for the corresponding "
+                            f"digital port ({port_number}) has not been loaded into the data dictionary. "
+                            f"Available data keys are: [{available_keys}]."
+                        ) from e
+                    elif isinstance(e, IndexError):
+                        raise ValueError(
+                            f"Could not retrieve data for digital channel {key}. The data for the corresponding "
+                            f"digital port ({port_number}) appears to be corrupted or in an unexpected format."
+                        ) from e
+                    else:
+                        raise ValueError(f"An unexpected error occurred while processing digital channel '{key}': {e}"
+                                         ) from e
 
         # Handle direct port access (0-1) or analog channels
         return super().__getitem__(key)
