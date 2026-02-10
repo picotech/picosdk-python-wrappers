@@ -1037,8 +1037,9 @@ class Library(object):
 
         overflow_warning = {}
         if overflow.value:
+            overflow_warning["bit field"] = bin(overflow.value)[2:]
             for channel in buffers.keys():
-                if overflow.value & (1 >> self.PICO_CHANNEL[channel]):
+                if channel in self.PICO_CHANNEL and (overflow.value & (1 << self.PICO_CHANNEL[channel])):
                     overflow_warning[channel] = True
 
         return scope_data, overflow_warning

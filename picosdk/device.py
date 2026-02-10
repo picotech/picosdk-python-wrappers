@@ -560,7 +560,7 @@ class Device(object):
             save_to_file (bool): True if the data has to be saved to a file on the disk, False otherwise
 
         Returns:
-            overflow_warning (dict): A dictionary indicating which channels had an overflow.
+            overflow warnings (dict): A dictionary indicating which channels had an overflow.
         """
         if not self.time_interval_ns:
             if self.timebase:
