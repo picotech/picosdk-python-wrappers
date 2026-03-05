@@ -903,7 +903,7 @@ class Library(object):
         timeout = time.time() + timeout_minutes * 60
         while not self.is_ready(device):
             if time.time() > timeout:
-                raise TimeoutError(f"Picoscope not ready within {timeout_minutes} minute(s).")
+                raise TimeoutError(f"Trigger not found or picoscope not ready within {timeout_minutes} minute(s).")
 
     @requires_device()
     def maximum_value(self, device):
