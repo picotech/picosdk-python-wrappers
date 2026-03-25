@@ -2,35 +2,31 @@
 # Copyright (C) 2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 from picosdk.errors import DeviceNotFoundError, CannotFindPicoSDKError
-from picosdk.ps2000 import ps2000
-from picosdk.ps2000a import ps2000a
-from picosdk.ps3000 import ps3000
-from picosdk.ps3000a import ps3000a
-from picosdk.ps4000 import ps4000
-from picosdk.ps4000a import ps4000a
-from picosdk.ps5000a import ps5000a
-from picosdk.ps6000 import ps6000
-from picosdk.ps6000a import ps6000a
+import importlib
 
 
 # the A drivers are faster to enumerate devices, so search them first.
-drivers = [
-    ps2000a,
-    ps3000a,
-    ps4000a,
-    ps5000a,
-    ps6000a,
-    ps6000,
-    ps2000,
-    ps3000,
-    ps4000,
+drivers_names = [
+    'ps2000a',
+    'ps3000a',
+    'ps4000a',
+    'ps5000a',
+    'ps6000a',
+    'ps6000',
+    'ps2000',
+    'ps3000',
+    'ps4000',
 ]
 
 
 def find_unit():
     """Search for, open and return the first device connected, on any driver."""
-    for driver in drivers:
+    for driver_name in drivers_names:
         try:
+            # Dynamically import the module (e.g., picosdk.ps2000a)
+            module = importlib.import_module(f'picosdk.{driver_name}')
+            # Get the actual driver class/object from the module
+            driver = getattr(module, driver_name)
             device = driver.open_unit()
         except DeviceNotFoundError:
             continue
@@ -41,8 +37,12 @@ def find_unit():
 def find_all_units():
     """Search for, open and return ALL devices on ALL pico drivers (supported in this SDK wrapper)."""
     devices = []
-    for driver in drivers:
+    for driver_name in drivers_names:
         try:
+            # Dynamically import the module (e.g., picosdk.ps2000a)
+            module = importlib.import_module(f'picosdk.{driver_name}')
+            # Get the actual driver class/object from the module
+            driver = getattr(module, driver_name)
             device = driver.open_unit()
         except DeviceNotFoundError:
             continue
@@ -57,8 +57,12 @@ def find_units_safely():
     Ignores CannotFindPicoSDKErrors."""
     devices = []
 
-    for driver in drivers:
+    for driver_name in drivers_names:
         try:
+            # Dynamically import the module (e.g., picosdk.ps2000a)
+            module = importlib.import_module(f'picosdk.{driver_name}')
+            # Get the actual driver class/object from the module
+            driver = getattr(module, driver_name)
             device = driver.open_unit()
         except (CannotFindPicoSDKError, DeviceNotFoundError):
             # Go to next driver when sdk is not installed or device is not found
