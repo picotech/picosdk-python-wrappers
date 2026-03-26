@@ -36,7 +36,7 @@ setup(
     name='picosdk',
     packages=['picosdk'],
     install_requires=["numpy>=1.12.1"],
-    version='1.0',
+    version='2.0',
     description='PicoSDK Python wrapper',
     long_description=readme,
     author='Pico Technology Ltd',
