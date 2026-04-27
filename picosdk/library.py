@@ -166,6 +166,31 @@ class SingletonScopeDataDict(dict):
         self.clear()
         gc.collect()
 
+    def __contains__(self, key) -> bool:
+        """Check if a channel or port is present in the data dictionary.
+
+        Handles both integer and string representations of digital ports.
+        """
+        if isinstance(key, str):
+            match = re.match(r"D(?P<channel_num>\d+)", key, re.IGNORECASE)
+            if match:
+                try:
+                    digital_number = int(match.group('channel_num'))
+                    port_number = digital_number // 8
+
+                    return super().__contains__(port_number) or super().__contains__(str(port_number))
+                except ValueError:
+                    return False
+
+            if key.isdigit():
+                return super().__contains__(key) or super().__contains__(int(key))
+
+        elif isinstance(key, int):
+            return super().__contains__(key) or super().__contains__(str(key))
+
+        # Fallback for analog channels ('A', 'B')
+        return super().__contains__(key)
+
     def __getitem__(self, key: str):
         """Get data with uniform access pattern for analog and digital channels.
 
@@ -195,7 +220,12 @@ class SingletonScopeDataDict(dict):
                     row_index = digital_number % 8
 
                     # Get the data for the entire port
-                    port_data = super().__getitem__(port_number)
+                    if super().__contains__(port_number):
+                        port_data = super().__getitem__(port_number)
+                    elif super().__contains__(str(port_number)):
+                        port_data = super().__getitem__(str(port_number))
+                    else:
+                        raise KeyError(port_number)
 
                     # Select the correct row from the numpy array.
                     return port_data[row_index]
@@ -219,6 +249,23 @@ class SingletonScopeDataDict(dict):
 
         # Handle direct port access (0-1) or analog channels
         return super().__getitem__(key)
+
+    @property
+    def available_channels(self) -> list[str]:
+        """Returns a list of all currently accessible individual channel names."""
+        channels = []
+        for key in super().keys():
+            # Check if the key is an integer or a string of digits ('0', '1')
+            if isinstance(key, int) or (isinstance(key, str) and key.isdigit()):
+                port_num = int(key)
+                start_d = port_num * 8
+                for i in range(8):
+                    channels.append(f"D{start_d + i}")
+            elif isinstance(key, str):
+                # These are the analog channels ('A', 'B', etc.)
+                channels.append(key)
+
+        return channels
 
 
 class Library(object):
