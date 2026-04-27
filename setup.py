@@ -31,12 +31,12 @@ if not os.path.exists(signalfile):
 
 with open("README.md") as f:
     readme = f.read()
-    
+
 setup(
     name='picosdk',
     packages=['picosdk'],
     install_requires=["numpy>=1.12.1"],
-    version='2.0',
+    version='2.1',
     description='PicoSDK Python wrapper',
     long_description=readme,
     author='Pico Technology Ltd',
