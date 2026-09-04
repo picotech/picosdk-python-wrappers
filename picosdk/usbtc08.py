@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (C) 2015-2018 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
@@ -8,7 +8,6 @@ for TC-08 Thermocouple Data Logger using the usbtc08 driver API functions.
 
 from ctypes import *
 from picosdk.library import Library
-from picosdk.errors import ArgumentOutOfRangeError
 from picosdk.constants import make_enum
 
 class usbtc08lib(Library):
@@ -17,6 +16,14 @@ class usbtc08lib(Library):
 
 
 usbtc08 = usbtc08lib()
+
+# General defines from usbtc08.h.
+usbtc08.USBTC08_MAX_CHANNELS = 8            # channels 1 to 8; channel 0 is the cold junction
+usbtc08.USBTC08_MAX_SAMPLE_BUFFER = 600     # most readings usb_tc08_get_temp will ever return
+usbtc08.USBTC08_MAX_INFO_CHARS = 256
+usbtc08.USBTC08_MAX_DATE_CHARS = 9
+usbtc08.USBTC08_MAX_SERIAL_CHARS = 11
+usbtc08.USBTC08_MAX_VERSION_CHARS = 12
 
 usbtc08.USBTC08_UNITS = make_enum([
     "USBTC08_UNITS_CENTIGRADE",
@@ -32,8 +39,8 @@ class USBTC08_INFO(Structure):
                 ("PicoppVersion", c_int16),
 				("HardwareVersion", c_int16),
 				("Variant", c_int16),
-				("szSerial[USBTC08_MAX_SERIAL_CHAR]", c_char * 11),
-				("szCalDate[USBTC08_MAX_DATE_CHARS]", c_char * 9)]
+				("szSerial", c_char * 11),
+				("szCalDate", c_char * 9)]
 
 doc = """ int16_t usb_tc08_open_unit
     (
@@ -77,11 +84,11 @@ doc = """ int32_t usb_tc08_get_minimum_interval_ms
     (
 	    int16_t  handle
 	); """
-usbtc08.make_symbol("_get_minimum_interval_ms_","usb_tc08_get_minimum_interval_ms", c_int16, [c_int16], doc)
+usbtc08.make_symbol("_get_minimum_interval_ms_","usb_tc08_get_minimum_interval_ms", c_int32, [c_int16], doc)
 
 doc = """ int16_t usb_tc08_get_unit_info
     (
-	    int16_t  handle
+	    int16_t  handle,
 		USBTC08_INFO  *info
 	); """
 usbtc08.make_symbol("_get_unit_info_","usb_tc08_get_unit_info", c_int16, [c_int16, c_void_p], doc)
@@ -122,7 +129,7 @@ doc = """ int32_t usb_tc08_run
 	    int16_t  handle,
 		int32_t  interval
 	); """
-usbtc08.make_symbol("_run_","usb_tc08_run", c_int16, [c_int16, c_int32], doc)
+usbtc08.make_symbol("_run_","usb_tc08_run", c_int32, [c_int16, c_int32], doc)
 
 doc = """ int16_t usb_tc08_get_single
     (
@@ -144,7 +151,7 @@ doc = """ int32_t usb_tc08_get_temp
 		int16_t  units,
 		int16_t  fill_missing
 	); """
-usbtc08.make_symbol("_get_temp_","usb_tc08_get_temp", c_int16, [c_int16, c_void_p, c_void_p, c_int32, c_void_p, c_void_p, c_int16, c_int16], doc)
+usbtc08.make_symbol("_get_temp_","usb_tc08_get_temp", c_int32, [c_int16, c_void_p, c_void_p, c_int32, c_void_p, c_int16, c_int16, c_int16], doc)
 
 doc = """ int32_t usb_tc08_get_temp_deskew
     (
@@ -157,4 +164,4 @@ doc = """ int32_t usb_tc08_get_temp_deskew
 		int16_t  units,
 		int16_t  fill_missing
 	); """
-usbtc08.make_symbol("_get_temp_deskew_","usb_tc08_get_temp_deskew", c_int16, [c_int16, c_void_p, c_void_p, c_int32, c_void_p, c_int16, c_int16, c_int16], doc)
+usbtc08.make_symbol("_get_temp_deskew_","usb_tc08_get_temp_deskew", c_int32, [c_int16, c_void_p, c_void_p, c_int32, c_void_p, c_int16, c_int16, c_int16], doc)
