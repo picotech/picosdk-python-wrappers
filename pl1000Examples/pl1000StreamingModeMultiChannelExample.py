@@ -103,7 +103,7 @@ try:
                 handle,
                 ctypes.byref(read_buffer),
                 ctypes.byref(read_sample_count),    # gets modified on return (per channel)
-                ctypes.byref(overflow),             # Channel voltage over range bit flags (LSB is Ch0)
+                ctypes.byref(overflow),             # Channel voltage over range bit flags (LSB is Ch1)
                 ctypes.byref(triggerIndex)
             )
         )
@@ -145,16 +145,13 @@ print(f'Final captured_samples (Samples, NoOfChannels): {captured_samples.shape}
 print(f'Channel_list: {channel_list}')
 
 if overflow_seen:
-    # The raw field is reported rather than being attributed to particular
-    # channels. It is a bit field, but the bit-to-channel base is not stated in
-    # pl1000Api.h - the comment on the pl1000GetValues call above claims the LSB
-    # is channel 0, while the equivalent usbtc08 field puts channel 1 in bit 0.
-    # Indexing it by position in channel_list, as this line used to, blames the
-    # wrong channel for any list that does not start at 1 and run consecutively.
-    # Naming a channel wrongly is worse than not naming one, so confirm the
-    # mapping against the PicoLog 1000 Series documentation before decoding it.
-    print(f'Warning: an over-range was flagged during this capture.')
-    print(f'         raw overflow field = 0x{overflow_seen:04X}, enabled channels = {channel_list}')
+    # One bit per channel, least significant bit is channel 1, so channel N is
+    # bit N-1. Indexed by channel number rather than by position in
+    # channel_list, so a non-consecutive list such as (1, 2, 8) still reports
+    # the right channels.
+    over_range = [ch for ch in channel_list if overflow_seen & (1 << (ch - 1))]
+    print(f'Warning: channels over range during this capture: {over_range}')
+    print(f'         raw overflow field = 0x{overflow_seen:04X}')
 
 # ideal_no_of_samples samples per channel are taken over us_for_block
 # microseconds, so the rate is samples divided by the block length in seconds.
