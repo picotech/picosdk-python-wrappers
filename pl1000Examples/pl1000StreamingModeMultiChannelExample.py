@@ -145,9 +145,16 @@ print(f'Final captured_samples (Samples, NoOfChannels): {captured_samples.shape}
 print(f'Channel_list: {channel_list}')
 
 if overflow_seen:
-    # The flags are per channel, least significant bit first.
-    over_range = [channel_list[i] for i in range(n_channels) if overflow_seen & (1 << i)]
-    print(f'Warning: channels over range during this capture: {over_range}')
+    # The raw field is reported rather than being attributed to particular
+    # channels. It is a bit field, but the bit-to-channel base is not stated in
+    # pl1000Api.h - the comment on the pl1000GetValues call above claims the LSB
+    # is channel 0, while the equivalent usbtc08 field puts channel 1 in bit 0.
+    # Indexing it by position in channel_list, as this line used to, blames the
+    # wrong channel for any list that does not start at 1 and run consecutively.
+    # Naming a channel wrongly is worse than not naming one, so confirm the
+    # mapping against the PicoLog 1000 Series documentation before decoding it.
+    print(f'Warning: an over-range was flagged during this capture.')
+    print(f'         raw overflow field = 0x{overflow_seen:04X}, enabled channels = {channel_list}')
 
 # ideal_no_of_samples samples per channel are taken over us_for_block
 # microseconds, so the rate is samples divided by the block length in seconds.
