@@ -36,14 +36,12 @@ try:
     assert_pico_ok(status["setInterval"])
 
     # start streaming
-    # In BM_STREAM mode the count passed to pl1000Run is the size of the
-    # driver's circular buffer, in samples per channel - not the number of
-    # samples to collect. Sizing it to exactly the collection period leaves no
-    # headroom, so readings at the start can be overwritten before they are
-    # read. The pl1000Con C example uses a factor of ten for the same reason.
-    circularBufferSamples = requestedSamples * 2
+    # pl1000Run takes the number of samples to collect, and it is the same
+    # count that was passed to pl1000SetInterval above. Sizing it larger than
+    # that - to give the driver's buffer some headroom, for instance - makes
+    # the call fail on hardware.
     mode = pl.PL1000_BLOCK_METHOD["BM_STREAM"]
-    status["run"] = pl.pl1000Run(chandle, circularBufferSamples, mode)
+    status["run"] = pl.pl1000Run(chandle, requestedSamples, mode)
     assert_pico_ok(status["run"])
 
     sleep(usForBlock.value / 1000000)

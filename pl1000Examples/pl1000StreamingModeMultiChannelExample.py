@@ -22,6 +22,19 @@ channel_array = (ctypes.c_int16 * len(channel_list))()
 for i, ch in enumerate(channel_list):
     channel_array[i] = pl.PL1000Inputs[f"PL1000_CHANNEL_{ch}"]
 
+
+def over_range_channels(overflow_field):
+    """Return the enabled channels flagged over range in an overflow field.
+
+    The field carries one bit per channel and the least significant bit is
+    channel 1, so channel N is bit N-1. Indexing by channel number rather than
+    by position in channel_list matters for any list that is not consecutive
+    from 1: with channel_list = (1, 2, 8), bit 7 is channel 8, not the eighth
+    entry of the list.
+    """
+    return [ch for ch in channel_list if overflow_field & (1 << (ch - 1))]
+
+
 # Max streaming sample rate for
 # 1012 - with all 12 channels on is = 100k /12 = 8333S/s
 # 1216 - with all 16 channels on is = 100k /16 = 6250S/s
@@ -68,9 +81,11 @@ try:
     print(f'us_for_block: {us_for_block.value} us')
 
     # start acquisition
-    # In BM_STREAM mode this count is the size of the driver's circular buffer,
-    # in samples per channel. It holds one second of data here, and the loop
-    # below reads every 0.1 s, so it never fills.
+    # This count is read_buffer_size, the total across all channels, whereas
+    # pl1000SetInterval above was given the per-channel count. That is how this
+    # example has always been written; the single channel example fails if the
+    # two counts disagree, so it is worth confirming on hardware that this one
+    # is happy with the larger value.
     assert_pico_ok(
         pl.pl1000Run(
             handle,
@@ -98,6 +113,10 @@ try:
         # comes back as the number of samples per channel actually returned.
         read_sample_count = ctypes.c_uint32(read_buffer_size // n_channels)
 
+        # Cleared before every read so a flag left over from the previous
+        # iteration is not reported against this one.
+        overflow.value = 0
+
         assert_pico_ok(
             pl.pl1000GetValues(
                 handle,
@@ -115,6 +134,12 @@ try:
         overflow_seen |= overflow.value
 
         print(f"iteration {iteration_idx}: readout {samples_this_read} samples across {n_channels} channels")
+
+        # Report over range as it happens, so it can be tied to the reading
+        # that caused it rather than only to the capture as a whole.
+        if overflow.value:
+            print(f'  - OVER RANGE on channels {over_range_channels(overflow.value)}'
+                  f' (raw overflow field = 0x{overflow.value:04X})')
 
         read_samples_numpy_varsized = numpy.array(read_buffer[:samples_this_read * n_channels]) # get only the valid samples out of the read_buffer
         print(f'  - read_samples_numpy_varsized.shape: {read_samples_numpy_varsized.shape}')
@@ -145,12 +170,8 @@ print(f'Final captured_samples (Samples, NoOfChannels): {captured_samples.shape}
 print(f'Channel_list: {channel_list}')
 
 if overflow_seen:
-    # One bit per channel, least significant bit is channel 1, so channel N is
-    # bit N-1. Indexed by channel number rather than by position in
-    # channel_list, so a non-consecutive list such as (1, 2, 8) still reports
-    # the right channels.
-    over_range = [ch for ch in channel_list if overflow_seen & (1 << (ch - 1))]
-    print(f'Warning: channels over range during this capture: {over_range}')
+    # Summary of every channel flagged at any point in the capture loop above.
+    print(f'Warning: channels over range during this capture: {over_range_channels(overflow_seen)}')
     print(f'         raw overflow field = 0x{overflow_seen:04X}')
 
 # ideal_no_of_samples samples per channel are taken over us_for_block
