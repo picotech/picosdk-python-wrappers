@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (C) 2019 Pico Technology Ltd. See LICENSE file for terms.
 #
 """
@@ -7,7 +7,6 @@ file for PicoLog 1000 Series datalogger using the pl1000 driver API functions.
 """
 
 from ctypes import *
-from picosdk.ctypes_wrapper import C_CALLBACK_FUNCTION_FACTORY
 from picosdk.library import Library
 from picosdk.constants import make_enum
 
@@ -34,11 +33,20 @@ def _pl1000Inputs():
     PL1000_CHANNEL_14 = 14
     PL1000_CHANNEL_15 = 15
     PL1000_CHANNEL_16 = 16
-    PL1000_MAX_CHANNEL = PL1000_CHANNEL_16
-	
+    PL1000_MAX_CHANNELS = PL1000_CHANNEL_16
+    PL1000_MAX_CHANNEL = PL1000_CHANNEL_16  # retained: earlier spelling of PL1000_MAX_CHANNELS
+
     return {k.upper(): v for k, v in locals().items() if k.startswith("PL1000")}
-	
+
 pl1000.PL1000Inputs = _pl1000Inputs()
+
+# PL1000_MIN_PERIOD / PL1000_MAX_PERIOD from pl1000Api.h: the range accepted by
+# pl1000SetPulseWidth, in microseconds.
+pl1000.PL1000_MIN_PERIOD = 100
+pl1000.PL1000_MAX_PERIOD = 1800
+
+# Full-scale input range of the PicoLog 1000 Series, in millivolts.
+pl1000.PL1000_FULL_SCALE_MV = 2500
 
 pl1000.PL1000DO_Channel = make_enum([
     'PL1000_DO_CHANNEL_0',
@@ -70,7 +78,7 @@ doc = """ PICO_STATUS pl1000GetSingle
     (
 	    int16_t  handle,
 		PL1000_INPUTS  channel,
-		unit16_t  *value
+		uint16_t  *value
 	); """
 pl1000.make_symbol("_GetSingle_", "pl1000GetSingle", c_uint32, [c_int16, c_int32, c_void_p], doc)
 
@@ -89,7 +97,7 @@ doc = """ PICO_STATUS pl1000GetValues
 	    int16_t  handle,
 		uint16_t  *values,
 		uint32_t  *noOfValues,
-		unit16_t  *overflow,
+		uint16_t  *overflow,
 		uint32_t  *triggerIndex
 	); """
 pl1000.make_symbol("_GetValues_", "pl1000GetValues", c_uint32, [c_int16, c_void_p, c_void_p, c_void_p, c_void_p], doc)
@@ -166,7 +174,7 @@ doc = """ PICO_STATUS pl1000SetPulseWidth
 		uint16_t  period,
 		uint8_t  cycle
 	); """
-pl1000.make_symbol("_SetPulseWidth_", "pl1000SetPulseWidth", c_uint32, [c_int16, c_int16, c_int8], doc)
+pl1000.make_symbol("_SetPulseWidth_", "pl1000SetPulseWidth", c_uint32, [c_int16, c_uint16, c_uint8], doc)
 
 doc = """ PICO_STATUS pl1000SetTrigger
     (
