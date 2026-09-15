@@ -18,11 +18,11 @@ import math
 class FindTimebaseTest(DriverTest):
     def assertValidTimebases(self, input_config, output_info):
         if input_config.max_time_interval is not None:
-            self.assertLessEqual(output_info.time_interval, input_config.max_time_interval)
+            self.assertLessEqual(output_info.time_interval_ns, input_config.max_time_interval)
         if input_config.no_of_samples is not None:
             self.assertGreaterEqual(output_info.max_samples, input_config.no_of_samples)
         if input_config.min_collection_time is not None:
-            self.assertGreaterEqual(output_info.time_interval * output_info.max_samples,
+            self.assertGreaterEqual(output_info.time_interval_ns * output_info.max_samples,
                                     input_config.min_collection_time)
 
     def test_find_timebase_success(self):
@@ -134,10 +134,11 @@ class TimebaseValidationTest(unittest.TestCase):
         request = TimebaseOptions(max_time_interval=0.005,
                                   no_of_samples=None,
                                   min_collection_time=1.)
-        actual_timebase = 0.004
-        required_max_samples = int(math.ceil(request.min_collection_time / actual_timebase))
+        actual_timebase_s = 0.004
+        actual_timebase_ns = 0.004 * 1e9
+        required_max_samples = int(math.ceil(request.min_collection_time / actual_timebase_s))
         response = TimebaseInfo(timebase_id=7,
-                                time_interval=0.004,
+                                time_interval_ns=actual_timebase_ns,
                                 time_units=None,
                                 max_samples=required_max_samples+1,
                                 segment_id=0)
@@ -148,10 +149,11 @@ class TimebaseValidationTest(unittest.TestCase):
         request = TimebaseOptions(max_time_interval=0.005,
                                   no_of_samples=None,
                                   min_collection_time=1.)
-        actual_timebase = 0.004
-        required_max_samples = int(math.ceil(request.min_collection_time / actual_timebase))
+        actual_timebase_s = 0.004
+        actual_timebase_ns = 0.004 * 1e9
+        required_max_samples = int(math.ceil(request.min_collection_time / actual_timebase_s))
         response = TimebaseInfo(timebase_id=7,
-                                time_interval=0.004,
+                                time_interval_ns=actual_timebase_ns,
                                 time_units=None,
                                 max_samples=required_max_samples-5,
                                 segment_id=0)
