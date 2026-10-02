@@ -39,11 +39,11 @@ drivers_with_device_connected = [
 
 
 class TestFailAndError(Exception):
-    pass
+    __test__ = False
 
 
 class TestError(Exception):
-    pass
+    __test__ = False
 
 
 class DriverTest(_unittest.TestCase):
