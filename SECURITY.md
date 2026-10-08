@@ -13,12 +13,7 @@ disclosure good practice (ISO/IEC 29147 and 30111).
 Please report suspected security vulnerabilities **privately** — do not open a
 public GitHub issue for a security problem.
 
-Preferred channel:
-
-- **GitHub private vulnerability reporting** — use the *"Report a vulnerability"*
-  button under this repository's **Security** tab.
-
-Alternative channel:
+Report via:
 
 - **Email:** support@picotech.com — please encrypt sensitive details where
   possible.
