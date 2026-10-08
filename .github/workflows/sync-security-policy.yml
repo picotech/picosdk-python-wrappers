@@ -1,0 +1,44 @@
+name: sync-security-policy
+
+# Keeps SECURITY.md (repo root) in step with the shared copy in
+# picotech/picosdk-repo-standards. Commits only when the file has changed.
+#
+# Scheduled and manual runs use the workflow file on the default branch, so
+# nothing happens until this is merged to master. Use "Run workflow" once after
+# merging for the first sync.
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'   # Mondays 04:17 UTC
+  workflow_dispatch:        # "Run workflow" button for an immediate sync
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync SECURITY.md
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # push the updated file
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Fetch shared SECURITY.md
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/picotech/picosdk-repo-standards/master/SECURITY.md -o SECURITY.md
+
+      - name: Commit if changed
+        run: |
+          set -euo pipefail
+          git add SECURITY.md
+          if git diff --cached --quiet -- SECURITY.md; then
+            echo "SECURITY.md is up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Sync SECURITY.md from picosdk-repo-standards"
+          git push
