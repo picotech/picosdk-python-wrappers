@@ -60,10 +60,14 @@ class PicoSDKCtypesError(PicoError, IOError):
 class ClosedDeviceError(PicoError, IOError):
     pass
 
+class InvalidRangeOfChannel(PicoError, ValueError):
+    pass
 
 class NoChannelsEnabledError(PicoError, ValueError):
     pass
 
+class ChannelNotEnabledError(PicoError, ValueError):
+    pass
 
 class NoValidTimebaseForOptionsError(PicoError, ValueError):
     pass
