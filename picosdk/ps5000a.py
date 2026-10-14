@@ -1014,3 +1014,17 @@ doc = """ PICO_STATUS ps5000aGetMinimumTimebaseStateless
         PS5000A_DEVICE_RESOLUTION    resolution
     ); """
 ps5000a.make_symbol("_GetMinimumTimebaseStateless", "ps5000aGetMinimumTimebaseStateless", c_uint32, [c_int16, c_uint32, c_void_p, c_void_p, c_uint32], doc)    
+
+
+doc = """ PICO_STATUS ps5000aNearestSampleIntervalStateless
+    (
+        int16_t   handle,
+        PS5000A_CHANNEL_FLAGS   enabledChannelOrPortFlags,
+        double		timeIntervalRequested,
+        PS5000A_DEVICE_RESOLUTION resolution,
+        uint16_t	useEts,
+        uint32_t	* timebase,
+        double		* timeIntervalAvailable
+    ); """
+ps5000a.make_symbol("_GetNearestTimebaseStateless", "ps5000aNearestSampleIntervalStateless", c_uint32, [c_int16, c_uint32, c_double, c_uint32, c_uint16, c_void_p, c_void_p], doc)
+
