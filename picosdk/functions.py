@@ -19,8 +19,10 @@ def adc2mV(bufferADC, range, maxADC):
     """
 
     channelInputRanges = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
-    vRange = channelInputRanges[range]
-    bufferV = [(np.int64(x) * vRange) / maxADC.value for x in bufferADC]
+    # vRange = channelInputRanges[range]
+    # bufferV = [(np.int64(x) * vRange) / maxADC.value for x in bufferADC]
+    normRange = channelInputRanges[range]/maxADC.value
+    bufferV =  np.ctypeslib.as_array(bufferADC) * normRange
     
     return bufferV
 	
@@ -35,7 +37,9 @@ def adc2mVpl1000(bufferADC, range, maxADC):
 		Takes a buffer of raw adc count values and converts it into millvolts
 	"""
 	
-	bufferV = [(x * range) / maxADC.value for x in bufferADC]
+	#bufferV = [(x * range) / maxADC.value for x in bufferADC]
+	normRange = range/maxADC.value
+	bufferV =  np.ctypeslib.as_array(bufferADC) * normRange   
 	
 	return bufferV
 
@@ -196,6 +200,8 @@ def adc2mVV2(bufferADC, rangeMax, maxADC):
                
         Takes a buffer of raw adc count values and converts it into millivolts for psospa driver scopes
     """
-    buffermV = [(x * (rangeMax/1000000)) / maxADC.value for x in bufferADC]
+    #buffermV = [(x * (rangeMax/1000000)) / maxADC.value for x in bufferADC]
+    normRange = (rangeMax/1000000)/maxADC.value
+    buffermV =  np.ctypeslib.as_array(bufferADC) * normRange
     
     return buffermV
