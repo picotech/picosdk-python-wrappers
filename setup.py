@@ -15,11 +15,17 @@ signalfile = ".sdkwarning"
 atleast1dll = 0
 if not os.path.exists(signalfile):
     for name in ['ps2000', 'ps3000', 'ps4000', 'ps5000', 'ps2000a', 'ps3000a', 'ps4000a', 'ps5000a', 'ps6000a', 'ps6000', 'psospa']:
+        # find_library() returns None when the DLL is not found, and
+        # WinDLL(None) / LoadLibrary(None) raise TypeError instead of OSError.
+        library_path = find_library(name)
+        if library_path is None:
+            print(f"Warning: PicoSDK installation is missing {name}.dll")
+            continue
         try:
             if sys.platform == 'win32':
-                result = ctypes.WinDLL(find_library(name))
+                result = ctypes.WinDLL(library_path)
             else:
-                result = cdll.LoadLibrary(find_library(name))
+                result = cdll.LoadLibrary(library_path)
             atleast1dll = 1
         except OSError:
             print(f"Warning: PicoSDK installation is missing {name}.dll")
